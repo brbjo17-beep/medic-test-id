@@ -1,90 +1,429 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medic Test ID</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medic Test ID</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f5f7fa;
-      color: #222;
-    }
+<style>
+* { box-sizing: border-box; }
 
-    header {
-      text-align: center;
-      padding: 60px 20px 40px;
-      background: white;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  color: #1f2937;
+}
 
-    header h1 {
-      font-size: 42px;
-      margin-bottom: 10px;
-    }
+header {
+  background: white;
+  padding: 35px 20px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
 
-    header p {
-      color: #666;
-      font-size: 18px;
-    }
+header h1 {
+  margin: 0;
+  font-size: 38px;
+}
 
-    main {
-      max-width: 900px;
-      margin: auto;
-      padding: 30px 20px;
-    }
+header p {
+  color: #666;
+}
 
-    h2 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 35px 20px;
+}
 
-    .subjects {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-    }
+h2 { text-align: center; }
 
-    .subject {
-      background: white;
-      padding: 30px 20px;
-      border-radius: 14px;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      box-shadow: 0 3px 12px rgba(0,0,0,.08);
-      cursor: pointer;
-    }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+  gap: 15px;
+  margin-top: 30px;
+}
 
-    .subject:hover {
-      transform: translateY(-3px);
-    }
-  </style>
+.card {
+  background: white;
+  padding: 28px 15px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid #ddd;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.hidden { display: none; }
+
+.back {
+  cursor: pointer;
+  margin-bottom: 25px;
+  display: inline-block;
+  font-weight: bold;
+}
+
+.quiz-box {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+}
+
+.option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 15px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.option.selected {
+  border: 2px solid #222;
+  background: #eee;
+}
+
+.next {
+  width: 100%;
+  padding: 15px;
+  border: 0;
+  border-radius: 8px;
+  background: #222;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.progress {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.review {
+  background: white;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 10px;
+}
+
+.score {
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  margin: 25px;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <h1>Medic Test ID</h1>
-  <p>Latihan soal kedokteran Indonesia</p>
+<h1>Medic Test ID</h1>
+<p>Latihan soal kedokteran Indonesia</p>
 </header>
 
-<main>
+<div class="container">
 
-  <h2>Pilih Materi</h2>
+<!-- HALAMAN MATERI -->
+<section id="subjects">
+<h2>Pilih Materi</h2>
 
-  <div class="subjects">
-    <div class="subject">Anatomi</div>
-    <div class="subject">Fisiologi</div>
-    <div class="subject">Histologi</div>
-    <div class="subject">Biokimia</div>
-    <div class="subject">Farmakologi</div>
-    <div class="subject">Mikrobiologi</div>
-    <div class="subject">Parasitologi</div>
-  </div>
+<div class="grid">
+<div class="card" onclick="openSubject('Anatomi')">Anatomi</div>
+<div class="card" onclick="openSubject('Fisiologi')">Fisiologi</div>
+<div class="card" onclick="openSubject('Histologi')">Histologi</div>
+<div class="card" onclick="openSubject('Biokimia')">Biokimia</div>
+<div class="card" onclick="openSubject('Farmakologi')">Farmakologi</div>
+<div class="card" onclick="openSubject('Mikrobiologi')">Mikrobiologi</div>
+<div class="card" onclick="openSubject('Parasitologi')">Parasitologi</div>
+</div>
+</section>
 
-</main>
+<!-- HALAMAN BANK -->
+<section id="banks" class="hidden">
+
+<span class="back" onclick="home()">← Kembali</span>
+
+<h2 id="subject-title"></h2>
+
+<div class="grid">
+<div class="card" onclick="startQuiz()">Bank 1</div>
+<div class="card">Bank 2 — Segera</div>
+<div class="card">Bank 3 — Segera</div>
+</div>
+
+</section>
+
+<!-- HALAMAN SOAL -->
+<section id="quiz" class="hidden">
+
+<span class="back" onclick="backBanks()">← Keluar dari soal</span>
+
+<div class="quiz-box">
+
+<div class="progress" id="progress"></div>
+
+<h3 id="question"></h3>
+
+<div id="options"></div>
+
+<button class="next" onclick="nextQuestion()">Selanjutnya</button>
+
+</div>
+</section>
+
+<!-- HASIL -->
+<section id="result" class="hidden">
+
+<h2>Hasil Latihan</h2>
+
+<div class="score" id="score"></div>
+
+<div id="review"></div>
+
+<button class="next" onclick="home()">Kembali ke Beranda</button>
+
+</section>
+
+</div>
+
+<script>
+
+let currentSubject = "";
+let currentQuestion = 0;
+let answers = [];
+let selected = null;
+
+/* SOAL CONTOH */
+const questions = [
+
+{
+question: "Organ manakah yang memompa darah ke seluruh tubuh?",
+options: [
+"Paru-paru",
+"Jantung",
+"Ginjal",
+"Hepar",
+"Pankreas"
+],
+answer: 1,
+explanation:
+"Jantung berfungsi sebagai pompa utama sistem kardiovaskular yang mempertahankan aliran darah ke sirkulasi pulmonal dan sistemik."
+},
+
+{
+question: "Ion utama yang berada dalam konsentrasi tinggi di cairan ekstrasel adalah?",
+options: [
+"Kalium (K⁺)",
+"Magnesium (Mg²⁺)",
+"Natrium (Na⁺)",
+"Fosfat",
+"Protein"
+],
+answer: 2,
+explanation:
+"Natrium merupakan kation utama cairan ekstrasel, sedangkan kalium merupakan kation utama cairan intrasel."
+},
+
+{
+question: "Reseptor beta-1 adrenergik terutama banyak ditemukan pada?",
+options: [
+"Jantung",
+"Bronkus",
+"Uterus",
+"Pembuluh darah kulit",
+"Saluran cerna"
+],
+answer: 0,
+explanation:
+"Reseptor β1 terutama terdapat pada jantung. Aktivasi β1 meningkatkan frekuensi jantung, kontraktilitas, dan konduksi."
+}
+
+];
+
+function hideAll(){
+document.getElementById("subjects").classList.add("hidden");
+document.getElementById("banks").classList.add("hidden");
+document.getElementById("quiz").classList.add("hidden");
+document.getElementById("result").classList.add("hidden");
+}
+
+function home(){
+hideAll();
+document.getElementById("subjects").classList.remove("hidden");
+}
+
+function openSubject(subject){
+currentSubject = subject;
+
+hideAll();
+
+document.getElementById("banks").classList.remove("hidden");
+document.getElementById("subject-title").innerText =
+"Bank Soal " + subject;
+}
+
+function backBanks(){
+hideAll();
+document.getElementById("banks").classList.remove("hidden");
+}
+
+function startQuiz(){
+
+currentQuestion = 0;
+answers = [];
+selected = null;
+
+hideAll();
+document.getElementById("quiz").classList.remove("hidden");
+
+showQuestion();
+}
+
+function showQuestion(){
+
+selected = null;
+
+let q = questions[currentQuestion];
+
+document.getElementById("progress").innerText =
+"Soal " + (currentQuestion + 1) + " dari " + questions.length;
+
+document.getElementById("question").innerText = q.question;
+
+let optionHTML = "";
+
+q.options.forEach((option,index)=>{
+
+optionHTML +=
+`<button class="option"
+onclick="selectOption(${index},this)">
+${String.fromCharCode(65+index)}. ${option}
+</button>`;
+
+});
+
+document.getElementById("options").innerHTML = optionHTML;
+
+}
+
+function selectOption(index,element){
+
+selected = index;
+
+document.querySelectorAll(".option")
+.forEach(x=>x.classList.remove("selected"));
+
+element.classList.add("selected");
+
+}
+
+function nextQuestion(){
+
+if(selected === null){
+alert("Pilih jawaban terlebih dahulu.");
+return;
+}
+
+answers.push(selected);
+
+currentQuestion++;
+
+if(currentQuestion < questions.length){
+
+showQuestion();
+
+}else{
+
+showResult();
+
+}
+
+}
+
+function showResult(){
+
+hideAll();
+
+document.getElementById("result").classList.remove("hidden");
+
+let correct = 0;
+
+answers.forEach((answer,index)=>{
+if(answer === questions[index].answer){
+correct++;
+}
+});
+
+let percentage =
+Math.round((correct/questions.length)*100);
+
+document.getElementById("score").innerText =
+percentage + "% (" + correct + "/" + questions.length + " benar)";
+
+let reviewHTML = "";
+
+answers.forEach((answer,index)=>{
+
+let q = questions[index];
+
+if(answer !== q.answer){
+
+reviewHTML += `
+
+<div class="review">
+
+<h3>Soal ${index+1}</h3>
+
+<p>${q.question}</p>
+
+<p>
+<strong>Jawabanmu:</strong>
+${String.fromCharCode(65+answer)}.
+${q.options[answer]}
+</p>
+
+<p>
+<strong>Jawaban benar:</strong>
+${String.fromCharCode(65+q.answer)}.
+${q.options[q.answer]}
+</p>
+
+<p>
+<strong>Pembahasan:</strong><br>
+${q.explanation}
+</p>
+
+</div>
+
+`;
+
+}
+
+});
+
+if(reviewHTML === ""){
+reviewHTML =
+"<div class='review'><strong>Semua jawaban benar. Mantap.</strong></div>";
+}
+
+document.getElementById("review").innerHTML = reviewHTML;
+
+}
+
+</script>
 
 </body>
 </html>
