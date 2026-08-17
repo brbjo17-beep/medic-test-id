@@ -6,123 +6,280 @@
 <title>Medic Test ID</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
-  color: #1f2937;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background:
+    radial-gradient(circle at top left, #e0f2fe 0, transparent 28%),
+    radial-gradient(circle at top right, #ede9fe 0, transparent 30%),
+    #f8fafc;
+  color: #1e293b;
+  min-height: 100vh;
 }
 
+/* HEADER */
+
 header {
-  background: white;
-  padding: 35px 20px;
+  background: linear-gradient(135deg, #0f766e, #2563eb);
+  color: white;
+  padding: 55px 20px 50px;
   text-align: center;
-  border-bottom: 1px solid #ddd;
+  box-shadow: 0 8px 30px rgba(15, 118, 110, 0.18);
 }
 
 header h1 {
   margin: 0;
-  font-size: 38px;
+  font-size: clamp(34px, 6vw, 52px);
+  letter-spacing: -1px;
 }
 
 header p {
-  color: #666;
+  margin: 10px 0 0;
+  font-size: 17px;
+  opacity: 0.9;
 }
+
+/* CONTAINER */
 
 .container {
-  max-width: 900px;
+  width: min(1000px, 92%);
   margin: auto;
-  padding: 35px 20px;
+  padding: 45px 0 70px;
 }
 
-h2 { text-align: center; }
+h2 {
+  text-align: center;
+  font-size: 28px;
+  margin: 0 0 30px;
+}
+
+/* GRID MATERI DAN BANK */
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
-  gap: 15px;
-  margin-top: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 18px;
 }
 
 .card {
-  background: white;
-  padding: 28px 15px;
-  border-radius: 12px;
+  background: rgba(255,255,255,0.92);
+  padding: 30px 20px;
+  border-radius: 18px;
   text-align: center;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(148,163,184,0.22);
+  box-shadow: 0 8px 25px rgba(15,23,42,0.07);
+  transition: 0.22s ease;
 }
 
 .card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(15,23,42,0.13);
+  border-color: #3b82f6;
 }
 
-.hidden { display: none; }
+.card:active {
+  transform: scale(0.98);
+}
+
+/* HALAMAN TERSEMBUNYI */
+
+.hidden {
+  display: none;
+}
+
+/* KEMBALI */
 
 .back {
-  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin-bottom: 25px;
-  display: inline-block;
-  font-weight: bold;
+  padding: 10px 15px;
+  background: white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(15,23,42,0.06);
+  transition: 0.2s;
 }
 
-.quiz-box {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
+.back:hover {
+  transform: translateX(-3px);
 }
+
+/* QUIZ */
+
+.quiz-box {
+  max-width: 760px;
+  margin: auto;
+  background: white;
+  padding: 32px;
+  border-radius: 22px;
+  box-shadow: 0 15px 45px rgba(15,23,42,0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.progress {
+  display: inline-block;
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+#question {
+  font-size: 21px;
+  line-height: 1.55;
+  margin-top: 5px;
+  margin-bottom: 25px;
+}
+
+/* PILIHAN JAWABAN */
 
 .option {
   display: block;
   width: 100%;
   text-align: left;
-  padding: 15px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  background: white;
-  border-radius: 8px;
+  padding: 16px 18px;
+  margin: 12px 0;
+  border: 1.5px solid #dbe3ec;
+  background: #ffffff;
+  color: #1e293b;
+  border-radius: 13px;
   cursor: pointer;
   font-size: 16px;
+  line-height: 1.45;
+  transition: 0.18s ease;
+}
+
+.option:hover:not(:disabled) {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  transform: translateX(3px);
 }
 
 .option.selected {
-  border: 2px solid #222;
-  background: #eee;
+  border-color: #2563eb;
+  background: #eff6ff;
 }
+
+.option:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+/* NEXT BUTTON */
 
 .next {
+  display: block;
   width: 100%;
-  padding: 15px;
-  border: 0;
-  border-radius: 8px;
-  background: #222;
+  padding: 16px 20px;
+  margin-top: 25px;
+  border: none;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #0f766e, #2563eb);
   color: white;
   font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
-  margin-top: 20px;
+  box-shadow: 0 7px 20px rgba(37,99,235,0.18);
+  transition: 0.2s;
 }
 
-.progress {
-  color: #666;
-  margin-bottom: 20px;
+.next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(37,99,235,0.25);
+}
+
+/* HASIL */
+
+.score {
+  max-width: 500px;
+  margin: 20px auto 35px;
+  background: linear-gradient(135deg, #ecfdf5, #eff6ff);
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 36px;
+  font-weight: 800;
+  box-shadow: 0 10px 30px rgba(15,23,42,0.08);
 }
 
 .review {
+  max-width: 760px;
+  margin: 18px auto;
   background: white;
-  padding: 20px;
-  margin: 15px 0;
-  border-radius: 10px;
+  padding: 24px;
+  border-radius: 16px;
+  border-left: 5px solid #ef4444;
+  box-shadow: 0 8px 25px rgba(15,23,42,0.06);
 }
 
-.score {
-  text-align: center;
-  font-size: 32px;
-  font-weight: bold;
-  margin: 25px;
+.review h3 {
+  margin-top: 0;
+}
+
+/* PEMBAHASAN LANGSUNG */
+
+#instant-explanation {
+  border-left: 5px solid #2563eb;
+  background: #f8fafc !important;
+  padding: 20px !important;
+  border-radius: 12px !important;
+  line-height: 1.7 !important;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+  header {
+    padding: 38px 18px;
+  }
+
+  header h1 {
+    font-size: 34px;
+  }
+
+  .container {
+    width: 94%;
+    padding-top: 28px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .card {
+    padding: 22px 10px;
+    font-size: 15px;
+  }
+
+  .quiz-box {
+    padding: 21px 17px;
+    border-radius: 16px;
+  }
+
+  #question {
+    font-size: 18px;
+  }
+
+  .option {
+    font-size: 15px;
+    padding: 14px;
+  }
+
 }
 </style>
 </head>
