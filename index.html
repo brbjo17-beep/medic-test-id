@@ -281,32 +281,546 @@ h2 {
   }
 
 }
+/* ===== MEDIC TEST ID HOMEPAGE ===== */
+
+.hero {
+  min-height: 78vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 20px;
+  background:
+    linear-gradient(rgba(15, 23, 42, 0.50), rgba(15, 23, 42, 0.58)),
+    radial-gradient(circle at top left, #14b8a6 0%, transparent 35%),
+    radial-gradient(circle at bottom right, #3b82f6 0%, transparent 35%),
+    #0f172a;
+  color: white;
+}
+
+.hero-content {
+  max-width: 820px;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 9px 15px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(255,255,255,0.22);
+  backdrop-filter: blur(8px);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(48px, 8vw, 78px);
+  line-height: 1;
+  letter-spacing: -3px;
+}
+
+.hero-subtitle {
+  max-width: 680px;
+  margin: 20px auto 0;
+  font-size: 20px;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.88);
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.primary-btn,
+.secondary-btn,
+.support-btn {
+  border: none;
+  border-radius: 13px;
+  padding: 15px 22px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.primary-btn {
+  background: white;
+  color: #0f766e;
+}
+
+.secondary-btn {
+  background: rgba(255,255,255,0.12);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.support-btn:hover {
+  transform: translateY(-3px);
+}
+
+.hero-small {
+  margin-top: 22px;
+  color: rgba(255,255,255,0.72);
+  font-size: 14px;
+}
+
+.welcome-section,
+.meme-section,
+.about-section,
+.support-section {
+  margin: 70px 0;
+}
+
+.welcome-card,
+.about-card,
+.support-card {
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 15px 45px rgba(15,23,42,0.08);
+}
+
+.welcome-card {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.welcome-emoji {
+  font-size: 48px;
+}
+
+.welcome-card h2,
+.about-card h2,
+.support-card h2 {
+  text-align: left;
+  margin: 0 0 12px;
+}
+
+.welcome-card p,
+.about-card p,
+.support-card p {
+  line-height: 1.75;
+  color: #475569;
+}
+
+.meme-section h2 {
+  margin-bottom: 25px;
+}
+
+.meme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.meme-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 28px rgba(15,23,42,0.06);
+}
+
+.meme-big {
+  font-size: 44px;
+  margin-bottom: 15px;
+}
+
+.meme-card p {
+  margin-bottom: 8px;
+  font-size: 17px;
+}
+
+.meme-card span {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.section-label {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.about-note {
+  margin-top: 22px;
+  padding: 18px;
+  background: #ecfeff;
+  border-left: 5px solid #14b8a6;
+  border-radius: 12px;
+  font-weight: 700;
+  color: #115e59;
+}
+
+.section-heading {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.section-heading h2 {
+  margin: 4px 0 8px;
+}
+
+.section-heading p {
+  color: #64748b;
+}
+
+.subject-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.card strong {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.subject-status {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.subject-status.coming {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.support-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  align-items: center;
+}
+
+.support-btn {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: white;
+  box-shadow: 0 8px 22px rgba(249,115,22,0.22);
+}
+
+@media (max-width: 800px) {
+  .meme-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .support-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .support-btn {
+    width: 100%;
+  }
+
+  .welcome-card {
+    flex-direction: column;
+  }
+
+  .hero {
+    min-height: 70vh;
+    padding: 60px 18px;
+  }
+
+  .hero h1 {
+    letter-spacing: -2px;
+  }
+
+  .hero-subtitle {
+    font-size: 17px;
+  }
+}
+  .hero-description {
+  max-width: 680px;
+  margin: 14px auto;
+  font-size: 16px;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.82);
+}
+
+.hero-message {
+  margin: 25px auto 8px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: white;
+}
+
+.hero-signature {
+  margin: 8px 0 25px;
+  font-size: 15px;
+  font-style: italic;
+  color: rgba(255,255,255,0.65);
+}
+/* ===== WELCOME SCREEN ===== */
+
+.welcome-screen {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  overflow: hidden;
+
+  background-image: url("images/welcome-bg.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.welcome-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.72);
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 2;
+  width: min(850px, 92%);
+  text-align: center;
+}
+
+.welcome-title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(64px, 10vw, 120px);
+  font-weight: 500;
+  color: #111827;
+  letter-spacing: -3px;
+}
+
+.welcome-text {
+  max-width: 760px;
+  margin: 24px auto 30px;
+  color: #6b7280;
+  font-size: 16px;
+  line-height: 1.85;
+}
+
+.start-title {
+  margin: 20px 0 12px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 38px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.start-button {
+  position: relative;
+  width: min(360px, 90%);
+  height: 88px;
+  border: none;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+
+  background-image:
+    linear-gradient(rgba(0,80,140,0.20), rgba(0,80,140,0.20)),
+    url("images/start-sea.jpg");
+
+  background-size: cover;
+  background-position: center;
+
+  box-shadow: 0 16px 40px rgba(15,23,42,0.18);
+  transition: 0.25s ease;
+}
+
+.start-button span {
+  position: relative;
+  z-index: 2;
+  color: white;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 600;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+
+.start-button:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 50px rgba(15,23,42,0.24);
+}
 </style>
 </head>
 
 <body>
 
-<header>
-<h1>Medic Test ID</h1>
-<p>Latihan soal kedokteran Indonesia</p>
-</header>
+<section id="welcome-screen" class="welcome-screen">
+
+  <div class="welcome-overlay"></div>
+
+  <div class="welcome-content">
+
+    <h1 class="welcome-title">Welcome</h1>
+
+    <p class="welcome-text">
+      Halo semua, <strong>medstu</strong> di sini. Kalau kalian lagi bingung
+      mau mulai belajar dari mana, sedang persiapan ujian, atau cuma ingin
+      latihan soal kedokteran dalam Bahasa Indonesia, kalian datang ke tempat
+      yang tepat.
+      <br><br>
+      Aku pernah ada di posisi itu juga—bingung mau belajar apa, mulai dari mana,
+      dan rasanya materi nggak pernah ada habisnya. Karena itu, aku bikin
+      <strong>Medic Test ID</strong> sebagai tempat kita latihan dan belajar bareng.
+      <br><br>
+      Nggak apa-apa kalau belum tahu semuanya.
+      <strong>Kita sama-sama masih belajar.</strong>
+      <br><br>
+      — medstu
+    </p>
+
+    <h2 class="start-title">Mulai</h2>
+
+    <button class="start-button" onclick="showSubjects()">
+      <span>Mulai Latihan</span>
+    </button>
+
+  </div>
+
+</section>
 
 <div class="container">
 
-<!-- HALAMAN MATERI -->
-<section id="subjects">
-<h2>Pilih Materi</h2>
+  <!-- ABOUT -->
+  <section id="about-section" class="about-section">
 
-<div class="grid">
-<div class="card" onclick="openSubject('Anatomi')">Anatomi</div>
-<div class="card" onclick="openSubject('Fisiologi')">Fisiologi</div>
-<div class="card" onclick="openSubject('Histologi')">Histologi</div>
-<div class="card" onclick="openSubject('Biokimia')">Biokimia</div>
-<div class="card" onclick="openSubject('Farmakologi')">Farmakologi</div>
-<div class="card" onclick="openSubject('Mikrobiologi')">Mikrobiologi</div>
-<div class="card" onclick="openSubject('Parasitologi')">Parasitologi</div>
+    <div class="about-card">
+
+      <span class="section-label">Tentang Medic Test ID</span>
+
+      <h2>Kenapa website ini dibuat?</h2>
+
+      <p>
+        Medic Test ID berawal dari kebutuhan sederhana:
+        belajar kedokteran itu sudah cukup berat tanpa harus menghabiskan
+        waktu mencari soal yang sesuai, menerjemahkan materi,
+        atau bingung harus mulai dari mana.
+      </p>
+
+      <p>
+        Website ini dibuat sebagai tempat latihan yang sederhana,
+        nyaman, dan mudah diakses mahasiswa kedokteran Indonesia.
+        Fokusnya bukan sekadar mendapat skor tinggi,
+        tetapi memahami kenapa suatu jawaban benar dan kenapa kita salah.
+      </p>
+
+      <p>
+        Semua bank soal akan terus dikembangkan agar Medic Test ID
+        dapat digunakan dalam jangka panjang sebagai teman belajar,
+        terutama ketika kepala sudah penuh dan kamu cuma butuh satu tempat
+        untuk mulai latihan.
+      </p>
+
+      <div class="about-note">
+        💙 Tidak harus pintar dulu untuk mulai latihan.
+        Justru kita latihan karena belum tahu semuanya.
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- SUBJECTS -->
+<section id="subjects" class="hidden">
+
+    <div class="section-heading">
+      <span class="section-label">Question Bank</span>
+      <h2>Mau berantem sama materi yang mana hari ini?</h2>
+      <p>Pilih bidang lalu pilih bank soal.</p>
+    </div>
+
+    <div class="grid">
+
+      <div class="card" onclick="openSubject('Anatomi')">
+        <div class="subject-icon">🫀</div>
+        <strong>Anatomi</strong>
+        <span class="subject-status">2 bank tersedia</span>
+      </div>
+
+      <div class="card" onclick="openSubject('Fisiologi')">
+        <div class="subject-icon">⚡</div>
+        <strong>Fisiologi</strong>
+        <span class="subject-status coming">Segera hadir</span>
+      </div>
+
+      <div class="card" onclick="openSubject('Histologi')">
+        <div class="subject-icon">🔬</div>
+        <strong>Histologi</strong>
+        <span class="subject-status coming">Segera hadir</span>
+      </div>
+
+      <div class="card" onclick="openSubject('Biokimia')">
+        <div class="subject-icon">🧪</div>
+        <strong>Biokimia</strong>
+        <span class="subject-status coming">Segera hadir</span>
+      </div>
+
+      <div class="card" onclick="openSubject('Farmakologi')">
+        <div class="subject-icon">💊</div>
+        <strong>Farmakologi</strong>
+        <span class="subject-status coming">Segera hadir</span>
+      </div>
+
+      <div class="card" onclick="openSubject('Mikrobiologi')">
+        <div class="subject-icon">🦠</div>
+        <strong>Mikrobiologi</strong>
+        <span class="subject-status coming">Segera hadir</span>
+      </div>
+
+      <div class="card" onclick="openSubject('Parasitologi')">
+        <div class="subject-icon">🪱</div>
+        <strong>Parasitologi</strong>
+        <span class="subject-status coming">Segera hadir</span>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- SUPPORT -->
+  <section class="support-section">
+
+    <div class="support-card">
+
+      <div>
+        <span class="section-label">Support the project</span>
+        <h2>Suka Medic Test ID?</h2>
+
+        <p>
+          Website ini dibuat dan dikembangkan secara mandiri.
+          Kalau suatu hari Medic Test ID membantu kamu melewati ujian,
+          kamu bisa ikut membantu website ini tetap hidup.
+        </p>
+      </div>
+
+      <button class="support-btn" onclick="supportComingSoon()">
+        ☕ Traktir pembuatnya
+      </button>
+
+    </div>
+
+  </section>
 </div>
-</section>
 
 <!-- HALAMAN BANK -->
 <section id="banks" class="hidden">
@@ -359,6 +873,25 @@ h2 {
 </div>
 
 <script>
+  function showSubjects() {
+  document.getElementById("welcome-screen").classList.add("hidden");
+  document.getElementById("subjects").classList.remove("hidden");
+}
+  function scrollToSubjects() {
+  document.getElementById("subjects").scrollIntoView({
+    behavior: "smooth"
+  });
+}
+
+function scrollToAbout() {
+  document.getElementById("about-section").scrollIntoView({
+    behavior: "smooth"
+  });
+}
+
+function supportComingSoon() {
+  alert("Fitur dukungan untuk Medic Test ID sedang disiapkan 💙");
+}
 
 let currentSubject = "";
 let currentQuestion = 0;
