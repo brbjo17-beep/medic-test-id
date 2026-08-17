@@ -821,19 +821,58 @@ h2 {
 </div>
 
 <!-- HALAMAN BANK -->
-<section id="banks" class="hidden">
+<section id="banks" class="hidden subject-page">
 
-<span class="back" onclick="home()">← Kembali</span>
+  <div class="subject-page-inner">
 
-<h2 id="subject-title"></h2>
+    <button class="subject-back" onclick="home()">
+      ← Materi
+    </button>
 
-<div class="grid">
-<div class="card" onclick="startQuiz('Bank 1')">Bank 1</div>
-<div class="card" onclick="startQuiz('Bank 2')">Bank 2</div>
-<div class="card" onclick="startQuiz('Bank 3')">Bank 3</div>
-<div class="card" onclick="startQuiz('Bank 4')">Bank 4</div>
-<div class="card" onclick="startQuiz('Bank 5')">Bank 5</div>
-</div>
+    <div class="subject-heading">
+      <h1 id="subject-title"></h1>
+
+      <p id="subject-quote">
+        Kalau semua struktur terasa mirip, berarti kamu sedang belajar anatomi dengan benar.
+      </p>
+    </div>
+
+    <div class="bank-grid">
+
+      <button class="bank-card" onclick="startQuiz('Bank 1')">
+        <span>Bank 1</span>
+    <small class="bank-count" data-bank="Bank 1"></small>
+      </button>
+
+      <button class="bank-card" onclick="startQuiz('Bank 2')">
+        <span>Bank 2</span>
+<small class="bank-count" data-bank="Bank 2"></small>
+      </button>
+
+      <button class="bank-card" onclick="startQuiz('Bank 3')">
+        <span>Bank 3</span>
+<small class="bank-count" data-bank="Bank 3"></small>
+      </button>
+
+      <button class="bank-card" onclick="startQuiz('Bank 4')">
+        <span>Bank 4</span>
+<small class="bank-count" data-bank="Bank 4"></small>
+      </button>
+
+      <button class="bank-card" onclick="startQuiz('Bank 5')">
+        <span>Bank 5</span>
+<small class="bank-count" data-bank="Bank 5"></small>
+      </button>
+
+    </div>
+
+    <div class="subject-support">
+      <button onclick="supportComingSoon()">
+        ☕ Traktir medstu
+      </button>
+    </div>
+
+  </div>
 
 </section>
 
@@ -2423,13 +2462,24 @@ document.getElementById("subjects").classList.remove("hidden");
 }
 
 function openSubject(subject){
-currentSubject = subject;
+  currentSubject = subject;
 
-hideAll();
+  hideAll();
 
-document.getElementById("banks").classList.remove("hidden");
-document.getElementById("subject-title").innerText =
-"Bank Soal " + subject;
+  document.getElementById("banks").classList.remove("hidden");
+
+  document.getElementById("subject-title").innerText = subject;
+
+  document.querySelectorAll(".bank-count").forEach(function(el) {
+    const bankName = el.dataset.bank;
+    const bank = questionBanks[currentSubject]?.[bankName];
+
+    if (bank && bank.length > 0) {
+      el.innerText = bank.length + " soal";
+    } else {
+      el.innerText = "Belum tersedia";
+    }
+  });
 }
 
 function backBanks(){
