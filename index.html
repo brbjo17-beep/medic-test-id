@@ -872,22 +872,23 @@ h2 {
 
 <script>
 function showSubjects() {
-  document.getElementById("welcome-screen").classList.add("hidden");
-  document.getElementById("subjects").classList.remove("hidden");
-
+  const welcome = document.getElementById("welcome-screen");
+  const subjects = document.getElementById("subjects");
   const about = document.getElementById("about-section");
+
+  if (welcome) {
+    welcome.style.display = "none";
+  }
+
   if (about) {
     about.style.display = "none";
   }
 
-  document.getElementById("subjects").scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
-}
-  document.getElementById("subjects").scrollIntoView({
-    behavior: "smooth"
-  });
+  if (subjects) {
+    subjects.classList.remove("hidden");
+    subjects.style.display = "block";
+    window.scrollTo(0, 0);
+  }
 }
 
 function scrollToAbout() {
