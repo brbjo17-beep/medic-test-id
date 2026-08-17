@@ -159,9 +159,11 @@ h2 { text-align: center; }
 <h2 id="subject-title"></h2>
 
 <div class="grid">
-<div class="card" onclick="startQuiz()">Bank 1</div>
-<div class="card">Bank 2 — Segera</div>
-<div class="card">Bank 3 — Segera</div>
+<div class="card" onclick="startQuiz('Bank 1')">Bank 1</div>
+<div class="card" onclick="startQuiz('Bank 2')">Bank 2</div>
+<div class="card" onclick="startQuiz('Bank 3')">Bank 3</div>
+<div class="card" onclick="startQuiz('Bank 4')">Bank 4</div>
+<div class="card" onclick="startQuiz('Bank 5')">Bank 5</div>
 </div>
 
 </section>
@@ -207,51 +209,788 @@ let answers = [];
 let selected = null;
 
 /* SOAL CONTOH */
-const questions = [
-
-{
-question: "Organ manakah yang memompa darah ke seluruh tubuh?",
-options: [
-"Paru-paru",
-"Jantung",
-"Ginjal",
-"Hepar",
-"Pankreas"
+const questionBanks = {
+Anatomi: {
+"Bank 1": [
+  {
+    question: "Seorang pasien menjalani operasi bypass jantung. Untuk mengakses ruang jantung, dokter bedah harus menginsisi lapisan terluar jantung yang membungkus dan melindungi organ ini. Lapisan manakah yang dimaksud?",
+    options: [
+      "Endokardium",
+      "Miokardium",
+      "Perikardium viscerale",
+      "Perikardium fibrosum",
+      "Lapisan subendokardial",
+    ],
+    answer: 3,
+    explanation: "Jantung dibungkus oleh kantung yang disebut perikardium. Lapisan terluar dari perikardium adalahperikardium fibrosum. Ini adalah lapisan jaringan ikat padat yang kuat dan tidak elastis, yang berfungsi untuk melindungi jantung dan mencegah peregangan berlebihan. Di dalamnya terdapat perikardium serosum yang memiliki dua lapisan: parietal (membatasi perikardium fibrosum) dan viscerale (epikardium, yang menempel langsung pada permukaan jantung)."
+  },
+  {
+    question: "Seorang pasien mengalami infark miokard akut yang merusak lapisan tengah dinding jantung. Jaringan manakah yang paling tebal dan bertanggung jawab atas kontraksi jantung?",
+    options: [
+      "Endokardium",
+      "Miokardium",
+      "Perikardium viscerale",
+      "Perikardium fibrosum",
+      "Perikardium serosum parietal",
+    ],
+    answer: 1,
+    explanation: "Miokardium adalah lapisan otot jantung yang terletak di tengah antara endokardium (lapisan dalam) dan epikardium (lapisan luar). Lapisan inilah yang paling tebal dan bertanggung jawab atas kontraksi jantung (sistol). Infark miokard terjadi akibat kematian sel-sel otot miokardium karena kekurangan pasokan darah dari arteri koronaria."
+  },
+  {
+    question: "Seorang pasien dengan efusi perikardial menjalani perikardiosentesis. Jarum yang digunakan untuk mengeluarkan cairan akan berada di rongga antara dua lapisan perikardium. Rongga apakah yang dimaksud?",
+    options: [
+      "Rongga pleura",
+      "Rongga perikardial",
+      "Rongga mediastinum",
+      "Rongga peritoneum",
+      "Rongga subarachnoid",
+    ],
+    answer: 1,
+    explanation: "Rongga perikardial adalah ruang potensial antara lapisan parietal dan viscerale dari perikardium serosum. Rongga ini berisi cairan pelumas (cairan perikardial) yang memungkinkan jantung bergerak tanpa gesekan saat berkontraksi. Efusi perikardial adalah penumpukan cairan di rongga ini."
+  },
+  {
+    question: "Manakah pernyataan yang PALING TEPAT mengenai lapisan epikardium?",
+    options: [
+      "Epikardium adalah lapisan terluar dari perikardium fibrosum.",
+      "Epikardium adalah nama lain untuk perikardium fibrosum.",
+      "Epikardium adalah perikardium viscerale yang menempel langsung pada permukaan jantung.",
+      "Epikardium adalah lapisan otot jantung yang bertanggung jawab untuk kontraksi.",
+      "Epikardium adalah lapisan endotel yang melapisi ruang jantung.",
+    ],
+    answer: 2,
+    explanation: "Epikardium adalah lapisan terluar dari dinding jantung, yang merupakan lapisan viscerale dari perikardium serosum. Lapisan ini menempel langsung pada permukaan miokardium. Opsi A dan B salah karena perikardium fibrosum adalah lapisan di luar epikardium. Opsi D salah karena itu adalah miokardium. Opsi E salah karena itu adalah endokardium."
+  },
+  {
+    question: "Seorang pasien dengan endokarditis bakterial mengalami infeksi pada lapisan terdalam jantung. Jaringan manakah yang terinfeksi?",
+    options: [
+      "Perikardium fibrosum",
+      "Miokardium",
+      "Epikardium",
+      "Endokardium",
+      "Perikardium serosum parietal",
+    ],
+    answer: 3,
+    explanation: "Endokardium adalah lapisan terdalam dari dinding jantung. Lapisan ini terdiri dari endotelium (lapisan epitel tipis) yang melapisi semua ruang jantung dan menutupi katup-katup jantung. Endokarditis adalah infeksi pada lapisan ini, yang sering menyerang katup jantung."
+  },
+  {
+    question: "Manakah pernyataan yang BENAR mengenai lapisan subendokardial?",
+    options: [
+      "Terletak di antara perikardium fibrosum dan perikardium serosum.",
+      "Terletak di antara endokardium dan miokardium.",
+      "Terletak di antara miokardium dan epikardium.",
+      "Terletak di antara lapisan parietal dan viscerale perikardium.",
+      "Terletak di antara lapisan serosum parietal dan fibrosum.",
+    ],
+    answer: 1,
+    explanation: "Lapisan subendokardial adalah lapisan tipis jaringan ikat yang terletak di antaraendokardium (lapisan dalam) danmiokardium (lapisan otot). Lapisan ini mengandung pembuluh darah dan serabut Purkinje yang merupakan bagian dari sistem konduksi jantung."
+  },
+  {
+    question: "Manakah fungsi UTAMA dari perikardium fibrosum?",
+    options: [
+      "Memproduksi cairan pelumas untuk jantung.",
+      "Menjadi tempat melekatnya otot-otot jantung.",
+      "Melindungi jantung dari peregangan berlebihan dan memfiksasi jantung di mediastinum.",
+      "Menghantarkan impuls listrik dari atrium ke ventrikel.",
+      "Menyediakan nutrisi untuk miokardium.",
+    ],
+    answer: 2,
+    explanation: "Perikardium fibrosum berfungsi sebagai kantung pelindung yang kuat untuk jantung. Karena sifatnya yang tidak elastis, ia mencegah peregangan berlebihan pada jantung saat volume darah meningkat. Selain itu, perikardium fibrosum melekat pada diafragma dan sternum, sehingga memfiksasi posisi jantung di mediastinum. Opsi A adalah fungsi perikardium serosum. Opsi D adalah fungsi sistem konduksi."
+  },
+  {
+    question: "Manakah komponen yang merupakan bagian dari perikardium serosum?",
+    options: [
+      "Perikardium fibrosum",
+      "Lapisan lemak epikardial",
+      "Epikardium (lapisan viscerale) dan lapisan parietal",
+      "Endokardium",
+      "Miokardium",
+    ],
+    answer: 2,
+    explanation: "Perikardium serosum adalah lapisan tipis membran yang terletak di dalam perikardium fibrosum. Perikardium serosum terdiri dari dua lapisan: 1.Lapisan parietal yang melapisi permukaan dalam perikardium fibrosum. 2.Lapisan viscerale (epikardium) yang menempel langsung pada permukaan jantung. Kedua lapisan ini dipisahkan oleh rongga perikardial yang berisi cairan pelumas. ## B. ANATOMI JANTUNG - RUANG & SULKUS (10 Soal)"
+  },
+  {
+    question: "Seorang pasien dengan gagal jantung mengalami peningkatan tekanan pada vena cava superior dan inferior. Peningkatan tekanan ini akan langsung mempengaruhi ruang jantung manakah yang berfungsi sebagai penerima darah dari seluruh tubuh?",
+    options: [
+      "Atrium kiri",
+      "Ventrikel kiri",
+      "Atrium kanan",
+      "Ventrikel kanan",
+      "Sinus koronarius",
+    ],
+    answer: 2,
+    explanation: "Atrium kanan berfungsi sebagai ruang penerima (reservoir) darah yang kaya karbon dioksida dari seluruh tubuh. Darah ini masuk melalui: -Vena cava superior (dari kepala, leher, dan lengan) -Vena cava inferior (dari tubuh bagian bawah) -Sinus koronarius (dari jantung itu sendiri)"
+  },
+  {
+    question: "Seorang pasien dengan stenosis katup mitral mengalami hambatan aliran darah ke ventrikel kiri. Darah akan menumpuk di ruang jantung manakah?",
+    options: [
+      "Atrium kanan",
+      "Ventrikel kanan",
+      "Atrium kiri",
+      "Ventrikel kiri",
+      "Vena cava superior",
+    ],
+    answer: 2,
+    explanation: "Atrium kiri menerima darah yang kaya oksigen dari paru-paru melalui empat vena pulmonalis. Dari atrium kiri, darah mengalir ke ventrikel kiri melalui katup mitral. Jika katup mitral mengalami stenosis (penyempitan), aliran darah terhambat sehingga terjadi penumpukan darah diatrium kiri. Opsi A (atrium kanan) menerima darah dari vena cava, bukan dari paru-paru."
+  },
+  {
+    question: "Seorang pasien dengan hipertensi sistemik kronis mengalami hipertrofi (penebalan) pada dinding ventrikel kiri. Manakah fungsi utama ventrikel kiri yang menyebabkan ototnya harus lebih tebal daripada ventrikel kanan?",
+    options: [
+      "Memompa darah ke paru-paru",
+      "Menerima darah dari vena cava",
+      "Memompa darah ke seluruh tubuh (sirkulasi sistemik)",
+      "Memompa darah ke atrium kanan",
+      "Menerima darah dari vena pulmonalis",
+    ],
+    answer: 2,
+    explanation: "Ventrikel kiri memiliki dinding yang jauh lebih tebal daripada ventrikel kanan karena ia harus memompa darah keseluruh tubuh melalui sirkulasi sistemik yang memiliki resistensi tinggi. Ventrikel kanan hanya memompa darah keparu-paru (sirkulasi pulmonal) yang memiliki resistensi rendah, sehingga dindingnya lebih tipis. Opsi E (menerima darah dari vena pulmonalis) adalah fungsi atrium kiri."
+  },
+  {
+    question: "Seorang pasien dengan hipertensi pulmonal kronis mengalami pembesaran ventrikel kanan. Manakah pernyataan yang BENAR mengenai ventrikel kanan?",
+    options: [
+      "Ventrikel kanan membentuk sebagian besar apeks jantung.",
+      "Dinding ventrikel kanan lebih tebal daripada ventrikel kiri.",
+      "Ventrikel kanan menerima darah dari vena pulmonalis.",
+      "Ventrikel kanan memompa darah ke seluruh tubuh.",
+      "Ventrikel kanan membentuk sebagian besar permukaan anterior jantung.",
+    ],
+    answer: 4,
+    explanation: "Ventrikel kanan membentuk sebagian besar permukaananterior (sternokostal) jantung. Opsi A salah karena apeks jantung dibentuk oleh ventrikel kiri. Opsi B salah karena dinding ventrikel kiri lebih tebal. Opsi C salah karena ventrikel kanan menerima darah dari atrium kanan. Opsi D salah karena ventrikel kiri yang memompa ke seluruh tubuh."
+  },
+  {
+    question: "Seorang ahli bedah jantung melakukan prosedur bypass pada arteri koronaria yang terletak di dalam sulkus yang memisahkan atrium dan ventrikel. Apakah nama sulkus tersebut?",
+    options: [
+      "Sulkus interventrikularis anterior",
+      "Sulkus interventrikularis posterior",
+      "Sulkus koronarius",
+      "Sulkus terminalis",
+      "Sulkus interatrialis",
+    ],
+    answer: 2,
+    explanation: "Sulkus koronarius (atrioventricular groove) adalah alur dangkal yang terletak di permukaan luar jantung dan berfungsi sebagai batas eksternal antaraatrium (di atas) danventrikel (di bawah). Sulkus ini mengandung: - Arteri koronaria kanan (RCA) - Arteri sirkumfleksa (cabang LCA) - Sinus koronarius (vena besar jantung)"
+  },
+  {
+    question: "Manakah struktur yang terdapat di dalam sulkus interventrikularis anterior?",
+    options: [
+      "Arteri koronaria kanan dan vena kardiaka kecil",
+      "Arteri desendens anterior kiri (LAD) dan vena kardiaka besar",
+      "Arteri sirkumfleksa dan vena kardiaka sedang",
+      "Sinus koronarius dan vena kardiaka besar",
+      "Arteri marginalis kanan dan vena kardiaka kecil",
+    ],
+    answer: 1,
+    explanation: "Sulkus interventrikularis anterior terletak di permukaan anterior jantung dan berisi: -Arteri desendens anterior kiri (LAD) cabang dari arteri koronaria kiri -Vena kardiaka besar (great cardiac vein) Opsi A salah karena arteri koronaria kanan berada di sulkus koronarius. Opsi C salah karena sirkumfleksa juga di sulkus koronarius. Opsi D salah karena sinus koronarius berada di sulkus koronarius posterior."
+  },
+  {
+    question: "Manakah struktur yang terdapat di dalam sulkus interventrikularis posterior?",
+    options: [
+      "Arteri desendens anterior kiri (LAD) dan vena kardiaka besar",
+      "Arteri koronaria kanan dan vena kardiaka kecil",
+      "Arteri desendens posterior (PDA) dan vena kardiaka sedang (middle cardiac vein)",
+      "Arteri sirkumfleksa dan vena kardiaka besar",
+      "Sinus koronarius dan vena kardiaka sedang",
+    ],
+    answer: 2,
+    explanation: "Sulkus interventrikularis posterior terletak di permukaan posterior (diafragmatik) jantung dan berisi: -Arteri desendens posterior (PDA) cabang dari arteri koronaria kanan (pada sebagian besar populasi) -Vena kardiaka sedang (middle cardiac vein) Opsi B salah karena arteri koronaria kanan berada di sulkus koronarius."
+  },
+  {
+    question: "Apakah fungsi dari aurikula (atrial appendage) pada atrium?",
+    options: [
+      "Meningkatkan volume atrium untuk menampung darah",
+      "Menghasilkan hormon natriuretik",
+      "Menghantarkan impuls listrik dari SA node",
+      "Mencegah aliran balik darah ke vena pulmonalis",
+      "Mempercepat aliran darah dari vena cava",
+    ],
+    answer: 0,
+    explanation: "Aurikula (atrial appendage) adalah struktur seperti kantong kecil yang menonjol dari atrium kanan dan kiri. Fungsinya adalah untukmeningkatkan kapasitas volume atrium sehingga atrium dapat menampung lebih banyak darah saat pengisian (diastol). Aurikula memiliki otot-otot pektinat (pectinate muscles) di bagian dalamnya."
+  },
+  {
+    question: "Di dalam atrium kanan, terdapat krista terminalis yang memisahkan dua bagian atrium. Manakah yang DIPISAHKAN oleh krista terminalis?",
+    options: [
+      "Atrium kanan dan atrium kiri",
+      "Bagian halus dan bagian kasar atrium kanan",
+      "Ventrikel kanan dan ventrikel kiri",
+      "Atrium kanan dan ventrikel kanan",
+      "Vena cava superior dan inferior",
+    ],
+    answer: 1,
+    explanation: "Krista terminalis (crista terminalis) adalah jembatan otot yang terletak di dinding dalam atrium kanan. Struktur ini memisahkan: -Bagian halus (sinus venarum) : bagian posterior yang menerima vena cava superior dan inferior, serta sinus koronarius. Dindingnya halus karena berasal dari embriologis sinus venosus. -Bagian kasar : bagian anterior yang memiliki otot-otot pektinat (pectinate muscles), yang berasal dari embriologis atrium primitif."
+  },
+  {
+    question: "Pada pemeriksaan autopsi, ditemukan cekungan berbentuk oval di septum interatrial. Struktur apakah ini dan apakah asal embriologisnya?",
+    options: [
+      "Foramen ovale; sisa dari duktus arteriosus",
+      "Fossa ovalis; sisa dari foramen ovale pada janin",
+      "Krista terminalis; sisa dari sinus venosus",
+      "Trabekula karnea; sisa dari otot ventrikel primitif",
+      "Aurikula; sisa dari atrium primitif",
+    ],
+    answer: 1,
+    explanation: "Fossa ovalis adalah cekungan berbentuk oval di septum interatrial (dinding pemisah atrium kanan dan kiri). Struktur ini merupakan sisa dariforamen ovale pada janin, yang berfungsi sebagai jalur pintas (shunt) darah dari atrium kanan ke atrium kiri untuk menghindari paru-paru yang belum berfungsi. Setelah lahir, foramen ovale menutup dan meninggalkan fossa ovalis. Opsi A salah karena duktus arteriosus berhubungan dengan trunkus pulmonalis dan aorta. ## C. ANATOMI JANTUNG - KATUP (8 Soal)"
+  },
+  {
+    question: "Pada seorang pasien dengan demam reumatik, terjadi kerusakan pada katup yang terletak di antara atrium kanan dan ventrikel kanan. Katup manakah yang mengalami kerusakan?",
+    options: [
+      "Katup mitral",
+      "Katup aorta",
+      "Katup pulmonal",
+      "Katup trikuspid",
+      "Katup semilunar",
+    ],
+    answer: 3,
+    explanation: "Katup trikuspid terletak di antaraatrium kanan danventrikel kanan. Katup ini memilikitiga daun katup (trikuspid = tiga puncak). Kerusakan pada katup ini dapat menyebabkan regurgitasi (aliran balik) darah dari ventrikel kanan ke atrium kanan. Opsi A (mitral) terletak di antara atrium kiri dan ventrikel kiri."
+  },
+  {
+    question: "Seorang pasien didiagnosis dengan stenosis mitral. Dimanakah letak anatomis katup mitral?",
+    options: [
+      "Di antara atrium kanan dan ventrikel kanan",
+      "Di antara ventrikel kanan dan arteri pulmonalis",
+      "Di antara atrium kiri dan ventrikel kiri",
+      "Di antara ventrikel kiri dan aorta",
+      "Di antara atrium kiri dan vena pulmonalis",
+    ],
+    answer: 2,
+    explanation: "Katup mitral (juga disebut katup bikuspid) terletak di antaraatrium kiri danventrikel kiri. Katup ini memilikidua daun katup (bikuspid = dua puncak). Stenosis mitral adalah penyempitan katup ini yang menghambat aliran darah dari atrium kiri ke ventrikel kiri."
+  },
+  {
+    question: "Seorang bayi baru lahir didiagnosis dengan stenosis katup pulmonal. Di manakah letak katup pulmonal?",
+    options: [
+      "Di antara atrium kiri dan ventrikel kiri",
+      "Di antara ventrikel kiri dan aorta",
+      "Di antara atrium kanan dan ventrikel kanan",
+      "Di antara ventrikel kanan dan trunkus pulmonalis",
+      "Di antara atrium kiri dan vena pulmonalis",
+    ],
+    answer: 3,
+    explanation: "Katup pulmonal terletak di antaraventrikel kanan dantrunkus pulmonalis (arteri pulmonalis). Katup ini merupakan katup semilunar yang memiliki tiga daun katup berbentuk bulan sabit. Fungsi utamanya adalah mencegah aliran balik darah dari arteri pulmonalis ke ventrikel kanan saat diastol."
+  },
+  {
+    question: "Pada saat sistol ventrikel kiri, katup aorta terbuka untuk memungkinkan darah mengalir ke seluruh tubuh. Di manakah letak anatomis katup aorta?",
+    options: [
+      "Di antara atrium kanan dan ventrikel kanan",
+      "Di antara ventrikel kanan dan trunkus pulmonalis",
+      "Di antara atrium kiri dan ventrikel kiri",
+      "Di antara ventrikel kiri dan aorta",
+      "Di antara atrium kiri dan vena pulmonalis",
+    ],
+    answer: 3,
+    explanation: "Katup aorta terletak di antaraventrikel kiri danaorta (pembuluh darah terbesar). Katup ini merupakan katup semilunar dengan tiga daun katup. Katup aorta terbuka saat ventrikel kiri berkontraksi (sistol) untuk memompa darah ke aorta, dan menutup saat ventrikel berelaksasi (diastol) untuk mencegah aliran balik darah ke ventrikel kiri. Sinus aorta (dilatasi di pangkal aorta) merupakan tempat muara arteri koronaria kiri dan kanan."
+  },
+  {
+    question: "Manakah fungsi dari korda tendinea?",
+    options: [
+      "Menghubungkan katup AV dengan dinding ventrikel untuk mencegah prolaps katup",
+      "Menghubungkan katup semilunar dengan dinding arteri",
+      "Menghantarkan impuls listrik dari atrium ke ventrikel",
+      "Menjaga agar katup AV tetap terbuka saat sistol",
+      "Menutup katup semilunar saat diastol",
+    ],
+    answer: 0,
+    explanation: "Korda tendinea adalah benang-benang jaringan ikat yang menghubungkan daun katup atrioventrikular (trikuspid dan mitral) dengan otot-otot papilaris di dinding ventrikel. Fungsi utamanya adalahmencegah prolaps (penonjolan) daun katup ke dalam atrium saat ventrikel berkontraksi (sistol). Saat ventrikel berkontraksi, otot papilaris juga berkontraksi, menarik korda tendinea dan menjaga katup tetap tertutup rapat."
+  },
+  {
+    question: "Pada ventrikel kanan, terdapat tiga otot papilaris. Manakah nama otot papilaris yang TIDAK TERDAPAT pada ventrikel kanan?",
+    options: [
+      "Otot papilaris anterior",
+      "Otot papilaris posterior",
+      "Otot papilaris medial",
+      "Otot papilaris septal",
+      "Otot papilaris lateral",
+    ],
+    answer: 4,
+    explanation: "Ventrikel kanan memilikitiga otot papilaris: 1.Otot papilaris anterior (terbesar, dari dinding anterior) 2.Otot papilaris posterior (dari dinding inferior) 3.Otot papilaris septal (dari septum interventrikular) Opsi E (lateral) tidak ada pada ventrikel kanan. Ventrikel kiri memiliki dua otot papilaris (anterior dan posterior). Opsi C (medial) adalah istilah lain yang terkadang digunakan untuk otot papilaris septal."
+  },
+  {
+    question: "Manakah perbedaan yang PALING TEPAT antara katup semilunar dan katup atrioventrikular (AV)?",
+    options: [
+      "Katup semilunar memiliki korda tendinea, sedangkan katup AV tidak.",
+      "Katup semilunar terletak di antara atrium dan ventrikel, sedangkan katup AV di antara ventrikel dan arteri besar.",
+      "Katup semilunar memiliki otot papilaris, sedangkan katup AV tidak.",
+      "Katup semilunar tidak memiliki korda tendinea dan otot papilaris, sedangkan katup AV memilikinya.",
+      "Katup semilunar memiliki dua daun katup, sedangkan katup AV memiliki tiga daun.",
+    ],
+    answer: 3,
+    explanation: "Perbedaan utama antara katup semilunar (aorta dan pulmonal) dengan katup AV (trikuspid dan mitral) adalah: -Katup semilunar tidak memiliki korda tendinea dan otot papilaris. Daun katupnya berbentuk bulan sabit dan menutup karena tekanan darah di arteri. -Katup AV memiliki korda tendinea dan otot papilaris yang mencegah prolaps daun katup. Opsi A, B, dan C salah. Opsi E salah karena katup semilunar memiliki tiga daun, sedangkan katup mitral hanya memiliki dua. ## D. VASKULARISASI JANTUNG - ARTERI (10 Soal)"
+  },
+  {
+    question: "Seorang pasien menjalani angiografi koroner dan ditemukan penyumbatan pada pembuluh darah yang bercabang dari sinus aorta kiri dan berjalan di belakang trunkus pulmonalis. Pembuluh darah manakah yang dimaksud?",
+    options: [
+      "Arteri koronaria kanan",
+      "Arteri koronaria kiri",
+      "Arteri desendens anterior kiri (LAD)",
+      "Arteri sirkumfleksa",
+      "Arteri marginalis kiri",
+    ],
+    answer: 1,
+    explanation: "Arteri koronaria kiri (left coronary artery) bercabang dari sinus aorta kiri dan berjalan di belakang trunkus pulmonalis. Arteri ini pendek (1-2 cm) dan kemudian bercabang menjadi: -Arteri desendens anterior kiri (LAD) (di sulkus interventrikularis anterior) -Arteri sirkumfleksa (di sulkus koronarius)"
+  },
+  {
+    question: "Seorang pria 55 tahun mengalami infark miokard. EKG menunjukkan elevasi segmen ST pada lead V1-V4 (dinding anterior). Arteri manakah yang paling mungkin mengalami oklusi?",
+    options: [
+      "Arteri koronaria kanan (RCA)",
+      "Arteri desendens anterior kiri (LAD)",
+      "Arteri sirkumfleksa",
+      "Arteri marginalis kanan",
+      "Arteri desendens posterior (PDA)",
+    ],
+    answer: 1,
+    explanation: "Arteri desendens anterior kiri (LAD) memperdarahi: - Dinding anterior ventrikel kiri - Septum interventrikular bagian anterior (2/3 anterior) - Apeks jantung Oklusi pada LAD menyebabkan infark dinding anterior, yang secara khas terlihat pada EKG lead V1-V4. LAD sering disebut \"widow-maker\" karena oklusi pada arteri ini dapat menyebabkan henti jantung mendadak."
+  },
+  {
+    question: "Seorang pasien dengan infark miokard lateral mengalami oklusi pada arteri yang berjalan di dalam sulkus koronarius kiri. Arteri manakah yang mengalami oklusi?",
+    options: [
+      "Arteri koronaria kanan",
+      "Arteri desendens anterior kiri (LAD)",
+      "Arteri sirkumfleksa",
+      "Arteri marginalis kanan",
+      "Arteri desendens posterior (PDA)",
+    ],
+    answer: 2,
+    explanation: "Arteri sirkumfleksa adalah cabang dari arteri koronaria kiri yang berjalan di dalamsulkus koronarius ke arah posterior (melingkari sisi kiri jantung). Cabang utamanya adalaharteri marginalis kiri yang memperdarahi dinding lateral ventrikel kiri. Oklusi pada sirkumfleksa menyebabkan infark dinding lateral."
+  },
+  {
+    question: "Seorang pasien dengan infark dinding inferior (lead II, III, aVF) juga mengalami bradikardia. Manakah arteri yang paling mungkin mengalami oklusi dan juga memperdarahi nodus SA?",
+    options: [
+      "Arteri sirkumfleksa",
+      "Arteri desendens anterior kiri (LAD)",
+      "Arteri koronaria kanan (RCA)",
+      "Arteri marginalis kiri",
+      "Arteri diagonalis",
+    ],
+    answer: 2,
+    explanation: "Arteri koronaria kanan (RCA) memperdarahi: - Dinding inferior ventrikel kiri (melalui PDA) - Dinding posterior ventrikel kiri -Nodus SA (pada sekitar 60% populasi) -Nodus AV (pada sekitar 80-90% populasi) Infark dinding inferior yang disertai bradikardia (gangguan konduksi) sering disebabkan oleh oklusi RCA yang juga memperdarahi nodus AV/SA."
+  },
+  {
+    question: "Manakah yang merupakan cabang dari arteri koronaria kanan?",
+    options: [
+      "Arteri desendens anterior kiri (LAD)",
+      "Arteri sirkumfleksa",
+      "Arteri marginalis kanan",
+      "Arteri marginalis kiri",
+      "Arteri diagonalis",
+    ],
+    answer: 2,
+    explanation: "Arteri marginalis kanan adalah cabang dariarteri koronaria kanan (RCA) yang berjalan di sepanjang permukaan lateral kanan jantung (tepi akut/acute margin) untuk memperdarahi ventrikel kanan. Opsi A, B, D, dan E adalah cabang dari arteri koronaria kiri. Arteri marginalis kiri adalah cabang dari sirkumfleksa."
+  },
+  {
+    question: "Manakah pernyataan yang BENAR mengenai arteri desendens posterior (PDA)?",
+    options: [
+      "PDA selalu bercabang dari arteri koronaria kanan (RCA).",
+      "PDA memperdarahi dinding anterior ventrikel kiri.",
+      "PDA berjalan di dalam sulkus interventrikularis posterior.",
+      "PDA tidak pernah memperdarahi nodus AV.",
+      "PDA bercabang dari arteri sirkumfleksa pada semua orang.",
+    ],
+    answer: 2,
+    explanation: "Arteri desendens posterior (PDA) berjalan di dalamsulkus interventrikularis posterior. Opsi A dan E salah karena PDA dapat bercabang dari RCA (pada 70-90% populasi) atau dari sirkumfleksa (pada 10-30% populasi) tergantung dominansi arteri koronaria. Opsi B salah karena PDA memperdarahi dinding inferior dan posterior, bukan anterior. Opsi D salah karena PDA (jika berasal dari RCA) sering memperdarahi nodus AV."
+  },
+  {
+    question: "Manakah definisi yang PALING TEPAT untuk \"dominansi kanan\" pada arteri koronaria?",
+    options: [
+      "Arteri koronaria kanan lebih besar dari arteri koronaria kiri.",
+      "Arteri koronaria kanan memperdarahi atrium kanan dan ventrikel kanan saja.",
+      "Arteri desendens posterior (PDA) berasal dari arteri koronaria kanan (RCA).",
+      "Arteri desendens posterior (PDA) berasal dari arteri sirkumfleksa.",
+      "Arteri koronaria kanan dan kiri memiliki ukuran yang sama besar.",
+    ],
+    answer: 2,
+    explanation: "Dominansi kanan (right dominance) berarti bahwaarteri desendens posterior (PDA) berasal dariarteri koronaria kanan (RCA). Ini terjadi pada sekitar 70-90% populasi.Dominansi kiri (left dominance) terjadi jika PDA berasal dariarteri sirkumfleksa (cabang arteri koronaria kiri). Opsi A, B, dan E adalah definisi yang salah."
+  },
+  {
+    question: "Manakah struktur yang berfungsi sebagai sirkulasi kolateral pada jantung saat terjadi oklusi arteri koronaria?",
+    options: [
+      "Anastomosis antara arteri koronaria kanan dan kiri",
+      "Korda tendinea",
+      "Otot papilaris",
+      "Sinus koronarius",
+      "Vena kardiaka besar",
+    ],
+    answer: 0,
+    explanation: "Terdapat anastomosis (hubungan) antara cabang-cabang arteri koronaria kanan dan kiri, terutama di: - Septum interventrikular (cabang septal LAD dengan cabang septal PDA) - Apeks jantung - Permukaan atrium Anastomosis ini berfungsi sebagaisirkulasi kolateral yang dapat memberikan aliran darah alternatif jika terjadi oklosi perlahan pada satu arteri koronaria. Namun, jika oklusi terjadi secara mendadak (akut), sirkulasi kolateral seringkali belum cukup berkembang untuk mencegah infark."
+  },
+  {
+    question: "Arteri yang memperdarahi nodus sinoatrial (SA) pada sebagian besar populasi berasal dari arteri manakah?",
+    options: [
+      "Arteri koronaria kiri (LCA)",
+      "Arteri sirkumfleksa",
+      "Arteri koronaria kanan (RCA)",
+      "Arteri desendens anterior kiri (LAD)",
+      "Arteri marginalis kanan",
+    ],
+    answer: 2,
+    explanation: "Pada sekitar60% populasi, arteri yang memperdarahi nodus SA berasal dariarteri koronaria kanan (RCA) (disebut arteri SA nodal). Pada sekitar 40% populasi, arteri SA nodal berasal dariarteri sirkumfleksa (cabang LCA). Oleh karena itu, RCA adalah jawaban yang paling benar untuk \"sebagian besar populasi\". Opsi jebakan B (sirkumfleksa) hanya benar untuk minoritas."
+  },
+  {
+    question: "Seorang pasien dengan infark dinding posterior mengalami komplikasi berupa bradikardia. Arteri manakah yang paling mungkin mengalami oklusi jika diketahui pasien ini memiliki dominansi kiri?",
+    options: [
+      "Arteri koronaria kanan (RCA)",
+      "Arteri sirkumfleksa",
+      "Arteri desendens anterior kiri (LAD)",
+      "Arteri marginalis kanan",
+      "Arteri desendens posterior (PDA)",
+    ],
+    answer: 1,
+    explanation: "Ini adalah soal jebakan! Pasien dengan infark dinding posterior dan bradikardia mungkin mengalami oklusi pada arteri yang memperdarahi nodus SA atau AV. Padadominansi kiri (sekitar 10-30% populasi),arteri desendens posterior (PDA) berasal dariarteri sirkumfleksa. Selain itu, pada dominansi kiri, arteri SA nodal sering juga berasal dari sirkumfleksa. Jadi, oklusi pada sirkumfleksa pada pasien dengan dominansi kiri dapat menyebabkan infark posterior dan bradikardia. Opsi A (RCA) adalah jawaban yang benar untuk populasi dominansi kanan (mayoritas), tetapi soal ini secara spesifik menyebutkan \"dominansi kiri\", sehingga jawabannya adalah B. ## E. VASKULARISASI JANTUNG - VENA & SINUS KORONARIUS (5 Soal)"
+  },
+  {
+    question: "Manakah pernyataan yang BENAR mengenai sinus koronarius?",
+    options: [
+      "Sinus koronarius bermuara ke atrium kiri.",
+      "Sinus koronarius bermuara ke atrium kanan, dekat muara vena cava inferior.",
+      "Sinus koronarius bermuara ke ventrikel kanan.",
+      "Sinus koronarius terletak di sulkus interventrikularis anterior.",
+      "Sinus koronarius membawa darah kaya oksigen ke miokardium.",
+    ],
+    answer: 1,
+    explanation: "Sinus koronarius adalah vena terbesar jantung yang terletak disulkus koronarius posterior (permukaan diafragmatik). Sinus ini bermuara keatrium kanan di antara muara vena cava inferior dan katup trikuspid. Sinus koronarius mengumpulkan darah dari sebagian besar vena-vena jantung (great cardiac vein, middle cardiac vein, small cardiac vein). Opsi A salah karena bermuara ke atrium kanan, bukan kiri. Opsi C, D, dan E salah."
+  },
+  {
+    question: "Manakah vena yang mengalirkan darah ke sinus koronarius dan berjalan bersama dengan arteri desendens anterior kiri (LAD)?",
+    options: [
+      "Vena kardiaka kecil (small cardiac vein)",
+      "Vena kardiaka sedang (middle cardiac vein)",
+      "Vena kardiaka besar (great cardiac vein)",
+      "Vena kardiaka posterior (posterior cardiac vein)",
+      "Vena kardiaka anterior (anterior cardiac veins)",
+    ],
+    answer: 2,
+    explanation: "Vena kardiaka besar (great cardiac vein) berjalan di dalamsulkus interventrikularis anterior bersama denganarteri desendens anterior kiri (LAD). Vena ini kemudian melengkung ke kiri dan masuk ke sulkus koronarius untuk bergabung dengan sinus koronarius di sisi kiri. Opsi A (small cardiac vein) berjalan dengan RCA. Opsi B (middle cardiac vein) berjalan di sulkus interventrikularis posterior dengan PDA. Opsi D (posterior cardiac vein) mengalirkan darah dari dinding posterior ventrikel kiri."
+  },
+  {
+    question: "Manakah vena yang berjalan bersama dengan arteri desendens posterior (PDA) di dalam sulkus interventrikularis posterior?",
+    options: [
+      "Vena kardiaka kecil (small cardiac vein)",
+      "Vena kardiaka sedang (middle cardiac vein)",
+      "Vena kardiaka besar (great cardiac vein)",
+      "Vena kardiaka posterior (posterior cardiac vein)",
+      "Vena kardiaka anterior (anterior cardiac veins)",
+    ],
+    answer: 1,
+    explanation: "Vena kardiaka sedang (middle cardiac vein) berjalan di dalamsulkus interventrikularis posterior bersama denganarteri desendens posterior (PDA) dan bermuara ke sinus koronarius. Opsi C (great cardiac vein) berjalan di sulkus interventrikularis anterior. Opsi A (small cardiac vein) berjalan di sisi kanan jantung bersama RCA."
+  },
+  {
+    question: "Manakah vena yang berjalan di dalam sulkus koronarius kanan bersama dengan arteri koronaria kanan (RCA)?",
+    options: [
+      "Vena kardiaka besar (great cardiac vein)",
+      "Vena kardiaka sedang (middle cardiac vein)",
+      "Vena kardiaka kecil (small cardiac vein)",
+      "Vena kardiaka posterior (posterior cardiac vein)",
+      "Vena kardiaka anterior (anterior cardiac veins)",
+    ],
+    answer: 2,
+    explanation: "Vena kardiaka kecil (small cardiac vein) berjalan di dalamsulkus koronarius kanan bersama denganarteri koronaria kanan (RCA) dan bermuara ke sinus koronarius di sisi kanan. Opsi A (great cardiac vein) berjalan di sulkus interventrikularis anterior. Opsi B (middle cardiac vein) berjalan di sulkus interventrikularis posterior."
+  },
+  {
+    question: "Vena manakah yang TIDAK mengalirkan darah ke sinus koronarius?",
+    options: [
+      "Vena kardiaka besar (great cardiac vein)",
+      "Vena kardiaka sedang (middle cardiac vein)",
+      "Vena kardiaka kecil (small cardiac vein)",
+      "Vena kardiaka posterior (posterior cardiac vein)",
+      "Vena kardiaka anterior (anterior cardiac veins)",
+    ],
+    answer: 4,
+    explanation: "Vena kardiaka anterior (anterior cardiac veins) adalah vena-vena kecil yang mengalirkan darah dari dinding anterior ventrikel kanan. Vena-vena iniTIDAK bermuara ke sinus koronarius, melainkan langsung bermuara keatrium kanan melalui beberapa lubang kecil. Opsi D (posterior cardiac vein) bermuara ke sinus koronarius (kadang langsung ke atrium kanan). Opsi A, B, dan C semuanya bermuara ke sinus koronarius. ## F. SISTEM KONDUKSI & FISIOLOGI DASAR (8 Soal)"
+  },
+  {
+    question: "Seorang pasien dengan bradikardia berat memerlukan pemasangan alat pacu jantung (pacemaker) karena nodus SA gagal berfungsi. Di manakah letak anatomis nodus SA?",
+    options: [
+      "Di dasar septum interatrial, dekat muara sinus koronarius.",
+      "Di dinding posterior atrium kanan, dekat muara vena cava superior.",
+      "Di dalam septum interventrikular, di bawah katup aorta.",
+      "Di dinding ventrikel kiri, dekat apeks jantung.",
+      "Di dalam otot-otot papilaris ventrikel kanan.",
+    ],
+    answer: 1,
+    explanation: "Nodus sinoatrial (SA) terletak didinding posterior atrium kanan, tepat di bawah muaravena cava superior dan di lateral sulkus terminalis. Nodus SA adalahpacemaker alami jantung yang memulai impuls listrik dan menentukan frekuensi jantung normal (60-100 kali/menit). Opsi A adalah lokasi nodus AV. Opsi C adalah lokasi berkas His."
+  },
+  {
+    question: "Manakah fungsi UTAMA dari nodus atrioventrikular (AV)?",
+    options: [
+      "Memulai impuls listrik jantung.",
+      "Menunda impuls listrik untuk memastikan kontraksi atrium selesai sebelum ventrikel berkontraksi.",
+      "Menghantarkan impuls dengan cepat dari atrium ke ventrikel.",
+      "Menghantarkan impuls langsung ke serabut Purkinje.",
+      "Mengatur frekuensi napas dan detak jantung.",
+    ],
+    answer: 1,
+    explanation: "Fungsi utamanodus AV adalahmenunda impuls listrik yang berasal dari nodus SA selama sekitar 0,1 detik. Penundaan ini penting untuk memberikan waktu bagi atrium untuk berkontraksi dan mengosongkan darah ke ventrikel sebelum ventrikel mulai berkontraksi. Opsi A adalah fungsi nodus SA. Opsi C adalah fungsi berkas His dan serabut Purkinje."
+  },
+  {
+    question: "Manakah yang merupakan jalur konduksi listrik yang benar dari nodus SA ke ventrikel?",
+    options: [
+      "Nodus SA → Nodus AV → Serabut Purkinje → Berkas His",
+      "Nodus SA → Nodus AV → Berkas His → Serabut Purkinje",
+      "Nodus SA → Berkas His → Nodus AV → Serabut Purkinje",
+      "Nodus AV → Nodus SA → Berkas His → Serabut Purkinje",
+      "Nodus SA → Serabut Purkinje → Berkas His → Nodus AV",
+    ],
+    answer: 1,
+    explanation: "Jalur konduksi listrik jantung yang benar adalah: 1.Nodus SA (pacemaker utama, di atrium kanan) 2.Nodus AV (di dasar septum interatrial, menunda impuls) 3.Berkas His (Bundle of His, di septum interventrikular) 4.Cabang berkas kiri dan kanan (Left & Right Bundle Branches) 5.Serabut Purkinje (menyebarkan impuls ke seluruh miokardium ventrikel) Urutan ini memastikan kontraksi atrium terjadi sebelum kontraksi ventrikel."
+  },
+  {
+    question: "Manakah pernyataan yang BENAR mengenai serabut Purkinje?",
+    options: [
+      "Terletak di lapisan subendokardial ventrikel dan menghantarkan impuls dengan sangat cepat.",
+      "Terletak di lapisan subepikardial dan menghantarkan impuls dengan lambat.",
+      "Terletak di nodus AV dan berfungsi sebagai pacemaker sekunder.",
+      "Hanya ditemukan di atrium dan tidak ada di ventrikel.",
+      "Menghantarkan impuls lebih lambat daripada otot ventrikel biasa.",
+    ],
+    answer: 0,
+    explanation: "Serabut Purkinje adalah serabut konduksi khusus yang terletak dilapisan subendokardial ventrikel (di bawah endokardium). Serabut ini memiliki diameter besar dan menghantarkan impuls dengansangat cepat (kecepatan 4 m/s) sehingga depolarisasi mencapai seluruh miokardium ventrikel secara hampir bersamaan, menghasilkan kontraksi ventrikel yang terkoordinasi dan kuat. Opsi C salah karena serabut Purkinje bukan di nodus AV."
+  },
+  {
+    question: "Pada siklus jantung, fase apakah yang ditandai dengan kontraksi ventrikel dan ejeksi darah ke arteri pulmonalis dan aorta?",
+    options: [
+      "Diastol ventrikel",
+      "Sistol ventrikel",
+      "Diastol atrium",
+      "Sistol atrium",
+      "Relaksasi isovolumetrik",
+    ],
+    answer: 1,
+    explanation: "Sistol ventrikel adalah fase kontraksi ventrikel. Pada fase ini: - Katup AV (trikuspid dan mitral) tertutup - Katup semilunar (pulmonal dan aorta) terbuka - Darah diejeksi dari ventrikel kanan ke trunkus pulmonalis dan dari ventrikel kiri ke aorta Diastol ventrikel adalah fase relaksasi ventrikel dan pengisian darah dari atrium."
+  },
+  {
+    question: "Fase manakah pada siklus jantung yang ditandai dengan penutupan katup semilunar (aorta dan pulmonal)?",
+    options: [
+      "Sistol ventrikel awal",
+      "Ejekasi ventrikel",
+      "Relaksasi isovolumetrik",
+      "Pengisian ventrikel",
+      "Kontraksi atrium",
+    ],
+    answer: 2,
+    explanation: "Relaksasi isovolumetrik adalah fase awal diastol ventrikel, yang ditandai dengan: - Penutupan katup semilunar (aorta dan pulmonal) → menghasilkan bunyi jantung S2 (\"DUB\") - Katup AV (trikuspid dan mitral) masih tertutup - Tekanan ventrikel menurun drastis - Volume ventrikel tetap (isovolumetrik) karena semua katup tertutup"
+  },
+  {
+    question: "Apakah penyebab utama bunyi jantung pertama (S1 atau \"LUB\")?",
+    options: [
+      "Penutupan katup semilunar (aorta dan pulmonal)",
+      "Penutupan katup atrioventrikular (trikuspid dan mitral)",
+      "Pembukaan katup semilunar",
+      "Pembukaan katup atrioventrikular",
+      "Kontraksi otot papilaris",
+    ],
+    answer: 1,
+    explanation: "Bunyi jantungS1 (\"LUB\") terjadi padaawal sistol ventrikel dan disebabkan olehpenutupan katup atrioventrikular (trikuspid dan mitral). Penutupan ini terjadi saat tekanan ventrikel mulai meningkat dan melebihi tekanan atrium, sehingga katup AV tertutup untuk mencegah aliran balik darah ke atrium. Opsi A (penutupan katup semilunar) adalah penyebab bunyi jantungS2 (\"DUB\") pada akhir sistol ventrikel."
+  },
+  {
+    question: "Apakah penyebab utama bunyi jantung kedua (S2 atau \"DUB\")?",
+    options: [
+      "Penutupan katup atrioventrikular (trikuspid dan mitral)",
+      "Penutupan katup semilunar (aorta dan pulmonal)",
+      "Pembukaan katup semilunar",
+      "Pembukaan katup atrioventrikular",
+      "Kontraksi otot papilaris",
+    ],
+    answer: 1,
+    explanation: ""
+  },
+  {
+    question: "Seorang pasien mengalami fraktur iga pada ruang interkosta ke-4 di linea aksilaris anterior. Manakah tulang rawan yang menghubungkan iga ini ke sternum?",
+    options: [
+      "Tulang rawan kosta",
+      "Tulang rawan tiroid",
+      "Tulang rawan krikoid",
+      "Tulang rawan aritenoid",
+      "Tulang rawan kuneiform",
+    ],
+    answer: 0,
+    explanation: "Tulang rawan kosta (cartilago costalis) adalah tulang rawan hialin yang menghubungkan ujung anterior tulang rusuk ke sternum. Tujuh pasang iga pertama (iga sejati) terhubung langsung ke sternum melalui tulang rawan kosta. Iga ke-8, 9, dan 10 terhubung ke tulang rawan kosta di atasnya (iga palsu). Iga ke-11 dan 12 tidak memiliki tulang rawan kosta (iga melayang)."
+  },
+  {
+    question: "Manakah otot yang berfungsi sebagai otot inspirasi utama dan memisahkan rongga thorax dari rongga abdomen?",
+    options: [
+      "Otot interkostal eksternus",
+      "Otot interkostal internus",
+      "Otot skalenus",
+      "Diafragma",
+      "Otot sternokleidomastoideus",
+    ],
+    answer: 3,
+    explanation: "Diafragma adalah otot inspirasi utama (75% dari usaha pernapasan saat istirahat). Diafragma berbentuk seperti kubah dan memisahkanrongga thorax (di atas) darirongga abdomen (di bawah). Saat diafragma berkontraksi, ia mendatar dan meningkatkan volume rongga thorax, menurunkan tekanan intratorakal, dan menarik udara masuk ke paru-paru (inspirasi). Otot interkostal eksternus adalah otot inspirasi aksesori."
+  },
+  {
+    question: "Manakah otot yang berperan dalam ekspirasi paksa (forceful expiration)?",
+    options: [
+      "Diafragma",
+      "Otot interkostal eksternus",
+      "Otot interkostal internus",
+      "Otot skalenus",
+      "Otot sternokleidomastoideus",
+    ],
+    answer: 2,
+    explanation: "Otot interkostal internus berfungsi sebagai ototekspirasi (terutama pada ekspirasi paksa). Otot ini terletak di antara tulang rusuk dan memiliki arah serat yang berlawanan dengan interkostal eksternus. Saat interkostal internus berkontraksi, tulang rusuk ditarik ke bawah dan ke dalam, menurunkan volume rongga thorax dan meningkatkan tekanan, sehingga udara keluar dari paru-paru (ekspirasi). Opsi A, B, D, dan E adalah otot-otot inspirasi."
+  },
+  {
+    question: "Manakah pernyataan yang BENAR mengenai mediastinum?",
+    options: [
+      "Mediastinum terletak di antara kedua paru-paru dan berisi jantung, trakea, esofagus, dan pembuluh darah besar.",
+      "Mediastinum terletak di bawah diafragma dan berisi organ-organ abdomen.",
+      "Mediastinum adalah rongga yang berisi paru-paru.",
+      "Mediastinum hanya berisi jantung dan tidak ada struktur lain.",
+      "Mediastinum terletak di antara pleura parietal dan pleura visceralis.",
+    ],
+    answer: 0,
+    explanation: "Mediastinum adalah kompartemen di rongga thorax yang terletak diantara kedua paru-paru (di tengah). Mediastinum berisi: - Jantung dan perikardium - Trakea - Esofagus - Pembuluh darah besar (aorta, vena cava, trunkus pulmonalis) - Timus - Nodus limfa dan saraf (n. vagus, n. frenikus) Opsi B, C, D, dan E salah. Mediastinum terletak di thorax, bukan abdomen (B). Mediastinum bukan rongga paru (C). Mediastinum berisi banyak struktur, bukan hanya jantung (D). Pleura adalah lapisan yang membungkus paru-paru, bukan mediastinum (E)."
+  },
+  {
+    question: "Manakah struktur yang TIDAK TERDAPAT di mediastinum superior?",
+    options: [
+      "Trakea",
+      "Esofagus",
+      "Arkus aorta",
+      "Jantung",
+      "Vena brakiosefalika",
+    ],
+    answer: 3,
+    explanation: "Mediastinum superior adalah bagian atas mediastinum yang terletak di atas bidang dari sudut sternum (angulus sterni/Louis) ke vertebra T4. Struktur yang terdapat di mediastinum superior meliputi: - Trakea - Esofagus - Arkus aorta (lengkung aorta) - Vena brakiosefalika (kanan dan kiri) → membentuk vena cava superior - Timus - N. vagus dan n. frenikus Jantung terletak dimediastinum medium (mediastinum tengah), bukan di mediastinum superior."
+  },
+  {
+    question: "Manakah struktur yang menjadi penanda penting pada sudut sternum (angulus sterni/T4)?",
+    options: [
+      "Percabangan trakea menjadi bronkus utama (bifurkasi trakea)",
+      "Apeks jantung",
+      "Muara vena cava inferior ke atrium kanan",
+      "Awal mula arteri koronaria",
+      "Batas antara mediastinum anterior dan posterior",
+    ],
+    answer: 0,
+    explanation: "Sudut sternum (angulus sterni, sudut Louis) terletak pada pertemuan manubrium dan corpus sterni, setinggi vertebra T4. Sudut ini merupakan penanda penting karena: -Bifurkasi trakea (percabangan trakea menjadi bronkus utama kanan dan kiri) terjadi pada level ini. - Batas antara mediastinum superior dan inferior. - Arkus aorta dimulai dan berakhir pada level ini. - Vena azygos bermuara ke vena cava superior pada level ini. ## H. ANATOMI SISTEM RESPIRASI (10 Soal)"
+  },
+  {
+    question: "Seorang anak kecil menghirup benda asing dan tersedak. Dokter memperkirakan benda asing lebih mungkin masuk ke bronkus kanan dibandingkan kiri. Manakah pernyataan yang PALING TEPAT mengenai perbedaan anatomi bronkus utama kanan dan kiri?",
+    options: [
+      "Bronkus utama kanan lebih panjang dan lebih horizontal.",
+      "Bronkus utama kiri lebih pendek, lebih lebar, dan lebih vertikal.",
+      "Bronkus utama kanan lebih pendek, lebih lebar, dan lebih vertikal.",
+      "Bronkus utama kiri lebih panjang dan lebih vertikal.",
+      "Bronkus utama kanan dan kiri memiliki ukuran dan sudut yang sama.",
+    ],
+    answer: 2,
+    explanation: "Bronkus utama kanan memiliki karakteristiklebih pendek, lebih lebar, dan lebih vertikal dibandingkan bronkus utama kiri. Karena anatominya yang lebih vertikal dan lurus (sudut 20-30° terhadap trakea), benda asing lebih mudah masuk ke bronkus kanan. Bronkus utama kiri lebih panjang, lebih sempit, dan lebih horizontal (sudut 40-60° terhadap trakea). Ini adalah alasan mengapa aspirasi benda asing lebih sering terjadi di paru-paru kanan."
+  },
+  {
+    question: "Manakah pernyataan yang BENAR mengenai lobus paru-paru?",
+    options: [
+      "Paru-paru kanan memiliki 2 lobus, paru-paru kiri memiliki 3 lobus.",
+      "Paru-paru kanan memiliki 3 lobus, paru-paru kiri memiliki 2 lobus.",
+      "Paru-paru kanan dan kiri memiliki 3 lobus.",
+      "Paru-paru kanan dan kiri memiliki 2 lobus.",
+      "Paru-paru kanan memiliki 4 lobus, paru-paru kiri memiliki 2 lobus.",
+    ],
+    answer: 1,
+    explanation: "-Paru-paru kanan memiliki3 lobus: lobus superior, lobus medius, dan lobus inferior. Dipisahkan oleh fisura horizontal dan fisura oblik. -Paru-paru kiri memiliki2 lobus: lobus superior dan lobus inferior. Dipisahkan oleh fisura oblik. Paru-paru kiri tidak memiliki lobus medius karena adanya jantung (takik jantung) yang menekan paru-paru kiri."
+  },
+  {
+    question: "Manakah fisura yang memisahkan lobus superior dari lobus inferior pada kedua paru-paru?",
+    options: [
+      "Fisura horizontal",
+      "Fisura oblik",
+      "Fisura vertikal",
+      "Fisura transversa",
+      "Fisura longitudinal",
+    ],
+    answer: 1,
+    explanation: "Fisura oblik (fissura obliqua) adalah fisura utama yang memisahkanlobus superior darilobus inferior padakedua paru-paru (kanan dan kiri). Pada paru-paru kanan, terdapat fisura tambahan yaitufisura horizontal yang memisahkan lobus superior dari lobus medius. Opsi A (fisura horizontal) hanya ada di paru-paru kanan."
+  },
+  {
+    question: "Manakah pernyataan yang BENAR mengenai pleura?",
+    options: [
+      "Pleura visceralis melapisi dinding dalam rongga thorax.",
+      "Pleura parietalis menempel langsung pada permukaan paru-paru.",
+      "Ruang antara pleura visceralis dan parietalis disebut rongga pleura yang berisi cairan pelumas.",
+      "Pleura visceralis dan parietalis tidak terhubung satu sama lain.",
+      "Rongga pleura selalu berisi udara dalam kondisi normal.",
+    ],
+    answer: 2,
+    explanation: "Pleura adalah membran serosa yang membungkus paru-paru dan melapisi rongga thorax. Terdiri dari: -Pleura visceralis (pleura pulmonalis): menempel langsung pada permukaan paru-paru. -Pleura parietalis: melapisi dinding rongga thorax (kostalis, mediastinalis, diafragmatika, dan servikalis). -Rongga pleura: ruang potensial antara kedua lapisan pleura, berisicairan pleura (cairan serosa) yang berfungsi sebagai pelumas untuk mengurangi gesekan saat paru-paru bergerak. Opsi A dan B terbalik (visceralis di paru, parietalis di dinding). Opsi D salah karena kedua lapisan pleura bersambung di hilus paru. Opsi E salah karena rongga pleura normalnya hanya berisi cairan, bukan udara (pneumotoraks adalah kondisi patologis)."
+  },
+  {
+    question: "Manakah struktur yang menonjol ke atas di atas iga pertama dan membentuk kubah (cupula) pleura?",
+    options: [
+      "Pleura visceralis",
+      "Pleura parietalis kostalis",
+      "Pleura parietalis servikalis (cupula pleurae)",
+      "Pleura parietalis diafragmatika",
+      "Pleura parietalis mediastinalis",
+    ],
+    answer: 2,
+    explanation: "Pleura parietalis servikalis (cupula pleurae, cervical pleura) adalah bagian dari pleura parietalis yang menonjol ke atasdi atas iga pertama dan masuk ke leher (pangkal). Kubah pleura ini mencapai setinggi vertebra C7 dan dilindungi oleh fasia prevertebralis dan otot-otot leher. Struktur ini penting untuk diketahui karena dapat cedera pada trauma leher atau saat melakukan blokade saraf di leher."
+  },
+  {
+    question: "Manakah struktur yang masuk dan keluar melalui hilus paru?",
+    options: [
+      "Hanya arteri dan vena pulmonalis",
+      "Bronkus, arteri pulmonalis, vena pulmonalis, dan saraf",
+      "Hanya bronkus dan arteri pulmonalis",
+      "Hanya vena pulmonalis dan saraf",
+      "Trakea dan esofagus",
+    ],
+    answer: 1,
+    explanation: "Hilus paru (porta pulmonis) adalah area pada permukaan mediastinal paru di mana struktur-struktur berikut masuk dan keluar: 1.Bronkus utama (kanan atau kiri) 2.Arteri pulmonalis (membawa darah kaya CO2 ke paru) 3.Vena pulmonalis (2 buah, membawa darah kaya O2 dari paru ke atrium kiri) 4.Arteri dan vena bronkialis (pembuluh nutrisi untuk paru) 5.Saraf (n. vagus dan serabut simpatis) 6.Pembuluh limfa Opsi A salah karena hanya menyebutkan arteri dan vena. Opsi C dan D salah karena tidak lengkap. Opsi E salah karena trakea dan esofagus tidak masuk melalui hilus paru (trakea bercabang di atas hilus, esofagus berada di belakang hilus)"
+  }
 ],
-answer: 1,
-explanation:
-"Jantung berfungsi sebagai pompa utama sistem kardiovaskular yang mempertahankan aliran darah ke sirkulasi pulmonal dan sistemik."
+
+  "Bank 2": [],
+  "Bank 3": [],
+  "Bank 4": [],
+  "Bank 5": []
 },
 
-{
-question: "Ion utama yang berada dalam konsentrasi tinggi di cairan ekstrasel adalah?",
-options: [
-"Kalium (K⁺)",
-"Magnesium (Mg²⁺)",
-"Natrium (Na⁺)",
-"Fosfat",
-"Protein"
-],
-answer: 2,
-explanation:
-"Natrium merupakan kation utama cairan ekstrasel, sedangkan kalium merupakan kation utama cairan intrasel."
+  Fisiologi: {
+  "Bank 1": [],
+  "Bank 2": [],
+  "Bank 3": [],
+  "Bank 4": [],
+  "Bank 5": []
 },
 
-{
-question: "Reseptor beta-1 adrenergik terutama banyak ditemukan pada?",
-options: [
-"Jantung",
-"Bronkus",
-"Uterus",
-"Pembuluh darah kulit",
-"Saluran cerna"
-],
-answer: 0,
-explanation:
-"Reseptor β1 terutama terdapat pada jantung. Aktivasi β1 meningkatkan frekuensi jantung, kontraktilitas, dan konduksi."
-}
+  Histologi: {
+  "Bank 1": [],
+  "Bank 2": [],
+  "Bank 3": [],
+  "Bank 4": [],
+  "Bank 5": []
+},
 
-];
+  Biokimia: {
+  "Bank 1": [],
+  "Bank 2": [],
+  "Bank 3": [],
+  "Bank 4": [],
+  "Bank 5": []
+},
+
+  Farmakologi: {
+  "Bank 1": [],
+  "Bank 2": [],
+  "Bank 3": [],
+  "Bank 4": [],
+  "Bank 5": []
+},
+
+  Mikrobiologi: {
+  "Bank 1": [],
+  "Bank 2": [],
+  "Bank 3": [],
+  "Bank 4": [],
+  "Bank 5": []
+},
+
+  Parasitologi: {
+  "Bank 1": [],
+  "Bank 2": [],
+  "Bank 3": [],
+  "Bank 4": [],
+  "Bank 5": []
+},
+};
+
+let questions = [];
+let currentBank = "";
 
 function hideAll(){
 document.getElementById("subjects").classList.add("hidden");
@@ -280,7 +1019,16 @@ hideAll();
 document.getElementById("banks").classList.remove("hidden");
 }
 
-function startQuiz(){
+function startQuiz(bankName){
+
+currentBank = bankName;
+
+questions = questionBanks[currentSubject][currentBank];
+
+if (!questions || questions.length === 0) {
+  alert("Bank soal ini masih kosong.");
+  return;
+}
 
 currentQuestion = 0;
 answers = [];
