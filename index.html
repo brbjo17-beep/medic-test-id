@@ -687,8 +687,6 @@ h2 {
       — medstu
     </p>
 
-    <h2 class="start-title">Mulai</h2>
-
     <button class="start-button" onclick="showSubjects()">
       <span>Mulai Latihan</span>
     </button>
@@ -873,11 +871,20 @@ h2 {
 </div>
 
 <script>
-  function showSubjects() {
+function showSubjects() {
   document.getElementById("welcome-screen").classList.add("hidden");
   document.getElementById("subjects").classList.remove("hidden");
+
+  const about = document.getElementById("about-section");
+  if (about) {
+    about.style.display = "none";
+  }
+
+  document.getElementById("subjects").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
 }
-  function scrollToSubjects() {
   document.getElementById("subjects").scrollIntoView({
     behavior: "smooth"
   });
