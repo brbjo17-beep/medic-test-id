@@ -921,7 +921,7 @@ h2 {
 .score-main {
   font-size: 32px;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .score-history-list {
@@ -958,7 +958,7 @@ h2 {
 .result-support {
   width: min(760px, 100%);
   margin: 14px auto 38px;
-  text-align: right;
+  text-align: left;
   color: #aaa;
   font-size: 11px;
 }
@@ -1010,6 +1010,127 @@ h2 {
   .score-main {
     font-size: 26px;
   }
+}
+
+/* ===== RESULT PAGE FINAL POSITIONING ===== */
+
+#result {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.result-page {
+  position: relative;
+  min-height: 100vh;
+  padding: 14px 55px 0;
+}
+
+/* Medic Test ID lebih ke atas */
+.result-header {
+  text-align: center;
+  margin: 0 auto 18px;
+  padding-top: 4px;
+}
+
+.result-header h1 {
+  margin: 0;
+  line-height: 1;
+  font-size: clamp(42px, 6vw, 78px);
+}
+
+.result-main-quote {
+  margin-top: 10px;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* tombol kembali */
+.result-back {
+  position: absolute;
+  top: 20px;
+  left: 28px;
+  z-index: 5;
+}
+
+/* skor + history */
+.result-summary {
+  width: min(760px, 100%);
+  margin: 28px auto 0;
+  text-align: left;
+}
+
+.score-history-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.score-history-item {
+  border: 0;
+  background: transparent;
+  padding: 3px 0;
+  color: #666;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.score-history-item:hover {
+  color: #111;
+  text-decoration: underline;
+}
+
+/* Support di sisi kiri */
+.result-support {
+  position: fixed;
+  left: 10px;
+  top: 50%;
+  width: auto;
+  margin: 0;
+  z-index: 10;
+
+  writing-mode: vertical-rl;
+  transform: translateY(-50%) rotate(180deg);
+
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: #aaa;
+  text-transform: uppercase;
+}
+
+/* review baru muncul setelah nilai diklik */
+.result-review {
+  width: min(900px, 100%);
+  margin: 35px auto 50px;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .result-page {
+    padding: 14px 20px 0;
+  }
+
+  .result-back {
+    position: static;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .result-support {
+    display: none;
+  }
+}
+
+.result-chart-card {
+  width: min(760px, 100%);
+  margin: 35px auto 20px;
+}
+
+#score-chart {
+  display: block;
+  width: 100%;
+  height: 300px;
 }
   
 </style>
@@ -1264,7 +1385,7 @@ h2 {
     ☕ Support Medic Test ID
   </div>
 
-  <div id="review" class="result-review"></div>
+<div id="review" class="result-review" style="display:none;"></div>
 
   <div id="result-subject-menu" class="result-subject-menu"></div>
 
@@ -2878,10 +2999,11 @@ function saveScoreHistory(score) {
 
   history.push({
     score: score,
-    date: new Date().toISOString()
+    date: new Date().toISOString(),
+    answers: [...answers],
+    questions: JSON.parse(JSON.stringify(questions))
   });
 
-  // Simpan maksimal 20 percobaan terakhir
   if (history.length > 20) {
     history.splice(0, history.length - 20);
   }
@@ -3282,15 +3404,147 @@ document.getElementById("review").innerHTML = reviewHTML;
 }
 
 function getResultMainQuote(score) {
-  if (score >= 95) return "Bagus. Sekarang coba ulang tanpa bantuan roh leluhur.";
-  if (score >= 85) return "Nilainya mencurigakan. Kamu belajar diam-diam ya?";
-  if (score >= 75) return "Lulus. Jangan terlalu sombong, opsi tadi mungkin sedang baik hati.";
-  if (score >= 70) return "Secara administratif selamat. Secara emosional, evaluasi sendiri.";
-  if (score >= 60) return "Hampir lulus. Kata yang sangat populer sebelum remedial.";
-  if (score >= 40) return "Setidaknya kamu masih ingat nama mata kuliahnya.";
-  if (score >= 20) return "Pilihan ganda ternyata tetap memungkinkan salah berkali-kali.";
-  if (score > 0) return "Denyut nadi pengetahuan teraba lemah. Observasi ketat.";
-  return "Secara statistik, menutup mata dan klik random mungkin bisa menyaingi hasil ini.";
+  const quotes = {
+    Anatomi: {
+      high: [
+        "Strukturnya sudah mulai menetap di kepala. Akhirnya atlas tidak dibuka cuma untuk dekorasi.",
+        "Anatomi tampaknya sudah menyerah melawanmu. Pertahankan.",
+        "Bagus. Setidaknya sekarang arteri dan vena tidak dianggap saudara kembar."
+      ],
+      mid: [
+        "Lumayan. Tubuh manusia mulai punya bentuk, walau beberapa bagian masih misterius.",
+        "Sudah ada kemajuan. Atlas anatomi belum bisa pensiun, tapi setidaknya tidak bekerja sendirian.",
+        "Beberapa struktur sudah kenal. Sisanya masih pura-pura tidak pernah bertemu."
+      ],
+      low: [
+        "Pilihan ganda ternyata tetap memungkinkan salah berkali-kali.",
+        "Tenang, tubuh manusia memang rumit. Tapi nilai ini ikut berkontribusi membuatnya lebih rumit.",
+        "Anatomi baru saja menunjukkan bahwa memiliki tubuh tidak otomatis membuat kita mengenalnya."
+      ]
+    },
+
+    Fisiologi: {
+      high: [
+        "Homeostasis tercapai. Setidaknya untuk nilai ini.",
+        "Tubuh mengatur dirinya sendiri. Hari ini otakmu ternyata ikut membantu.",
+        "Feedback positif: nilaimu bagus. Feedback negatif: tetap harus belajar."
+      ],
+      mid: [
+        "Sistemnya mulai bekerja. Beberapa mekanisme masih mogok tanpa pemberitahuan.",
+        "Homeostasis hampir tercapai. Hampir adalah kata yang sangat berguna.",
+        "Tubuhnya paham mekanismenya. Otakmu sedang menyusul."
+      ],
+      low: [
+        "Homeostasis gagal dipertahankan. Nilai ikut kolaps.",
+        "Potensial aksi berjalan. Potensial nilaimu sementara belum.",
+        "Tubuh manusia bekerja 24 jam. Sayangnya pemahaman fisiologinya belum ikut shift malam."
+      ]
+    },
+
+    Histologi: {
+      high: [
+        "Sel dan jaringan akhirnya terlihat berbeda. Mikroskop boleh istirahat.",
+        "Bagus. Epitel tidak lagi sekadar kumpulan warna pink dan ungu.",
+        "Preparat mulai bicara dan kali ini kamu mengerti bahasanya."
+      ],
+      mid: [
+        "Sudah mulai kelihatan jaringan mana yang mana. Sebagian masih abstrak modern.",
+        "Lumayan. Tidak semua preparat terlihat seperti bubur H&E lagi.",
+        "Mikroskopnya fokus. Pemahamannya hampir."
+      ],
+      low: [
+        "Semuanya masih terlihat pink dan ungu. H&E menang telak.",
+        "Preparatnya jelas. Yang blur ternyata bukan lensanya.",
+        "Histologi berhasil membuktikan bahwa memperbesar gambar tidak selalu memperbesar pemahaman."
+      ]
+    },
+
+    Biokimia: {
+      high: [
+        "Jalur metabolisme mulai masuk akal. Kejadian langka, nikmati.",
+        "ATP aman, enzim bekerja, nilai juga ikut hidup.",
+        "Bagus. Siklus-siklus itu akhirnya berhenti terlihat seperti konspirasi."
+      ],
+      mid: [
+        "Metabolisme berjalan. Beberapa jalurnya masih mengambil jalan alternatif.",
+        "Enzimnya aktif. Ingatannya kadang inhibitor kompetitif.",
+        "Lumayan. ATP terbentuk, pemahaman juga—walau yield-nya belum maksimal."
+      ],
+      low: [
+        "ATP mungkin dihasilkan. Nilai tampaknya tidak.",
+        "Siklus Krebs sudah berputar berkali-kali, nilainya masih mencari pintu masuk.",
+        "Biokimia kembali membuktikan bahwa panah yang banyak bukan berarti arah menjadi jelas."
+      ]
+    },
+
+    Farmakologi: {
+      high: [
+        "Reseptor tepat, obat tepat, nilai selamat.",
+        "Bagus. Agonis dan antagonis akhirnya berhenti bertukar identitas.",
+        "Farmakologi mulai jinak. Jangan lengah, efek samping bisa muncul kapan saja."
+      ],
+      mid: [
+        "Obatnya benar sebagian. Sisanya mungkin sedang mengalami interaksi.",
+        "Reseptor mulai dikenal, tapi beberapa masih dianggap orang asing.",
+        "Lumayan. Belum therapeutic failure, tapi belum boleh sombong."
+      ],
+      low: [
+        "Indikasi belum jelas, kontraindikasi nilai sudah terlihat.",
+        "Kalau jawaban ini obat, mungkin sudah ditarik dari pasaran.",
+        "Farmakologi meminta dosis tambahan belajar."
+      ]
+    },
+
+    Mikrobiologi: {
+      high: [
+        "Kumannya berhasil diidentifikasi. CDC mungkin belum menelepon, tapi lumayan.",
+        "Bakteri, virus, jamur—akhirnya tidak semuanya dianggap tersangka yang sama.",
+        "Bagus. Patogennya kalah sebelum sempat bikin kultur."
+      ],
+      mid: [
+        "Sebagian patogen sudah tertangkap. Sebagian masih buron.",
+        "Kultur pemahaman mulai tumbuh. Belum confluent.",
+        "Lumayan. Gram positif dan negatif mulai berhenti bertukar KTP."
+      ],
+      low: [
+        "Patogennya lolos. Nilainya ikut terinfeksi.",
+        "Kultur pengetahuan tampaknya perlu inkubasi lebih lama.",
+        "Mikroorganismenya kecil. Masalah nilainya tidak."
+      ]
+    },
+
+    Parasitologi: {
+      high: [
+        "Parasit berhasil diidentifikasi sebelum sempat ganti host.",
+        "Siklus hidupnya panjang, tapi setidaknya jawabanmu tidak ikut tersesat.",
+        "Bagus. Host definitifnya jelas, nilai juga."
+      ],
+      mid: [
+        "Sebagian parasit tertangkap. Sisanya masih menyelesaikan siklus hidup.",
+        "Host sudah ketemu. Stadium infektifnya kadang masih main petak umpet.",
+        "Lumayan. Parasitnya belum sepenuhnya berhasil mengambil alih otak."
+      ],
+      low: [
+        "Parasitnya hidup nyaman. Nilaimu yang mengalami kerugian.",
+        "Siklus hidup parasit berhasil. Siklus belajarnya perlu diulang.",
+        "Host definitif ditemukan. Jawaban definitif masih dicari."
+      ]
+    }
+  };
+
+  const subjectQuotes = quotes[currentSubject] || quotes.Anatomi;
+
+  let group;
+
+  if (score >= 80) {
+    group = subjectQuotes.high;
+  } else if (score >= 50) {
+    group = subjectQuotes.mid;
+  } else {
+    group = subjectQuotes.low;
+  }
+
+  return group[Math.floor(Math.random() * group.length)];
 }
 
 function getTrendQuote(history) {
@@ -3325,19 +3579,88 @@ function renderScoreHistory() {
   const recent = history.slice(-3).reverse();
 
   box.innerHTML = recent.map(function(item, index) {
+    const originalIndex = history.length - 1 - index;
     const label = index === 0 ? "Hasil terbaru" : "Hasil sebelumnya";
-    return "<div>" + label + ": <strong>" + item.score + "%</strong></div>";
+
+    return `
+      <button
+        class="score-history-item"
+        onclick="showAttemptReview(${originalIndex})"
+      >
+        ${label}: <strong>${item.score}%</strong>
+      </button>
+    `;
   }).join("");
 }
 
-function drawScoreChart() {
-  const canvas = document.getElementById("score-chart");
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
+function showAttemptReview(historyIndex) {
   const history = getScoreHistory();
+  const attempt = history[historyIndex];
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!attempt || !attempt.answers || !attempt.questions) {
+    alert("Pembahasan untuk hasil lama ini belum tersimpan.");
+    return;
+  }
+
+  const reviewBox = document.getElementById("review");
+  if (!reviewBox) return;
+
+  let reviewHTML = "";
+
+  attempt.answers.forEach(function(answer, index) {
+    const q = attempt.questions[index];
+    if (!q) return;
+
+    const isCorrect = answer === q.answer;
+
+    reviewHTML += `
+      <div class="review">
+        <p><strong>Soal ${index + 1}</strong></p>
+        <p>${q.question}</p>
+
+        <p>
+          <strong>Jawaban kamu:</strong>
+          ${String.fromCharCode(65 + answer)}. ${q.options[answer]}
+        </p>
+
+        <p>
+          <strong>Jawaban benar:</strong>
+          ${String.fromCharCode(65 + q.answer)}. ${q.options[q.answer]}
+        </p>
+
+        <p>
+          <strong>Status:</strong>
+          ${isCorrect ? "✅ Benar" : "❌ Salah"}
+        </p>
+
+        <p>
+          <strong>Pembahasan:</strong><br>
+          ${q.explanation || "Belum ada pembahasan."}
+        </p>
+      </div>
+    `;
+  });
+
+  reviewBox.innerHTML = reviewHTML;
+  reviewBox.style.display = "block";
+  reviewBox.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function drawScoreChart() {
+const canvas = document.getElementById("score-chart");
+if (!canvas) return;
+
+const parentWidth = canvas.parentElement
+  ? canvas.parentElement.clientWidth
+  : 700;
+
+canvas.width = Math.min(parentWidth, 760);
+canvas.height = 300;
+
+const ctx = canvas.getContext("2d");
+const history = getScoreHistory();
+
+ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (history.length === 0) {
     ctx.font = "16px sans-serif";
@@ -3345,28 +3668,33 @@ function drawScoreChart() {
     return;
   }
 
-  const scores = history.map(function(item) {
-    return item.score;
-  });
+const scores = history.slice(-10).map(function(item) {
+  return item.score;
+});
 
-  const padding = 40;
-  const width = canvas.width - padding * 2;
-  const height = canvas.height - padding * 2;
+const paddingLeft = 45;
+const paddingRight = 25;
+const paddingTop = 25;
+const paddingBottom = 40;
 
-  ctx.beginPath();
-  ctx.moveTo(padding, padding);
-  ctx.lineTo(padding, canvas.height - padding);
-  ctx.lineTo(canvas.width - padding, canvas.height - padding);
-  ctx.stroke();
+const width = canvas.width - paddingLeft - paddingRight;
+const height = canvas.height - paddingTop - paddingBottom;
+
+ctx.beginPath();
+ctx.moveTo(paddingLeft, paddingTop);
+ctx.lineTo(paddingLeft, canvas.height - paddingBottom);
+ctx.lineTo(canvas.width - paddingRight, canvas.height - paddingBottom);
+ctx.stroke();
 
   ctx.beginPath();
 
   scores.forEach(function(score, index) {
-    const x = scores.length === 1
-      ? canvas.width / 2
-      : padding + (index * width / (scores.length - 1));
+const x = scores.length === 1
+  ? paddingLeft + width / 2
+  : paddingLeft + (index * width / (scores.length - 1));
 
-    const y = canvas.height - padding - (score / 100) * height;
+const y =
+  canvas.height - paddingBottom - (score / 100) * height;
 
     if (index === 0) {
       ctx.moveTo(x, y);
@@ -3378,11 +3706,12 @@ function drawScoreChart() {
   ctx.stroke();
 
   scores.forEach(function(score, index) {
-    const x = scores.length === 1
-      ? canvas.width / 2
-      : padding + (index * width / (scores.length - 1));
+const x = scores.length === 1
+  ? paddingLeft + width / 2
+  : paddingLeft + (index * width / (scores.length - 1));
 
-    const y = canvas.height - padding - (score / 100) * height;
+const y =
+  canvas.height - paddingBottom - (score / 100) * height;
 
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, Math.PI * 2);
