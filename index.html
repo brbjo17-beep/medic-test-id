@@ -1417,6 +1417,41 @@ document.addEventListener("copy", function(event) {
   font-size: 13px;
   font-weight: 600;
 }
+
+.result-subject-menu {
+  position: fixed !important;
+
+  left: 50% !important;
+  bottom: 16px !important;
+  transform: translateX(-50%) !important;
+
+  width: min(900px, calc(100vw - 50px)) !important;
+  margin: 0 !important;
+
+  border: 1px solid rgba(210,210,210,0.8) !important;
+  border-radius: 20px !important;
+
+  background: rgba(255,255,255,0.88) !important;
+  backdrop-filter: blur(14px);
+
+  box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+
+  overflow: hidden;
+  z-index: 9998;
+}
+
+.result-subject-menu button {
+  border: 0 !important;
+  border-right: 1px solid rgba(220,220,220,0.7) !important;
+  background: transparent;
+
+  padding: 15px 10px;
+  cursor: pointer;
+}
+
+.result-subject-menu button:last-child {
+  border-right: 0 !important;
+}
   
 </style>
   
@@ -3347,19 +3382,17 @@ let questions = [];
 let currentBank = "";
 
 function hideAll(){
-document.getElementById("subjects").classList.add("hidden");
-document.getElementById("banks").classList.add("hidden");
-document.getElementById("quiz").classList.add("hidden");
-document.getElementById("result").classList.add("hidden");
+  document.getElementById("subjects").classList.add("hidden");
+  document.getElementById("banks").classList.add("hidden");
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("access-screen")?.classList.add("hidden");
 }
 
 function home(){
-hideAll();
-document.getElementById("subjects").classList.remove("hidden");
+  hideAll();
+  document.getElementById("subjects").classList.remove("hidden");
 }
-
-function openSubject(subject) {
-  currentSubject = subject;
 
   updateSubjectAttemptCounter();
 
@@ -4297,19 +4330,12 @@ document.addEventListener("keyup", function(event) {
 });  
 
 function showAccessGate() {
-  const choice = confirm(
-    "NC untuk " + currentSubject + " sudah habis.\n\n" +
-    "OK = Login untuk +3 attempt\n" +
-    "Cancel = Guest Pass Rp2.886"
-  );
+  hideAll();
 
-  if (choice) {
-    alert("Fitur Login sedang disiapkan.");
-  } else {
-    alert(
-      "Guest Pass Rp2.886 akan memberi +3 attempt untuk " +
-      currentSubject + ". Fitur pembayaran sedang disiapkan."
-    );
+  const accessScreen = document.getElementById("access-screen");
+
+  if (accessScreen) {
+    accessScreen.classList.remove("hidden");
   }
 }
 
