@@ -8,6 +8,48 @@
 
 <style>
 
+/* ===== BANK PAGE FIT 1 SCREEN ===== */
+
+#banks:not(.hidden) {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+#banks:not(.hidden) .subject-page-inner {
+  padding-top: 28px !important;
+  padding-bottom: 15px !important;
+  min-height: 100vh !important;
+}
+
+/* tombol Materi naik */
+#banks:not(.hidden) .subject-back {
+  margin-top: 0 !important;
+  margin-bottom: 8px !important;
+}
+
+/* Judul Fisiologi/Anatomi naik */
+#banks:not(.hidden) .subject-heading {
+  margin-top: 0 !important;
+  margin-bottom: 24px !important;
+}
+
+#banks:not(.hidden) .subject-heading h1 {
+  margin-top: 0 !important;
+  margin-bottom: 8px !important;
+}
+
+/* Bank lebih rapat supaya Bank 5 ikut masuk layar */
+#banks:not(.hidden) .bank-grid {
+  margin-top: 15px !important;
+  gap: 18px !important;
+}
+
+#banks:not(.hidden) .bank-card {
+  min-height: 130px !important;
+  padding: 20px !important;
+}  
+  
 /* Kunci halaman menu materi + menu bank agar tidak bisa scroll */
 
 body:has(#subjects:not(.hidden)),
@@ -10118,6 +10160,24 @@ function openSubject(subject) {
   document.getElementById("banks").classList.remove("hidden");
 
   document.getElementById("subject-title").innerText = subject;
+
+  const subjectQuotes = {
+  Anatomi: "Kalau semua struktur terasa mirip, berarti kamu sedang belajar anatomi dengan benar.",
+  Fisiologi: "Tubuh punya banyak cara menjaga keseimbangan. Soalnya punya banyak cara merusaknya.",
+  Histologi: "Sel-selnya kecil. Masalah mengenalinya tidak.",
+  Biokimia: "Kalau jalurnya mulai bercabang, tarik napas. Metabolisme memang suka drama.",
+  Farmakologi: "Obatnya menyembuhkan pasien. Nama dan mekanismenya menguji mahasiswa.",
+  Mikrobiologi: "Makhluknya mikroskopis. Daftar yang harus dihafal tidak.",
+  Parasitologi: "Mereka numpang hidup. Kamu yang harus menghafal siklus hidupnya."
+};
+
+const quote = document.getElementById("subject-quote");
+
+if (quote) {
+  quote.innerText =
+    subjectQuotes[subject] ||
+    "Satu bank dulu. Urusan menyerah belakangan.";
+}
 
   document.querySelectorAll(".bank-count").forEach(function(el) {
     const bankName = el.dataset.bank;
