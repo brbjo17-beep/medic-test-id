@@ -1644,6 +1644,52 @@ document.addEventListener("copy", function(event) {
   border-color: #8b5cf6;
   transform: translateY(-1px);
 }
+
+.guest-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 12px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.guest-divider::before,
+.guest-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.guest-pass-btn {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px dashed #c4b5fd;
+  border-radius: 15px;
+  background: #faf9ff;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+
+  color: #64748b;
+}
+
+.guest-pass-btn strong {
+  color: #7c3aed;
+}
+
+.guest-pass-btn span {
+  font-size: 12px;
+}
+
+.guest-pass-btn:hover {
+  border-color: #8b5cf6;
+  transform: translateY(-1px);
+}
   
 </style>
   
@@ -1897,10 +1943,19 @@ document.addEventListener("copy", function(event) {
 
     </div>
 
-    <button class="access-main-btn" onclick="createMedicAccount()">
-      ♡ Log in Yuk!
-    </button>
+<button class="access-main-btn" onclick="createMedicAccount()">
+  ♡ Buat Akun Yuk!
+</button>
 
+<div class="guest-divider">
+  <span>atau lanjut tanpa akun</span>
+</div>
+
+<button class="guest-pass-btn" onclick="openGuestPayment()">
+  <strong>👻 Guest Pass</strong>
+  <span>Rp2.886 • +3 NC untuk materi ini</span>
+</button>
+    
     <div class="access-divider">
       <span>atau</span>
     </div>
