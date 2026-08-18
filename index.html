@@ -1629,6 +1629,70 @@ document.addEventListener("copy", function(event) {
 
 </section>
 
+<!-- AKSES AKUN -->
+<section id="access-screen" class="hidden">
+
+  <div class="access-card">
+
+    <h2>Medic Test ID</h2>
+    <p class="access-subtitle">
+      NC kamu sudah habis. Bikin akun untuk lanjut.
+    </p>
+
+    <input
+      type="text"
+      id="signup-name"
+      placeholder="Nama"
+      autocomplete="name"
+    >
+
+    <input
+      type="email"
+      id="signup-email"
+      placeholder="Email"
+      autocomplete="email"
+    >
+
+    <input
+      type="password"
+      id="signup-password"
+      placeholder="Buat password"
+      autocomplete="new-password"
+    >
+
+    <button class="access-main-btn" onclick="createMedicAccount()">
+      Buat Akun
+    </button>
+
+    <p id="signup-message" class="signup-message"></p>
+
+  <div id="access-options" class="access-options hidden">
+
+  <button class="access-option-btn" onclick="claimFreeAccess()">
+    <strong>🎁 Pemakaian Gratis Sementara</strong>
+    <span>Tambah 3× pemakaian per materi</span>
+  </button>
+
+  <button class="access-option-btn lifetime" onclick="openLifetimePayment()">
+    <strong>♾️ Bayar Sekali Untuk Pemakaian Selamanya</strong>
+    <span>Rp4.886 • sekali bayar</span>
+  </button>
+
+</div>
+
+<p id="signup-message" class="signup-message"></p>
+
+<div id="access-options" class="access-options hidden">
+   ...
+</div>
+
+</div>
+</section>    
+
+  </div>
+
+</section>  
+  
 <!-- HALAMAN SOAL -->
 <section id="quiz" class="hidden">
 
@@ -4253,6 +4317,79 @@ function resetSubjectAttemptsForTesting(subject) {
   localStorage.removeItem(getSubjectAttemptKey(subject));
   updateSubjectAttemptCounter();
 }  
+
+async function createMedicAccount() {
+  const name = document.getElementById("signup-name").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const password = document.getElementById("signup-password").value;
+  const message = document.getElementById("signup-message");
+
+  if (!name || !email || !password) {
+    message.innerText = "Isi nama, email, dan password dulu.";
+    return;
+  }
+
+  if (password.length < 6) {
+    message.innerText = "Password minimal 6 karakter.";
+    return;
+  }
+
+  message.innerText = "Membuat akun...";
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      data: {
+        name: name
+      }
+    }
+  });
+
+  if (error) {
+    message.innerText = error.message;
+    return;
+  }
+
+message.innerText = "Akun berhasil dibuat 🎉";
+
+const accessOptions = document.getElementById("access-options");
+
+if (accessOptions) {
+  accessOptions.classList.remove("hidden");
+}
+
+console.log("Medic Test account:", data.user);
+}
+
+async function claimFreeAccess() {
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError || !user) {
+    alert("Akun belum terbaca. Coba login ulang.");
+    return;
+  }
+
+  const { data, error } =
+    await supabaseClient.rpc("claim_free_access");
+
+  if (error) {
+    console.error(error);
+    alert("Bonus belum berhasil diaktifkan.");
+    return;
+  }
+
+  alert(
+    "Yeay! 🎉 Kamu bisa ngerjakan soal gratis 3x lagi per materi."
+  );
+
+  document
+    .getElementById("access-screen")
+    ?.classList.add("hidden");
+
+  backBanks();
+}
   
 </script>
 
