@@ -8,6 +8,23 @@
 
 <style>
 
+.quiz-top-actions {
+  width: min(900px, 92%);
+  margin: 20px auto 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.quiz-top-actions .back {
+  margin-bottom: 0;
+}
+
+.review-history-button {
+  margin-left: auto;
+}
+  
 body:has(#subjects:not(.hidden)) {
   overflow: hidden !important;
   height: 100vh !important;
@@ -1966,17 +1983,17 @@ background:
 
     <div class="grid">
 
-      <div class="card" onclick="openSubject('Anatomi')">
-        <div class="subject-icon">🫀</div>
-        <strong>Anatomi</strong>
-        <span class="subject-status">5 bank tersedia</span>
-      </div>
+<div class="card" onclick="openSubject('Anatomi')">
+  <div class="subject-icon">🫀</div>
+  <strong>Anatomi</strong>
+  <span class="subject-status">5 bank tersedia</span>
+</div>
 
-      <div class="card" onclick="openSubject('Fisiologi')">
-        <div class="subject-icon">⚡</div>
-        <strong>Fisiologi</strong>
-        <span class="subject-status coming">5 bank tersedia</span>
-      </div>
+<div class="card" onclick="openSubject('Fisiologi')">
+  <div class="subject-icon">⚡</div>
+  <strong>Fisiologi</strong>
+  <span class="subject-status">5 bank tersedia</span>
+</div>
 
       <div class="card" onclick="openSubject('Histologi')">
         <div class="subject-icon">🔬</div>
@@ -2210,7 +2227,13 @@ background:
 <!-- HALAMAN SOAL -->
 <section id="quiz" class="hidden">
 
-<span class="back" onclick="backBanks()">← Keluar dari soal</span>
+<div class="quiz-top-actions">
+  <span class="back" onclick="backBanks()">← Keluar dari soal</span>
+
+  <span class="back review-history-button" onclick="openPreviousResults()">
+    Review →
+  </span>
+</div>
 
 <div class="quiz-box">
 
@@ -10238,6 +10261,79 @@ function prepareRandomQuestions(originalQuestions) {
 
   return shuffleArray(prepared);
 }
+
+function openPreviousResults() {
+  const history = getScoreHistory();
+
+  if (!history || history.length === 0) {
+    alert("Belum ada hasil sebelumnya untuk bank ini.");
+    return;
+  }
+
+  // Simpan posisi quiz agar saat kembali tidak kehilangan progress
+  saveQuizProgress();
+
+  hideAll();
+
+  const resultSection = document.getElementById("result");
+  if (resultSection) {
+    resultSection.classList.remove("hidden");
+  }
+
+  const review = document.getElementById("review");
+
+  if (review) {
+    review.style.display = "none";
+    review.innerHTML = "";
+  }
+
+  const scoreBox = document.getElementById("score");
+  const historyBox = document.getElementById("score-history");
+
+  if (scoreBox) {
+    const latest = history[history.length - 1];
+
+    scoreBox.innerHTML = `
+      <div class="score-main">
+        ${latest.score}%
+      </div>
+
+      <div class="score-label">
+        Hasil terakhir
+      </div>
+    `;
+  }
+
+  if (historyBox) {
+    historyBox.innerHTML = "";
+
+    history
+      .slice()
+      .reverse()
+      .forEach(function(item, index) {
+        const attemptNumber = history.length - index;
+
+        const date = new Date(item.date);
+
+        const button = document.createElement("button");
+        button.className = "score-history-item";
+
+        button.innerHTML = `
+          Percobaan ${attemptNumber}
+          — <strong>${item.score}%</strong>
+          — ${date.toLocaleDateString("id-ID")}
+        `;
+
+        button.onclick = function() {
+          showSavedAttempt(item);
+        };
+
+        historyBox.appendChild(button);
+      });
+  }
+
+  drawScoreChart(history);
+}  
   
 function startQuiz(bankName){
 
