@@ -8,6 +8,57 @@
 
 <style>
 
+/* ===== BANK PAGE COMPACT POSITION ===== */
+
+#banks:not(.hidden) {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+#banks:not(.hidden) .subject-page-inner {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  padding: 18px 7% 24px !important;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* tombol Materi */
+#banks:not(.hidden) .subject-back {
+  margin: 0 0 6px !important;
+  padding: 4px 0 !important;
+}
+
+/* judul Anatomi / Fisiologi */
+#banks:not(.hidden) .subject-heading {
+  margin: 0 0 18px !important;
+}
+
+#banks:not(.hidden) #subject-title {
+  margin: 0 !important;
+  font-size: clamp(48px, 6vw, 76px) !important;
+  line-height: 1 !important;
+}
+
+#banks:not(.hidden) #subject-quote {
+  margin: 10px auto 0 !important;
+}
+
+/* bank */
+#banks:not(.hidden) .bank-grid {
+  margin: 10px auto 0 !important;
+  gap: 16px !important;
+  width: 100%;
+}
+
+#banks:not(.hidden) .bank-card {
+  min-height: 115px !important;
+  padding: 16px 18px !important;
+}  
+
 /* ===== BANK PAGE FIT 1 SCREEN ===== */
 
 #banks:not(.hidden) {
