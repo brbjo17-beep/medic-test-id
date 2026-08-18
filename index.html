@@ -1333,6 +1333,27 @@ document.addEventListener("copy", function(event) {
   min-height: 100vh !important;
   width: 100% !important;
 }
+
+#subjects:not(.hidden) {
+  position: fixed !important;
+  inset: 0 !important;
+
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+
+  margin: 0 !important;
+  padding: 40px 50px !important;
+
+  overflow: hidden !important;
+
+  background-image: url("menu-wallpaper.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+
+  z-index: 1000;
+}  
   
 </style>
 </head>
