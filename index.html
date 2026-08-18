@@ -8,21 +8,54 @@
 
 <style>
 
-/* ===== NAIKKAN KONTEN BANK, TOMBOL MATERI TETAP ===== */
+/* ===== SEMUA JUDUL MATERI NAIK KE AREA BIRU ===== */
 
-/* Judul + quote naik */
 #banks:not(.hidden) .subject-heading {
-  transform: translateY(-70px) !important;
-  margin-bottom: -50px !important;
+  transform: translateY(-145px) !important;
+  margin-bottom: -125px !important;
+  position: relative !important;
+  z-index: 3 !important;
 }
 
-/* Semua kartu bank ikut naik */
-#banks:not(.hidden) .bank-grid {
-  transform: translateY(-70px) !important;
+#banks:not(.hidden) #subject-title {
+  margin: 0 0 10px !important;
 }
 
-/* Tombol Materi TIDAK digeser */
+#banks:not(.hidden) #subject-quote {
+  margin: 0 auto !important;
+}
+
 #banks:not(.hidden) .subject-back {
+  transform: none !important;
+}
+
+#banks:not(.hidden) .bank-grid {
+  transform: none !important;
+}
+
+/* Hanya Fisiologi/Anatomi + quote yang naik */
+#banks:not(.hidden) .subject-heading {
+  transform: translateY(-145px) !important;
+  margin-bottom: -125px !important;
+  position: relative;
+  z-index: 2;
+}
+
+#banks:not(.hidden) #subject-title {
+  margin-bottom: 10px !important;
+}
+
+#banks:not(.hidden) #subject-quote {
+  margin-top: 0 !important;
+}
+
+/* Tombol Materi tetap */
+#banks:not(.hidden) .subject-back {
+  transform: none !important;
+}
+
+/* Kartu bank jangan digeser paksa */
+#banks:not(.hidden) .bank-grid {
   transform: none !important;
 }
 
