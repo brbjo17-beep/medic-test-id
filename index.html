@@ -17,6 +17,16 @@ body:has(#subjects:not(.hidden)) {
   height: 100vh !important;
   min-height: 100vh !important;
   overflow: hidden !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #eefaff 28%,
+      #dff5ff 55%,
+      #cceeff 78%,
+      #f8fdff 100%
+    ) !important;
 }
 
 * {
@@ -605,7 +615,7 @@ h2 {
   padding: 60px 20px;
   overflow: hidden;
 
-  background-image: url("images/welcome-bg.jpg");
+  background-image: url("welcome-bg.jpg");
   background-size: cover;
   background-position: center;
 }
@@ -1315,17 +1325,27 @@ document.addEventListener("copy", function(event) {
   min-height: 100vh !important;
   width: 100% !important;
 
-  background:
-    linear-gradient(
-      rgba(255, 255, 255, 0.35),
-      rgba(255, 255, 255, 0.35)
-    ),
-    url("./menu-wallpaper.png") center center / cover no-repeat !important;
+background:
+  linear-gradient(
+    145deg,
+    #ffffff 0%,
+    #eefaff 28%,
+    #dff5ff 55%,
+    #cceeff 78%,
+    #f8fdff 100%
+  ) !important;
 }
 
 #subjects:not(.hidden) {
-  background-image: url("menu-wallpaper.png") !important;
-  background-size: cover !important;
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #eefaff 28%,
+      #dff5ff 55%,
+      #cceeff 78%,
+      #f8fdff 100%
+    ) !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
   background-color: transparent !important;
