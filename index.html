@@ -3456,6 +3456,14 @@ function startQuiz(bankName){
 currentBank = bankName;
 resultSaved = false;
 
+const remainingAttempts =
+  getRemainingFreeAttempts(currentSubject);
+
+if (remainingAttempts <= 0) {
+  showAccessGate();
+  return;
+}  
+  
 const originalQuestions = questionBanks[currentSubject][currentBank];
 
 if (!originalQuestions || originalQuestions.length === 0) {
@@ -4211,6 +4219,28 @@ document.addEventListener("keyup", function(event) {
     }, 1500);
   }
 });  
+
+function showAccessGate() {
+  const choice = confirm(
+    "NC untuk " + currentSubject + " sudah habis.\n\n" +
+    "OK = Login untuk +3 attempt\n" +
+    "Cancel = Guest Pass Rp2.886"
+  );
+
+  if (choice) {
+    alert("Fitur Login sedang disiapkan.");
+  } else {
+    alert(
+      "Guest Pass Rp2.886 akan memberi +3 attempt untuk " +
+      currentSubject + ". Fitur pembayaran sedang disiapkan."
+    );
+  }
+}
+
+function resetSubjectAttemptsForTesting(subject) {
+  localStorage.removeItem(getSubjectAttemptKey(subject));
+  updateSubjectAttemptCounter();
+}  
   
 </script>
 
