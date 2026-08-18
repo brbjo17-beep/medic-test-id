@@ -1354,6 +1354,69 @@ document.addEventListener("copy", function(event) {
 
   z-index: 1000;
 }  
+
+.subject-support {
+  display: flex;
+  justify-content: center;
+  margin: 28px auto 10px;
+}
+
+.subject-support button {
+  border: 1px solid rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(10px);
+
+  padding: 11px 20px;
+  border-radius: 16px;
+
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+
+  cursor: pointer;
+  transition: transform 0.2s ease,
+              box-shadow 0.2s ease,
+              background 0.2s ease;
+}
+
+.subject-support button:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+.subject-support button:active {
+  transform: translateY(0);
+}
+
+#quiz.quiz-protected {
+  filter: blur(18px);
+  opacity: 0.08;
+  pointer-events: none;
+  user-select: none;
+}  
+
+.nc-counter {
+  margin: 18px auto 8px;
+  text-align: center;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.nc-counter span {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  opacity: 0.55;
+  vertical-align: middle;
+}
+
+.nc-counter strong {
+  font-size: 13px;
+  font-weight: 600;
+}
   
 </style>
 </head>
@@ -1537,13 +1600,18 @@ document.addEventListener("copy", function(event) {
 <small class="bank-count" data-bank="Bank 5"></small>
       </button>
 
-    </div>
+   </div>
 
-    <div class="subject-support">
-      <button onclick="supportComingSoon()">
-        ☕ Traktir medstu
-      </button>
-    </div>
+<div class="nc-counter">
+  <span>NC</span>
+  <strong id="subject-attempt-counter">3/3</strong>
+</div>
+
+<div class="subject-support">
+  <button onclick="supportComingSoon()">
+    ☕ Traktir medstu
+  </button>
+</div>
 
   </div>
 
@@ -1654,6 +1722,48 @@ let currentQuestion = 0;
 let answers = [];
 let selected = null;
 let resultSaved = false;
+
+const FREE_ATTEMPTS_PER_SUBJECT = 3;
+
+function getSubjectAttemptKey(subject) {
+  return "medicTestAttempts_" + subject;
+}
+
+function getSubjectAttempts(subject) {
+  const saved = localStorage.getItem(
+    getSubjectAttemptKey(subject)
+  );
+
+  return saved ? parseInt(saved, 10) : 0;
+}
+
+function addSubjectAttempt(subject) {
+  const current = getSubjectAttempts(subject);
+
+  localStorage.setItem(
+    getSubjectAttemptKey(subject),
+    String(current + 1)
+  );
+
+  return current + 1;
+}
+
+function getRemainingFreeAttempts(subject) {
+  return Math.max(
+    0,
+    FREE_ATTEMPTS_PER_SUBJECT - getSubjectAttempts(subject)
+  );
+}  
+
+function updateSubjectAttemptCounter() {
+  const counter = document.getElementById("subject-attempt-counter");
+
+  if (!counter || !currentSubject) return;
+
+  const remaining = getRemainingFreeAttempts(currentSubject);
+
+  counter.innerText = remaining + "/3";
+}  
 
 /* SOAL CONTOH */
 const questionBanks = {
@@ -3172,8 +3282,10 @@ hideAll();
 document.getElementById("subjects").classList.remove("hidden");
 }
 
-function openSubject(subject){
+function openSubject(subject) {
   currentSubject = subject;
+
+  updateSubjectAttemptCounter();
 
   hideAll();
 
@@ -3569,6 +3681,7 @@ Math.round((correct/questions.length)*100);
 
 if (!resultSaved) {
   saveScoreHistory(percentage);
+  addSubjectAttempt(currentSubject);
   resultSaved = true;
 }
 
@@ -4061,6 +4174,43 @@ function renderResultDashboard() {
   drawScoreChart();
   renderResultSubjectMenu();
 }
+
+function protectQuiz() {
+  const quiz = document.getElementById("quiz");
+
+  if (quiz && !quiz.classList.contains("hidden")) {
+    quiz.classList.add("quiz-protected");
+  }
+}
+
+function revealQuiz() {
+  const quiz = document.getElementById("quiz");
+
+  if (quiz) {
+    quiz.classList.remove("quiz-protected");
+  }
+}
+
+window.addEventListener("blur", protectQuiz);
+window.addEventListener("focus", revealQuiz);
+
+document.addEventListener("visibilitychange", function() {
+  if (document.hidden) {
+    protectQuiz();
+  } else {
+    revealQuiz();
+  }
+});
+
+document.addEventListener("keyup", function(event) {
+  if (event.key === "PrintScreen") {
+    protectQuiz();
+
+    setTimeout(function() {
+      revealQuiz();
+    }, 1500);
+  }
+});  
   
 </script>
 
