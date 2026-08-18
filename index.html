@@ -1288,22 +1288,28 @@ document.addEventListener("copy", function(event) {
   }
 });  
 
- #subjects {
-  position: relative;
-  min-height: 100vh;
+#subjects:not(.hidden) {
+  min-height: 100vh !important;
+  width: 100% !important;
 
-  background-image:
+  background:
     linear-gradient(
-      rgba(255, 255, 255, 0.42),
-      rgba(255, 255, 255, 0.42)
+      rgba(255, 255, 255, 0.35),
+      rgba(255, 255, 255, 0.35)
     ),
-    url("menu-wallpaper.png");
+    url("./menu-wallpaper.png") center center / cover no-repeat !important;
+}
 
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-} 
+#subjects:not(.hidden) {
+  background-image: url("menu-wallpaper.png") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-color: transparent !important;
+
+  min-height: 100vh !important;
+  width: 100% !important;
+}
   
 </style>
 </head>
