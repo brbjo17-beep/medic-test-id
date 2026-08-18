@@ -858,6 +858,159 @@ h2 {
   color: #9299a4;
   font-size: 12px;
 }
+
+.quiz-quote {
+  text-align: right;
+  color: #9aa0aa;
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  min-height: 18px;
+}
+
+/* ===== RESULT DASHBOARD ===== */
+
+#result {
+  min-height: 100vh;
+  background: #fbfaf7;
+}
+
+.result-page {
+  min-height: 100vh;
+  padding: 28px 42px 0;
+  color: #171717;
+}
+
+.result-back {
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+  cursor: pointer;
+  color: #555;
+  padding: 8px 0;
+}
+
+.result-header {
+  text-align: center;
+  margin: 0 auto 40px;
+}
+
+.result-header h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(42px, 6vw, 78px);
+  font-weight: 400;
+  letter-spacing: -2px;
+}
+
+.result-main-quote {
+  margin: 12px auto 0;
+  max-width: 720px;
+  color: #8d8d8d;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.result-summary {
+  width: min(700px, 100%);
+  margin: 0 auto 38px;
+}
+
+.score-main {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.score-history-list {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.result-chart-card {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: 26px;
+  border: 1px solid #e5e2dc;
+  border-radius: 22px;
+  background: rgba(255,255,255,.7);
+}
+
+#score-chart {
+  display: block;
+  width: 100%;
+  max-width: 700px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.trend-quote {
+  margin: 18px 0 0;
+  text-align: center;
+  color: #8d8d8d;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.result-support {
+  width: min(760px, 100%);
+  margin: 14px auto 38px;
+  text-align: right;
+  color: #aaa;
+  font-size: 11px;
+}
+
+.result-review {
+  width: min(900px, 100%);
+  margin: 0 auto 50px;
+}
+
+.result-subject-menu {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  width: 100%;
+  margin-top: 50px;
+  border-top: 1px solid #d8d4cc;
+  background: rgba(251,250,247,.96);
+  backdrop-filter: blur(10px);
+}
+
+.result-subject-menu button {
+  border: 0;
+  border-right: 1px solid #d8d4cc;
+  background: transparent;
+  padding: 20px 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.result-subject-menu button:last-child {
+  border-right: 0;
+}
+
+.result-subject-menu button:hover {
+  background: #f1eee8;
+}
+
+@media (max-width: 700px) {
+  .result-page {
+    padding: 20px 18px 0;
+  }
+
+  .result-subject-menu {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .score-main {
+    font-size: 26px;
+  }
+}
   
 </style>
 </head>
@@ -1060,6 +1213,8 @@ h2 {
 
 <div class="quiz-box">
 
+<div id="quiz-quote" class="quiz-quote"></div>
+
 <div class="progress" id="progress"></div>
 
 <h3 id="question"></h3>
@@ -1080,13 +1235,40 @@ h2 {
 <!-- HASIL -->
 <section id="result" class="hidden">
 
-<h2>Hasil Latihan</h2>
+<div class="result-page">
 
-<div class="score" id="score"></div>
+  <button class="result-back" onclick="backBanks()">← Kembali</button>
 
-<div id="review"></div>
+  <div class="result-header">
+    <h1>Medic Test ID</h1>
+    <p id="result-main-quote" class="result-main-quote"></p>
+  </div>
 
-<button class="next" onclick="home()">Kembali ke Beranda</button>
+  <div class="result-summary">
+
+    <div class="score-main" id="score"></div>
+
+    <div id="score-history-list" class="score-history-list"></div>
+
+  </div>
+
+  <div class="result-chart-card">
+
+    <canvas id="score-chart" width="700" height="320"></canvas>
+
+    <p id="trend-quote" class="trend-quote"></p>
+
+  </div>
+
+  <div class="result-support">
+    ☕ Support Medic Test ID
+  </div>
+
+  <div id="review" class="result-review"></div>
+
+  <div id="result-subject-menu" class="result-subject-menu"></div>
+
+</div>
 
 </section>
 
@@ -1126,6 +1308,7 @@ let currentSubject = "";
 let currentQuestion = 0;
 let answers = [];
 let selected = null;
+let resultSaved = false;
 
 /* SOAL CONTOH */
 const questionBanks = {
@@ -2674,6 +2857,41 @@ function getProgressKey() {
   return "medicTestProgress_" + currentSubject + "_" + currentBank;
 }
 
+function getScoreHistoryKey() {
+  return "medicTestScoreHistory_" + currentSubject + "_" + currentBank;
+}
+
+function getScoreHistory() {
+  const saved = localStorage.getItem(getScoreHistoryKey());
+
+  if (!saved) return [];
+
+  try {
+    return JSON.parse(saved);
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveScoreHistory(score) {
+  const history = getScoreHistory();
+
+  history.push({
+    score: score,
+    date: new Date().toISOString()
+  });
+
+  // Simpan maksimal 20 percobaan terakhir
+  if (history.length > 20) {
+    history.splice(0, history.length - 20);
+  }
+
+  localStorage.setItem(
+    getScoreHistoryKey(),
+    JSON.stringify(history)
+  );
+}
+  
 function saveQuizProgress() {
 const data = {
   currentQuestion: currentQuestion,
@@ -2778,6 +2996,7 @@ function prepareRandomQuestions(originalQuestions) {
 function startQuiz(bankName){
 
 currentBank = bankName;
+resultSaved = false;
 
 const originalQuestions = questionBanks[currentSubject][currentBank];
 
@@ -2840,8 +3059,35 @@ showQuestion();
 updateAnswerProgress();
 }
 
-function showQuestion(){
+const quizQuotes = [
+  "Kalau semua opsi terlihat benar, selamat datang di FK.",
+  "Jangan percaya opsi yang terlalu cantik. Biasanya ada jebakan.",
+  "N. vagus pergi ke mana-mana. Kamu buka PPT saja sudah capek.",
+  "Potensial aksi naik turun. Nilai ujian jangan ikut-ikutan.",
+  "Ginjal menyaring darah 24 jam. Masa kamu 20 soal sudah menyerah.",
+  "Kalau lupa, baca lagi. Jangan diagnosis diri sendiri dulu.",
+  "Salah satu opsi pasti benar. Semoga bukan yang barusan kamu coret.",
+  "Tenang. Yang diuji pengetahuanmu, bukan harga dirimu.",
+  "Kalau jawabannya C terus, itu bukan pola. Itu paranoia mahasiswa FK.",
+  "Yang penting bukan hafal posisi jawabannya. Kita sudah mengacaknya. Hehe.",
+  "Anatomi punya banyak nama karena satu nama rupanya belum cukup menyiksa.",
+  "Jangan menyerah. Bahkan refleks patella perlu diketuk dulu baru bereaksi.",
+  "Kalau skornya turun, sebut saja variasi fisiologis.",
+  "Baca stem-nya. Soalnya kadang baik, opsinya yang kriminal.",
+  "Jangan overthinking. Differential diagnosis soal ini tidak perlu 17 penyakit."
+];
 
+function updateQuizQuote() {
+  const quoteBox = document.getElementById("quiz-quote");
+  if (!quoteBox) return;
+
+  const randomIndex = Math.floor(Math.random() * quizQuotes.length);
+  quoteBox.innerText = quizQuotes[randomIndex];
+}
+  
+  function showQuestion(){
+    
+updateQuizQuote();
 selected = null;
 
 const oldExplanation = document.getElementById("instant-explanation");
@@ -2975,8 +3221,15 @@ correct++;
 let percentage =
 Math.round((correct/questions.length)*100);
 
+if (!resultSaved) {
+  saveScoreHistory(percentage);
+  resultSaved = true;
+}
+
 document.getElementById("score").innerText =
 percentage + "% (" + correct + "/" + questions.length + " benar)";
+
+renderResultDashboard();
 
 let reviewHTML = "";
 
@@ -3028,6 +3281,169 @@ document.getElementById("review").innerHTML = reviewHTML;
 
 }
 
+function getResultMainQuote(score) {
+  if (score >= 95) return "Bagus. Sekarang coba ulang tanpa bantuan roh leluhur.";
+  if (score >= 85) return "Nilainya mencurigakan. Kamu belajar diam-diam ya?";
+  if (score >= 75) return "Lulus. Jangan terlalu sombong, opsi tadi mungkin sedang baik hati.";
+  if (score >= 70) return "Secara administratif selamat. Secara emosional, evaluasi sendiri.";
+  if (score >= 60) return "Hampir lulus. Kata yang sangat populer sebelum remedial.";
+  if (score >= 40) return "Setidaknya kamu masih ingat nama mata kuliahnya.";
+  if (score >= 20) return "Pilihan ganda ternyata tetap memungkinkan salah berkali-kali.";
+  if (score > 0) return "Denyut nadi pengetahuan teraba lemah. Observasi ketat.";
+  return "Secara statistik, menutup mata dan klik random mungkin bisa menyaingi hasil ini.";
+}
+
+function getTrendQuote(history) {
+  if (history.length < 2) {
+    return "Belum ada tren. Satu nilai belum cukup untuk membuat diagnosis akademik.";
+  }
+
+  const latest = history[history.length - 1].score;
+  const previous = history[history.length - 2].score;
+  const diff = latest - previous;
+
+  if (diff >= 20) return "Peningkatan akut. Etiologi masih belum diketahui.";
+  if (diff >= 8) return "Prognosis membaik. Jangan dirusak di attempt berikutnya.";
+  if (diff > 0) return "Naik sedikit. Mikroskop mungkin diperlukan untuk melihat bedanya.";
+  if (diff === 0) return "Stabil sekali. Sayangnya stabil di nilai yang sama.";
+  if (diff >= -8) return "Sedikit menurun. Sebut saja variasi fisiologis.";
+  if (diff >= -20) return "Grafik turun. Pertimbangkan resusitasi akademik.";
+  return "Penurunan kesadaran akademik. Cek GCS dan buka materi.";
+}
+
+function renderScoreHistory() {
+  const history = getScoreHistory();
+  const box = document.getElementById("score-history-list");
+
+  if (!box) return;
+
+  if (history.length === 0) {
+    box.innerHTML = "<div>Belum ada riwayat nilai.</div>";
+    return;
+  }
+
+  const recent = history.slice(-3).reverse();
+
+  box.innerHTML = recent.map(function(item, index) {
+    const label = index === 0 ? "Hasil terbaru" : "Hasil sebelumnya";
+    return "<div>" + label + ": <strong>" + item.score + "%</strong></div>";
+  }).join("");
+}
+
+function drawScoreChart() {
+  const canvas = document.getElementById("score-chart");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const history = getScoreHistory();
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (history.length === 0) {
+    ctx.font = "16px sans-serif";
+    ctx.fillText("Belum ada data nilai.", 30, 50);
+    return;
+  }
+
+  const scores = history.map(function(item) {
+    return item.score;
+  });
+
+  const padding = 40;
+  const width = canvas.width - padding * 2;
+  const height = canvas.height - padding * 2;
+
+  ctx.beginPath();
+  ctx.moveTo(padding, padding);
+  ctx.lineTo(padding, canvas.height - padding);
+  ctx.lineTo(canvas.width - padding, canvas.height - padding);
+  ctx.stroke();
+
+  ctx.beginPath();
+
+  scores.forEach(function(score, index) {
+    const x = scores.length === 1
+      ? canvas.width / 2
+      : padding + (index * width / (scores.length - 1));
+
+    const y = canvas.height - padding - (score / 100) * height;
+
+    if (index === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+
+  ctx.stroke();
+
+  scores.forEach(function(score, index) {
+    const x = scores.length === 1
+      ? canvas.width / 2
+      : padding + (index * width / (scores.length - 1));
+
+    const y = canvas.height - padding - (score / 100) * height;
+
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.font = "12px sans-serif";
+    ctx.fillText(score + "%", x - 12, y - 10);
+  });
+}
+
+function renderResultSubjectMenu() {
+  const subjects = [
+    "Anatomi",
+    "Fisiologi",
+    "Histologi",
+    "Biokimia",
+    "Farmakologi",
+    "Mikrobiologi",
+    "Parasitologi"
+  ];
+
+  const menu = document.getElementById("result-subject-menu");
+  if (!menu) return;
+
+  const others = subjects.filter(function(subject) {
+    return subject !== currentSubject;
+  });
+
+  menu.innerHTML = others.map(function(subject) {
+    return (
+      '<button onclick="openSubject(\'' +
+      subject +
+      '\')">' +
+      subject +
+      "</button>"
+    );
+  }).join("");
+}
+
+function renderResultDashboard() {
+  const history = getScoreHistory();
+  const latest = history.length
+    ? history[history.length - 1].score
+    : 0;
+
+  const mainQuote = document.getElementById("result-main-quote");
+  const trendQuote = document.getElementById("trend-quote");
+
+  if (mainQuote) {
+    mainQuote.innerText = getResultMainQuote(latest);
+  }
+
+  if (trendQuote) {
+    trendQuote.innerText = getTrendQuote(history);
+  }
+
+  renderScoreHistory();
+  drawScoreChart();
+  renderResultSubjectMenu();
+}
+  
 </script>
 
 </body>
