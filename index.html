@@ -956,11 +956,30 @@ h2 {
 }
 
 .result-support {
-  width: min(760px, 100%);
-  margin: 14px auto 38px;
-  text-align: left;
+  position: fixed;
+  right: 10px;
+  top: 50%;
+  z-index: 10;
+
+  writing-mode: vertical-rl;
+  transform: translateY(-50%);
+
+  margin: 0;
+  width: auto;
+}
+
+.result-support button {
+  border: none;
+  background: transparent;
   color: #aaa;
-  font-size: 11px;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.result-support button:hover {
+  color: #555;
 }
 
 .result-review {
@@ -1131,6 +1150,42 @@ h2 {
   display: block;
   width: 100%;
   height: 300px;
+}
+
+.result-title-blue {
+  background: #dfefff;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: 18px 0 16px;
+  text-align: center;
+}
+
+.result-title-blue h1 {
+  margin: 0;
+}
+
+.result-main-quote {
+  text-align: center;
+  margin: 10px auto 0;
+}
+  
+.score-history-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-delete-btn {
+  border: none;
+  background: transparent;
+  color: #bbb;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.score-delete-btn:hover {
+  color: #d33;
 }
   
 </style>
@@ -1360,10 +1415,13 @@ h2 {
 
   <button class="result-back" onclick="backBanks()">← Kembali</button>
 
-  <div class="result-header">
+<div class="result-header">
+  <div class="result-title-blue">
     <h1>Medic Test ID</h1>
-    <p id="result-main-quote" class="result-main-quote"></p>
   </div>
+
+  <p id="result-main-quote" class="result-main-quote"></p>
+</div>
 
   <div class="result-summary">
 
@@ -1381,9 +1439,11 @@ h2 {
 
   </div>
 
-  <div class="result-support">
+<div class="result-support">
+  <button onclick="supportComingSoon()">
     ☕ Support Medic Test ID
-  </div>
+  </button>
+</div>
 
 <div id="review" class="result-review" style="display:none;"></div>
 
@@ -3399,7 +3459,12 @@ reviewHTML =
 "<div class='review'><strong>Semua jawaban benar. Mantap.</strong></div>";
 }
 
-document.getElementById("review").innerHTML = reviewHTML;
+const reviewBox = document.getElementById("review");
+
+if (reviewBox) {
+  reviewBox.innerHTML = "";
+  reviewBox.style.display = "none";
+}
 
 }
 
@@ -3582,15 +3647,64 @@ function renderScoreHistory() {
     const originalIndex = history.length - 1 - index;
     const label = index === 0 ? "Hasil terbaru" : "Hasil sebelumnya";
 
-    return `
-      <button
-        class="score-history-item"
-        onclick="showAttemptReview(${originalIndex})"
-      >
-        ${label}: <strong>${item.score}%</strong>
-      </button>
-    `;
+return `
+  <div class="score-history-row">
+    <button
+      class="score-history-item"
+      onclick="showAttemptReview(${originalIndex})"
+    >
+      ${label}: <strong>${item.score}%</strong>
+    </button>
+
+    <button
+      class="score-delete-btn"
+      onclick="deleteScoreHistory(${originalIndex}, event)"
+      title="Hapus hasil ini"
+    >
+      ×
+    </button>
+  </div>
+`;
   }).join("");
+}
+
+function deleteScoreHistory(index, event) {
+  if (event) {
+    event.stopPropagation();
+  }
+
+  const history = getScoreHistory();
+
+  if (!history[index]) return;
+
+  const yakin = confirm(
+    "Hapus hasil " + history[index].score + "% ini?"
+  );
+
+  if (!yakin) return;
+
+  history.splice(index, 1);
+
+  localStorage.setItem(
+    getScoreHistoryKey(),
+    JSON.stringify(history)
+  );
+
+  const reviewBox = document.getElementById("review");
+
+  if (reviewBox) {
+    reviewBox.innerHTML = "";
+    reviewBox.style.display = "none";
+  }
+
+  renderScoreHistory();
+  drawScoreChart();
+
+  const trendQuote = document.getElementById("trend-quote");
+
+  if (trendQuote) {
+    trendQuote.innerText = getTrendQuote(history);
+  }
 }
 
 function showAttemptReview(historyIndex) {
