@@ -8,6 +8,21 @@
 
 <style>
 
+/* Kunci halaman menu materi + menu bank agar tidak bisa scroll */
+
+body:has(#subjects:not(.hidden)),
+body:has(#banks:not(.hidden)) {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+#subjects:not(.hidden),
+#banks:not(.hidden) {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+}
+  
 .quiz-top-actions {
   width: min(900px, 92%);
   margin: 20px auto 0;
