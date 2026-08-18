@@ -1690,6 +1690,147 @@ document.addEventListener("copy", function(event) {
   border-color: #8b5cf6;
   transform: translateY(-1px);
 }
+
+/* ===== GUEST PAYMENT ===== */
+
+#guest-payment-screen {
+  min-height: 100vh;
+  width: 100%;
+  padding: 45px 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background:
+    radial-gradient(circle at 15% 15%, #dff4ff 0, transparent 32%),
+    radial-gradient(circle at 85% 20%, #eee5ff 0, transparent 34%),
+    linear-gradient(135deg, #f8fcff, #fbf8ff);
+}
+
+#guest-payment-screen.hidden {
+  display: none !important;
+}
+
+.guest-payment-card {
+  width: min(460px, 100%);
+  padding: 32px;
+
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(139,92,246,0.15);
+  border-radius: 28px;
+
+  box-shadow: 0 24px 70px rgba(79,70,150,0.13);
+
+  text-align: center;
+}
+
+.guest-payment-logo {
+  font-size: 24px;
+  font-weight: 800;
+
+  background: linear-gradient(90deg, #2563eb, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.guest-payment-icon {
+  font-size: 42px;
+  margin: 18px 0 4px;
+}
+
+.guest-payment-card h2 {
+  margin: 5px 0;
+  color: #1e293b;
+}
+
+.guest-payment-text {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.guest-payment-text strong {
+  color: #7c3aed;
+}
+
+.guest-price {
+  margin: 22px 0;
+  padding: 17px;
+
+  border-radius: 18px;
+  background: #faf9ff;
+  border: 1px solid #ede9fe;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.guest-price span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.guest-price strong {
+  color: #7c3aed;
+  font-size: 23px;
+}
+
+.guest-payment-method {
+  margin-top: 18px;
+}
+
+.guest-payment-method p {
+  margin: 5px 0 15px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.guest-qris-box {
+  width: 220px;
+  height: 220px;
+
+  margin: auto;
+
+  border: 2px dashed #ddd6fe;
+  border-radius: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.guest-paid-btn {
+  width: 100%;
+  margin-top: 22px;
+  padding: 14px;
+
+  border: 0;
+  border-radius: 15px;
+
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.guest-cancel-btn {
+  margin-top: 12px;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.guest-payment-message {
+  font-size: 13px;
+  color: #64748b;
+}
   
 </style>
   
@@ -1982,6 +2123,50 @@ document.addEventListener("copy", function(event) {
       </button>
 
     </div>
+
+  </div>
+
+</section> 
+
+ <!-- GUEST PAYMENT -->
+<section id="guest-payment-screen" class="hidden">
+
+  <div class="guest-payment-card">
+
+    <div class="guest-payment-logo">Medic Test ID ✨</div>
+
+    <div class="guest-payment-icon">👻</div>
+
+    <h2>Guest Pass</h2>
+
+    <p class="guest-payment-text">
+      Sedikit lagi bisa lanjut berantem sama
+      <strong id="guest-payment-subject">materi</strong> ✨
+    </p>
+
+    <div class="guest-price">
+      <span>Total pembayaran</span>
+      <strong>Rp2.886</strong>
+    </div>
+
+    <div class="guest-payment-method">
+      <strong>Bayar pakai QRIS</strong>
+      <p>Scan QR Medic Test ID di bawah ini.</p>
+
+      <div id="guest-qris-box" class="guest-qris-box">
+        QRIS segera dipasang
+      </div>
+    </div>
+
+    <button class="guest-paid-btn" onclick="submitGuestPayment()">
+      ✓ Aku sudah bayar
+    </button>
+
+    <button class="guest-cancel-btn" onclick="backFromGuestPayment()">
+      ← Nanti dulu
+    </button>
+
+    <p id="guest-payment-message" class="guest-payment-message"></p>
 
   </div>
 
@@ -3641,11 +3826,13 @@ let questions = [];
 let currentBank = "";
 
 function hideAll(){
+function hideAll(){
   document.getElementById("subjects").classList.add("hidden");
   document.getElementById("banks").classList.add("hidden");
   document.getElementById("quiz").classList.add("hidden");
   document.getElementById("result").classList.add("hidden");
   document.getElementById("access-screen")?.classList.add("hidden");
+  document.getElementById("guest-payment-screen")?.classList.add("hidden");
 }
 
 function home(){
@@ -4677,6 +4864,34 @@ async function claimFreeAccess() {
     ?.classList.add("hidden");
 
   backBanks();
+}
+function openGuestPayment() {
+  hideAll();
+
+  const screen = document.getElementById("guest-payment-screen");
+  const subject = document.getElementById("guest-payment-subject");
+
+  if (subject) {
+    subject.innerText = currentSubject;
+  }
+
+  if (screen) {
+    screen.classList.remove("hidden");
+  }
+}
+
+function backFromGuestPayment() {
+  hideAll();
+  document.getElementById("access-screen")?.classList.remove("hidden");
+}
+
+function submitGuestPayment() {
+  const message = document.getElementById("guest-payment-message");
+
+  if (message) {
+    message.innerText =
+      "Pembayaran belum bisa diverifikasi otomatis.";
+  }
 }
   
 </script>
