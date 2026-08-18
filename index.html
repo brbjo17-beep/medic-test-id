@@ -6,6 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Medic Test ID</title>
 
+body:has(#subjects:not(.hidden)) {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+#subjects:not(.hidden) {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  overflow: hidden !important;
+}
+  
 <style>
 * {
   box-sizing: border-box;
