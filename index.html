@@ -1452,6 +1452,198 @@ document.addEventListener("copy", function(event) {
 .result-subject-menu button:last-child {
   border-right: 0 !important;
 }
+
+/* ===== ACCESS / LOGIN ===== */
+
+#access-screen {
+  min-height: 100vh;
+  width: 100%;
+  padding: 55px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(circle at 15% 15%, #dff4ff 0, transparent 32%),
+    radial-gradient(circle at 85% 20%, #eee5ff 0, transparent 34%),
+    linear-gradient(135deg, #f8fcff, #fbf8ff);
+}
+
+#access-screen.hidden {
+  display: none !important;
+}
+
+.access-card {
+  width: min(480px, 100%);
+  background: rgba(255,255,255,0.94);
+
+  border: 1px solid rgba(160,150,230,0.20);
+  border-radius: 28px;
+
+  padding: 34px;
+
+  box-shadow:
+    0 24px 70px rgba(79,70,150,0.13);
+
+  text-align: center;
+}
+
+.access-logo {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 25px;
+
+  background: linear-gradient(90deg, #2563eb, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.access-greeting {
+  color: #25324a;
+  line-height: 1.65;
+  margin-bottom: 25px;
+}
+
+.access-greeting strong {
+  font-size: 18px;
+}
+
+.access-greeting p {
+  margin: 7px 0 0;
+  font-size: 14px;
+}
+
+.access-greeting span {
+  color: #ec4899;
+  font-weight: 700;
+}
+
+.access-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.access-fields input {
+  width: 100%;
+  border: 1px solid #ddddea;
+  border-radius: 15px;
+
+  padding: 15px 17px;
+
+  font-size: 14px;
+  outline: none;
+
+  background: #fff;
+
+  transition: 0.2s;
+}
+
+.access-fields input:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 4px rgba(139,92,246,0.09);
+}
+
+.access-main-btn {
+  width: 100%;
+  margin-top: 16px;
+
+  border: 0;
+  border-radius: 15px;
+
+  padding: 15px;
+
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+
+  box-shadow: 0 10px 25px rgba(124,58,237,0.22);
+
+  cursor: pointer;
+}
+
+.access-main-btn:hover {
+  transform: translateY(-1px);
+}
+
+.access-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin: 20px 0 12px;
+
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.access-divider::before,
+.access-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.access-login-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  color: #64748b;
+  font-size: 13px;
+}
+
+.access-login-btn strong {
+  color: #7c3aed;
+}
+
+.signup-message {
+  margin: 14px 0 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.access-options {
+  margin-top: 22px;
+  display: grid;
+  gap: 10px;
+}
+
+.access-options.hidden {
+  display: none !important;
+}
+
+.access-option-btn {
+  width: 100%;
+  padding: 14px 16px;
+
+  border: 1px solid #ddd6fe;
+  border-radius: 16px;
+
+  background: #faf9ff;
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.access-option-btn strong {
+  color: #4c1d95;
+}
+
+.access-option-btn span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.access-option-btn:hover {
+  border-color: #8b5cf6;
+  transform: translateY(-1px);
+}
   
 </style>
   
@@ -1669,64 +1861,76 @@ document.addEventListener("copy", function(event) {
 
   <div class="access-card">
 
-    <h2>Medic Test ID</h2>
-    <p class="access-subtitle">
-      NC kamu sudah habis. Bikin akun untuk lanjut.
-    </p>
+    <div class="access-logo">Medic Test ID ✨</div>
 
-    <input
-      type="text"
-      id="signup-name"
-      placeholder="Nama"
-      autocomplete="name"
-    >
+    <div class="access-greeting">
+      <strong>👋 Halo Medic Test ID lovers,</strong>
+      <p>
+        maaf ya <span>NC kamu udah habis</span>,<br>
+        jadi kalo kamu masih berminat bahas soal,<br>
+        log in yuk ✨
+      </p>
+    </div>
 
-    <input
-      type="email"
-      id="signup-email"
-      placeholder="Email"
-      autocomplete="email"
-    >
+    <div class="access-fields">
 
-    <input
-      type="password"
-      id="signup-password"
-      placeholder="Buat password"
-      autocomplete="new-password"
-    >
+      <input
+        type="text"
+        id="signup-name"
+        placeholder="👤  Nama lengkap"
+        autocomplete="name"
+      >
+
+      <input
+        type="email"
+        id="signup-email"
+        placeholder="✉️  Email"
+        autocomplete="email"
+      >
+
+      <input
+        type="password"
+        id="signup-password"
+        placeholder="🔒  Buat password"
+        autocomplete="new-password"
+      >
+
+    </div>
 
     <button class="access-main-btn" onclick="createMedicAccount()">
-      Buat Akun
+      ♡ Log in Yuk!
+    </button>
+
+    <div class="access-divider">
+      <span>atau</span>
+    </div>
+
+    <button class="access-login-btn" onclick="loginMedicAccount()">
+      Udah punya akun? <strong>Masuk di sini →</strong>
     </button>
 
     <p id="signup-message" class="signup-message"></p>
 
-  <div id="access-options" class="access-options hidden">
+    <div id="access-options" class="access-options hidden">
 
-  <button class="access-option-btn" onclick="claimFreeAccess()">
-    <strong>🎁 Pemakaian Gratis Sementara</strong>
-    <span>Tambah 3× pemakaian per materi</span>
-  </button>
+      <button class="access-option-btn" onclick="claimFreeAccess()">
+        <strong>🎁 Pemakaian Gratis Sementara</strong>
+        <span>+3 pemakaian per materi</span>
+      </button>
 
-  <button class="access-option-btn lifetime" onclick="openLifetimePayment()">
-    <strong>♾️ Bayar Sekali Untuk Pemakaian Selamanya</strong>
-    <span>Rp4.886 • sekali bayar</span>
-  </button>
+      <button
+        class="access-option-btn lifetime"
+        onclick="openLifetimePayment()"
+      >
+        <strong>♾️ Buka Akses Selamanya</strong>
+        <span>Rp4.886 • sekali bayar</span>
+      </button>
 
-</div>
-
-<p id="signup-message" class="signup-message"></p>
-
-<div id="access-options" class="access-options hidden">
-   ...
-</div>
-
-</div>
-</section>    
+    </div>
 
   </div>
 
-</section>  
+</section> 
   
 <!-- HALAMAN SOAL -->
 <section id="quiz" class="hidden">
