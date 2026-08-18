@@ -822,6 +822,43 @@ h2 {
   }
 }
   
+/* ===== PROGRESS JAWABAN ===== */
+
+.answer-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d8dde5;
+  transition: .2s ease;
+}
+
+.progress-dot.correct {
+  background: #22a06b;
+}
+
+.progress-dot.wrong {
+  background: #dc4c4c;
+}
+
+.progress-dot.unanswered {
+  background: #d8dde5;
+}
+
+.answered-count {
+  margin-top: 10px;
+  text-align: center;
+  color: #9299a4;
+  font-size: 12px;
+}
+  
 </style>
 </head>
 
@@ -2629,29 +2666,178 @@ function openSubject(subject){
 }
 
 function backBanks(){
-hideAll();
-document.getElementById("banks").classList.remove("hidden");
+    hideAll();
+  document.getElementById("banks").classList.remove("hidden");
+}
+  
+function getProgressKey() {
+  return "medicTestProgress_" + currentSubject + "_" + currentBank;
 }
 
+function saveQuizProgress() {
+const data = {
+  currentQuestion: currentQuestion,
+  answers: answers,
+  questions: questions
+};
+
+  localStorage.setItem(
+    getProgressKey(),
+    JSON.stringify(data)
+  );
+}
+
+function loadQuizProgress() {
+  const saved = localStorage.getItem(getProgressKey());
+
+  if (!saved) return null;
+
+  try {
+    return JSON.parse(saved);
+  } catch (error) {
+    return null;
+  }
+}
+
+function clearQuizProgress() {
+  localStorage.removeItem(getProgressKey());
+}
+
+function updateAnswerProgress() {
+  const progressBox = document.getElementById("answer-progress");
+  const countBox = document.getElementById("answered-count");
+
+  if (!progressBox || !countBox) return;
+
+  let html = "";
+  let answered = 0;
+
+  questions.forEach((question, index) => {
+
+    const userAnswer = answers[index];
+
+    let status = "unanswered";
+
+    if (userAnswer !== undefined && userAnswer !== null) {
+      answered++;
+
+      if (userAnswer === question.answer) {
+        status = "correct";
+      } else {
+        status = "wrong";
+      }
+    }
+
+    html += `<span class="progress-dot ${status}"></span>`;
+  });
+
+  progressBox.innerHTML = html;
+  countBox.innerText =
+    answered + " / " + questions.length + " soal dikerjakan";
+}
+
+  function shuffleArray(array) {
+  const copy = [...array];
+
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+
+  return copy;
+}
+
+function prepareRandomQuestions(originalQuestions) {
+  const prepared = originalQuestions.map(function(q) {
+
+    const optionObjects = q.options.map(function(option, index) {
+      return {
+        text: option,
+        correct: index === q.answer
+      };
+    });
+
+    const shuffledOptions = shuffleArray(optionObjects);
+
+    const newAnswer = shuffledOptions.findIndex(function(option) {
+      return option.correct;
+    });
+
+    return {
+      ...q,
+      options: shuffledOptions.map(function(option) {
+        return option.text;
+      }),
+      answer: newAnswer
+    };
+  });
+
+  return shuffleArray(prepared);
+}
+  
 function startQuiz(bankName){
 
 currentBank = bankName;
 
-questions = questionBanks[currentSubject][currentBank];
+const originalQuestions = questionBanks[currentSubject][currentBank];
 
-if (!questions || questions.length === 0) {
+if (!originalQuestions || originalQuestions.length === 0) {
   alert("Bank soal ini masih kosong.");
   return;
 }
 
-currentQuestion = 0;
-answers = [];
+const savedProgress = loadQuizProgress();
+
+if (savedProgress && savedProgress.answers && savedProgress.answers.length > 0) {
+
+  const lanjut = confirm(
+    "Kamu punya progress tersimpan di bank ini.\n\nOK = Lanjutkan\nCancel = Ulang dari awal"
+  );
+
+  if (lanjut) {
+
+  questions = savedProgress.questions || prepareRandomQuestions(originalQuestions);
+
+  answers = savedProgress.answers || [];
+  currentQuestion = savedProgress.currentQuestion || 0;
+
+/* Cari soal pertama yang belum dikerjakan */
+while (
+  currentQuestion < questions.length &&
+  answers[currentQuestion] !== undefined &&
+  answers[currentQuestion] !== null
+) {
+  currentQuestion++;
+}
+
+/* Jaga-jaga kalau seluruh soal sudah selesai */
+if (currentQuestion >= questions.length) {
+  currentQuestion = questions.length - 1;
+}
+
+  } else {
+  clearQuizProgress();
+
+  questions = prepareRandomQuestions(originalQuestions);
+
+  currentQuestion = 0;
+  answers = [];
+}
+
+} else {
+  questions = prepareRandomQuestions(originalQuestions);
+
+  currentQuestion = 0;
+  answers = [];
+}
+
 selected = null;
 
 hideAll();
 document.getElementById("quiz").classList.remove("hidden");
 
 showQuestion();
+updateAnswerProgress();
 }
 
 function showQuestion(){
@@ -2692,6 +2878,10 @@ function selectOption(index, element) {
 if (selected !== null) return;
 
 selected = index;
+
+answers[currentQuestion] = index;
+saveQuizProgress();
+updateAnswerProgress();
 
 const q = questions[currentQuestion];
 const allOptions = document.querySelectorAll(".option");
@@ -2753,14 +2943,13 @@ alert("Pilih jawaban terlebih dahulu.");
 return;
 }
 
-answers.push(selected);
-
 currentQuestion++;
 
+saveQuizProgress();
+updateAnswerProgress();
+
 if(currentQuestion < questions.length){
-
-showQuestion();
-
+  showQuestion();
 }else{
 
 showResult();
