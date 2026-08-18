@@ -8,7 +8,7 @@
 
 <style>
 
-/* ===== BANK PAGE FINAL ===== */
+/* ===== BANK PAGE CLEAN FINAL ===== */
 
 #banks:not(.hidden) {
   height: 100vh !important;
@@ -18,90 +18,70 @@
 }
 
 #banks:not(.hidden) .subject-page-inner {
+  position: relative !important;
   height: 100vh !important;
   max-height: 100vh !important;
 
-  padding: 18px 7% 85px !important;
-
-  display: flex !important;
-  flex-direction: column !important;
+  padding: 0 7% 45px !important;
 }
 
 /* tombol Materi tetap di kiri atas */
 #banks:not(.hidden) .subject-back {
-  margin: 0 0 4px !important;
-  padding: 5px 0 !important;
+  position: absolute !important;
+  top: 28px !important;
+  left: 7% !important;
+
+  margin: 0 !important;
+  padding: 4px 0 !important;
   transform: none !important;
+
+  z-index: 5;
 }
 
-/* Anatomi / Fisiologi / Histologi / dst */
+/* judul materi + quote */
 #banks:not(.hidden) .subject-heading {
-  margin: -5px auto 14px !important;
+  margin: 0 auto !important;
+  padding-top: 22px !important;
+
   transform: none !important;
-  text-align: center;
+  text-align: center !important;
 }
 
-/* kecilkan judul supaya tidak kepotong */
 #banks:not(.hidden) #subject-title {
   margin: 0 !important;
-  font-size: clamp(42px, 5vw, 64px) !important;
+
+  font-size: clamp(50px, 5.5vw, 72px) !important;
   line-height: 1 !important;
 }
 
-/* quote lebih rapat */
 #banks:not(.hidden) #subject-quote {
-  margin: 8px auto 0 !important;
+  margin: 9px auto 0 !important;
+
   font-size: 13px !important;
-  line-height: 1.45 !important;
+  line-height: 1.4 !important;
 }
 
 /* area kartu bank */
 #banks:not(.hidden) .bank-grid {
   width: 100% !important;
-  max-width: 950px !important;
+  max-width: 1050px !important;
 
-  margin: 10px auto 0 !important;
+  margin: 42px auto 0 !important;
 
-  gap: 14px !important;
-
+  gap: 18px !important;
   transform: none !important;
 }
 
-/* kartu dibuat sedikit lebih pendek */
+/* kartu bank */
 #banks:not(.hidden) .bank-card {
-  min-height: 100px !important;
-  padding: 14px 18px !important;
-  border-radius: 20px !important;
+  min-height: 120px !important;
+
+  padding: 18px 20px !important;
+  border-radius: 22px !important;
 }
 
 #banks:not(.hidden) .bank-card span {
-  font-size: 25px !important;
-}
-
-/* Hanya Fisiologi/Anatomi + quote yang naik */
-#banks:not(.hidden) .subject-heading {
-  transform: translateY(-145px) !important;
-  margin-bottom: -125px !important;
-  position: relative;
-  z-index: 2;
-}
-
-#banks:not(.hidden) #subject-title {
-  margin-bottom: 10px !important;
-}
-
-#banks:not(.hidden) #subject-quote {
-  margin-top: 0 !important;
-}
-
-/* Tombol Materi tetap */
-#banks:not(.hidden) .subject-back {
-  transform: none !important;
-}
-
-/* Kartu bank jangan digeser paksa */
-#banks:not(.hidden) .bank-grid {
-  transform: none !important;
+  font-size: 27px !important;
 }
 
 /* ===== BANK PAGE FIT 1 SCREEN ===== */
