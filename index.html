@@ -1152,18 +1152,6 @@ h2 {
   height: 300px;
 }
 
-.result-title-blue {
-  background: #dfefff;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  padding: 18px 0 16px;
-  text-align: center;
-}
-
-.result-title-blue h1 {
-  margin: 0;
-}
-
 .result-main-quote {
   text-align: center;
   margin: 10px auto 0;
@@ -1187,7 +1175,73 @@ h2 {
 .score-delete-btn:hover {
   color: #d33;
 }
-  
+
+.result-header {
+  margin: 0 auto 20px !important;
+  padding-top: 0 !important;
+  text-align: center;
+}
+
+.result-header h1 {
+  margin: 0 !important;
+  font-size: clamp(42px, 6vw, 78px);
+  line-height: 1;
+}
+
+.result-main-quote {
+  margin: 10px auto 0 !important;
+  text-align: center;
+  color: #8d8d8d;
+}
+
+.result-support {
+  position: fixed !important;
+  left: auto !important;
+  right: 8px !important;
+  top: 50% !important;
+  bottom: auto !important;
+
+  width: auto !important;
+  margin: 0 !important;
+
+  writing-mode: vertical-rl;
+  transform: translateY(-50%) !important;
+
+  z-index: 9999;
+}
+
+.result-support button {
+  border: none;
+  background: transparent;
+  color: #999;
+  cursor: pointer;
+  font-size: 10px;
+  letter-spacing: 3px;
+}
+
+.score-history-item:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.result-back {
+  position: fixed !important;
+  top: 16px !important;
+  left: 18px !important;
+  z-index: 9999 !important;
+
+  border: 0;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(8px);
+
+  padding: 8px 12px;
+  border-radius: 999px;
+
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  cursor: pointer;
+}
+
 </style>
 </head>
 
@@ -1416,10 +1470,7 @@ h2 {
   <button class="result-back" onclick="backBanks()">← Kembali</button>
 
 <div class="result-header">
-  <div class="result-title-blue">
-    <h1>Medic Test ID</h1>
-  </div>
-
+  <h1>Medic Test ID</h1>
   <p id="result-main-quote" class="result-main-quote"></p>
 </div>
 
@@ -3641,37 +3692,40 @@ function renderScoreHistory() {
     return;
   }
 
-  const recent = history.slice(-3).reverse();
+const recent = history.slice().reverse();
 
   box.innerHTML = recent.map(function(item, index) {
     const originalIndex = history.length - 1 - index;
     const label = index === 0 ? "Hasil terbaru" : "Hasil sebelumnya";
 
+const canReview = item.answers && item.questions;
+
 return `
   <div class="score-history-row">
+
     <button
       class="score-history-item"
-      onclick="showAttemptReview(${originalIndex})"
+      ${canReview
+        ? `onclick="showAttemptReview(${originalIndex})"`
+        : `disabled title="Pembahasan attempt lama belum tersimpan"`}
     >
       ${label}: <strong>${item.score}%</strong>
     </button>
 
     <button
       class="score-delete-btn"
-      onclick="deleteScoreHistory(${originalIndex}, event)"
+      onclick="deleteScoreHistory(${originalIndex})"
       title="Hapus hasil ini"
     >
       ×
     </button>
+
   </div>
 `;
   }).join("");
 }
 
-function deleteScoreHistory(index, event) {
-  if (event) {
-    event.stopPropagation();
-  }
+function deleteScoreHistory(index) {
 
   const history = getScoreHistory();
 
@@ -3697,14 +3751,20 @@ function deleteScoreHistory(index, event) {
     reviewBox.style.display = "none";
   }
 
-  renderScoreHistory();
-  drawScoreChart();
+renderScoreHistory();
+drawScoreChart();
 
-  const trendQuote = document.getElementById("trend-quote");
+const trendQuote = document.getElementById("trend-quote");
 
-  if (trendQuote) {
-    trendQuote.innerText = getTrendQuote(history);
-  }
+if (trendQuote) {
+  trendQuote.innerText = getTrendQuote(history);
+}
+
+const mainQuote = document.getElementById("result-main-quote");
+
+if (mainQuote && history.length > 0) {
+  mainQuote.innerText =
+    getResultMainQuote(history[history.length - 1].score);
 }
 
 function showAttemptReview(historyIndex) {
