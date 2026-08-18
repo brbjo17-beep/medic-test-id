@@ -1263,6 +1263,30 @@ h2 {
 body {
   padding-top: 0 !important;
 }  
+
+/* Soal dan opsi tidak bisa diseleksi */
+#question,
+.options,
+.option,
+#instant-explanation {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+document.addEventListener("copy", function(event) {
+  const selection = window.getSelection();
+
+  if (!selection || selection.rangeCount === 0) return;
+
+  const selectedElement = selection.anchorNode?.parentElement;
+
+  if (
+    selectedElement &&
+    selectedElement.closest("#quiz")
+  ) {
+    event.preventDefault();
+  }
+});  
   
 </style>
 </head>
