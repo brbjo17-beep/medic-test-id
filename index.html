@@ -5,8 +5,86 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Medic Test ID</title>
-
+ 
 <style>
+
+/* ===== TRAKTIR MEDSTU ===== */
+
+#support-screen {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 15%, #dff5ff, transparent 35%),
+    radial-gradient(circle at 80% 80%, #e8e5ff, transparent 35%),
+    #ffffff;
+}
+
+.support-page {
+  width: min(900px, 90%);
+  min-height: 100vh;
+  margin: auto;
+  padding: 35px 0 60px;
+}
+
+.support-content {
+  max-width: 520px;
+  margin: 40px auto 0;
+  text-align: center;
+}
+
+.support-icon {
+  font-size: 38px;
+  margin-bottom: 8px;
+}
+
+.support-content h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(38px, 6vw, 62px);
+  font-weight: 500;
+}
+
+.support-quote {
+  max-width: 480px;
+  margin: 18px auto 28px;
+  color: #64748b;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.7;
+}
+
+.support-qr {
+  width: 280px;
+  height: 280px;
+  margin: 0 auto 20px;
+  padding: 12px;
+
+  background: rgba(255,255,255,.85);
+  border: 1px solid rgba(148,163,184,.25);
+  border-radius: 24px;
+
+  box-shadow: 0 15px 45px rgba(15,23,42,.09);
+}
+
+.support-qr-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px dashed #b8c5d1;
+  border-radius: 16px;
+
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.support-small {
+  color: #94a3b8;
+  font-size: 12px;
+} 
 
  #banks:not(.hidden) .subject-support {
   margin: 22px auto 0 !important;
@@ -2033,6 +2111,28 @@ background:
     SUPABASE_URL,
     SUPABASE_PUBLISHABLE_KEY
   );
+
+function openSupportPage() {
+  hideAll();
+
+  const supportScreen =
+    document.getElementById("support-screen");
+
+  if (supportScreen) {
+    supportScreen.classList.remove("hidden");
+    window.scrollTo(0, 0);
+  }
+}
+
+function backFromSupport() {
+  hideAll();
+
+  document.getElementById("banks")
+    ?.classList.remove("hidden");
+
+  window.scrollTo(0, 0);
+} 
+ 
 </script>
   
 </head>
@@ -2224,8 +2324,8 @@ background:
 </div>
 
 <div class="subject-support">
-  <button onclick="supportComingSoon()">
-    ☕ Traktir medstu
+<button onclick="openSupportPage()">
+  ☕ Traktir medstu
   </button>
 </div>
 
@@ -2306,7 +2406,9 @@ background:
 
       <button
         class="access-option-btn lifetime"
-        onclick="openLifetimePayment()"
+async function openLifetimePayment() {
+  await claimFreeAccess();
+}
       >
         <strong>♾️ Buka Akses Selamanya</strong>
         <span>Rp4.886 • sekali bayar</span>
@@ -2397,6 +2499,44 @@ background:
 </div>
 </section>
 
+<!-- HALAMAN TRAKTIR -->
+<section id="support-screen" class="hidden">
+
+  <div class="support-page">
+
+    <span class="back" onclick="backFromSupport()">
+      ← Kembali
+    </span>
+
+    <div class="support-content">
+
+      <div class="support-icon">☕</div>
+
+      <h1>Traktir medstu</h1>
+
+      <p class="support-quote">
+        “Kalau Medic Test ID pernah menyelamatkanmu dari satu soal
+        yang bikin emosi, kopi ini akan diterima dengan penuh rasa syukur.”
+      </p>
+
+      <div class="support-qr">
+       
+        <!-- NANTI FOTO QR MERCHANT MASUK DI SINI -->
+        <div class="support-qr-placeholder">
+          QR Merchant
+        </div>
+      </div>
+
+      <p class="support-small">
+        Tidak wajib. Belajar di Medic Test ID tetap bisa jalan seperti biasa.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+ 
 <!-- HASIL -->
 <section id="result" class="hidden">
 
