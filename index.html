@@ -2508,15 +2508,24 @@ const { error } =
     }
   );
 
-  if (error) {
-    console.error(error);
+if (error) {
+  console.error("Reset password error:", error);
 
-    if (message) {
+  if (message) {
+    if (
+      error.status === 429 ||
+      error.message?.toLowerCase().includes("rate limit")
+    ) {
       message.innerText =
-        "Gagal mengirim link reset password.";
+        "Terlalu banyak permintaan reset. Tunggu sebentar lalu coba lagi.";
+    } else {
+      message.innerText =
+        "Gagal mengirim link reset password. Coba lagi nanti.";
     }
-    return;
   }
+
+  return;
+}
 
   if (message) {
     message.innerText =
