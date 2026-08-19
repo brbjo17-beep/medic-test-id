@@ -2099,7 +2099,40 @@ background:
   color: #8b5cf6;
   font-weight: 700;
 }
-  
+
+<style>
+
+  /* CSS web-mu yang sudah ada */
+  body {
+    ...
+  }
+
+  /* CSS RESET PASSWORD — TAMBAHKAN DI SINI */
+
+  #reset-password-screen {
+    min-height: 100vh;
+    width: 100%;
+    padding: 40px 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+      radial-gradient(circle at 15% 15%, #dff4ff 0, transparent 32%),
+      radial-gradient(circle at 85% 20%, #eee5ff 0, transparent 34%),
+      linear-gradient(135deg, #f8fcff, #fbf8ff);
+  }
+
+  #reset-password-screen.hidden {
+    display: none !important;
+  }
+
+/* BARU SETELAH ITU */
+</style>
+
+</head>
+ 
 </style>
   
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16718,6 +16751,55 @@ function submitGuestPayment() {
       <p>
         Masukkan password baru untuk akunmu.
       </p>
+    </div>
+
+    <div class="access-fields">
+
+      <input
+        type="password"
+        id="new-password"
+        placeholder="🔒 Password baru"
+        autocomplete="new-password"
+      >
+
+      <input
+        type="password"
+        id="confirm-new-password"
+        placeholder="🔒 Ulangi password baru"
+        autocomplete="new-password"
+      >
+
+    </div>
+
+    <button
+      type="button"
+      class="access-main-btn"
+      onclick="updateMedicPassword()"
+    >
+      Simpan Password Baru
+    </button>
+
+    <p
+      id="reset-password-message"
+      class="signup-message"
+    ></p>
+
+  </div>
+
+</section>
+
+<!-- RESET PASSWORD SCREEN -->
+<section id="reset-password-screen" class="hidden">
+
+  <div class="access-card">
+
+    <div class="access-logo">
+      Medic Test ID ✨
+    </div>
+
+    <div class="access-greeting">
+      <strong>🔐 Buat password baru</strong>
+      <p>Masukkan password baru untuk akunmu.</p>
     </div>
 
     <div class="access-fields">
