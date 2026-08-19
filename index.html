@@ -2113,6 +2113,110 @@ const supabaseClient = supabase.createClient(
   SUPABASE_PUBLISHABLE_KEY
 );
 
+/* ===== PASSWORD RECOVERY LISTENER ===== */
+
+supabaseClient.auth.onAuthStateChange((event, session) => {
+
+  if (event === "PASSWORD_RECOVERY") {
+
+    hideAll();
+
+    const resetScreen =
+      document.getElementById("reset-password-screen");
+
+    if (resetScreen) {
+      resetScreen.classList.remove("hidden");
+    }
+
+    window.scrollTo(0, 0);
+  }
+
+});
+
+/* ===== SIMPAN PASSWORD BARU ===== */
+
+async function updateMedicPassword() {
+
+  const password =
+    document.getElementById("new-password")?.value;
+
+  const confirmPassword =
+    document.getElementById("confirm-new-password")?.value;
+
+  const message =
+    document.getElementById("reset-password-message");
+
+  if (!password || !confirmPassword) {
+    if (message) {
+      message.innerText =
+        "Isi kedua kolom password dulu.";
+    }
+    return;
+  }
+
+  if (password.length < 6) {
+    if (message) {
+      message.innerText =
+        "Password minimal 6 karakter.";
+    }
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    if (message) {
+      message.innerText =
+        "Password yang kamu masukkan belum sama.";
+    }
+    return;
+  }
+
+  if (message) {
+    message.innerText =
+      "Menyimpan password baru...";
+  }
+
+  const { data, error } =
+    await supabaseClient.auth.updateUser({
+      password: password
+    });
+
+  if (error) {
+    console.error(error);
+
+    if (message) {
+      message.innerText =
+        "Password belum berhasil diperbarui.";
+    }
+
+    return;
+  }
+
+  if (message) {
+    message.innerText =
+      "Password berhasil diperbarui 🎉";
+  }
+
+  setTimeout(() => {
+
+    document
+      .getElementById("reset-password-screen")
+      ?.classList.add("hidden");
+
+    document
+      .getElementById("welcome-screen")
+      ?.classList.remove("hidden");
+
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname
+    );
+
+    window.scrollTo(0, 0);
+
+  }, 1200);
+} 
+ 
 /* ===== AKUN MEDIC TEST ID ===== */
 
 function showLoginForm() {
@@ -2362,14 +2466,14 @@ async function forgotMedicPassword() {
     message.innerText = "Mengirim link reset password...";
   }
 
-  const { error } =
-    await supabaseClient.auth.resetPasswordForEmail(
-      email,
-      {
-        redirectTo:
-          window.location.origin + window.location.pathname
-      }
-    );
+const { error } =
+  await supabaseClient.auth.resetPasswordForEmail(
+    email,
+    {
+      redirectTo:
+        "https://brbjo17-beep.github.io/medic-test-id/"
+    }
+  );
 
   if (error) {
     console.error(error);
@@ -15422,15 +15526,20 @@ let questions = [];
 let currentBank = "";
 
 function hideAll(){
-  document.getElementById("subjects").classList.add("hidden");
-  document.getElementById("banks").classList.add("hidden");
-  document.getElementById("quiz").classList.add("hidden");
-  document.getElementById("result").classList.add("hidden");
+  document.getElementById("subjects")?.classList.add("hidden");
+  document.getElementById("banks")?.classList.add("hidden");
+  document.getElementById("quiz")?.classList.add("hidden");
+  document.getElementById("result")?.classList.add("hidden");
   document.getElementById("access-screen")?.classList.add("hidden");
   document.getElementById("guest-payment-screen")?.classList.add("hidden");
+  document.getElementById("support-screen")?.classList.add("hidden");
+
+  /* halaman buat password baru */
+  document.getElementById("reset-password-screen")?.classList.add("hidden");
 }
 
 function home(){
+ 
   hideAll();
   document.getElementById("subjects").classList.remove("hidden");
 }
@@ -16595,5 +16704,56 @@ function submitGuestPayment() {
   
 </script>
 
+<!-- RESET PASSWORD SCREEN -->
+<section id="reset-password-screen" class="hidden">
+
+  <div class="access-card">
+
+    <div class="access-logo">
+      Medic Test ID ✨
+    </div>
+
+    <div class="access-greeting">
+      <strong>🔐 Buat password baru</strong>
+      <p>
+        Masukkan password baru untuk akunmu.
+      </p>
+    </div>
+
+    <div class="access-fields">
+
+      <input
+        type="password"
+        id="new-password"
+        placeholder="🔒 Password baru"
+        autocomplete="new-password"
+      >
+
+      <input
+        type="password"
+        id="confirm-new-password"
+        placeholder="🔒 Ulangi password baru"
+        autocomplete="new-password"
+      >
+
+    </div>
+
+    <button
+      type="button"
+      class="access-main-btn"
+      onclick="updateMedicPassword()"
+    >
+      Simpan Password Baru
+    </button>
+
+    <p
+      id="reset-password-message"
+      class="signup-message"
+    ></p>
+
+  </div>
+
+</section>
+ 
 </body>
 </html>
