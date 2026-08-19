@@ -2123,13 +2123,14 @@ function showLoginForm() {
   const nameInput = document.getElementById("signup-name");
   const passwordInput = document.getElementById("signup-password");
   const mainButton = document.querySelector(".access-main-btn");
+  const message = document.getElementById("signup-message");
 
   if (nameInput) {
     nameInput.style.display = "none";
   }
 
   if (passwordInput) {
-    passwordInput.placeholder = "🔒  Password";
+    passwordInput.placeholder = "🔒 Password";
     passwordInput.autocomplete = "current-password";
   }
 
@@ -2140,8 +2141,6 @@ function showLoginForm() {
       "loginMedicAccount()"
     );
   }
-
-  const message = document.getElementById("signup-message");
 
   if (message) {
     message.innerText = "";
@@ -2267,8 +2266,8 @@ async function createMedicAccount() {
   }
 
   console.log("Account:", data.user);
-} 
-
+}
+ 
 /* ===== LOGIN AKUN ===== */
 
 function showLoginForm() {
@@ -2609,12 +2608,6 @@ function backFromSupport() {
       >
 
     </div>
- <div class="login-switch">
-  <span>Sudah punya akun?</span>
-  <button type="button" onclick="showLoginForm()">
-    Masuk akun
-  </button>
-</div>  
 
 <button class="access-main-btn" onclick="createMedicAccount()">
   ♡ Buat Akun Yuk!
