@@ -2345,16 +2345,35 @@ async function forgotMedicPassword() {
 }
 
 
+}
+
+
+/* ===== SUPPORT PAGE ===== */
+
 function openSupportPage() {
- 
-  /* tampilkan Lupa Password hanya saat mode login */
-  if (forgotButton) {
-    forgotButton.classList.remove("hidden");
+  hideAll();
+
+  const supportScreen =
+    document.getElementById("support-screen");
+
+  if (supportScreen) {
+    supportScreen.classList.remove("hidden");
+    window.scrollTo(0, 0);
   }
 }
 
+function backFromSupport() {
+  hideAll();
+
+  document
+    .getElementById("banks")
+    ?.classList.remove("hidden");
+
+  window.scrollTo(0, 0);
+}
+
 </script>
- 
+
 </head>
 
 <body>
@@ -2607,9 +2626,9 @@ function openSupportPage() {
   <span>Rp2.886 • +3 NC untuk materi ini</span>
 </button>
     
-    <div class="access-divider">
-      <span>atau</span>
-    </div>
+<div class="access-divider">
+  <span>atau</span>
+</div>
 
 <button
   type="button"
