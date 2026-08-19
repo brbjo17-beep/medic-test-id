@@ -2626,18 +2626,22 @@ function backFromSupport() {
       <span>atau</span>
     </div>
 
-    <button class="access-login-btn" onclick="loginMedicAccount()">
-      Udah punya akun? <strong>Masuk di sini →</strong>
-    </button>
+<button
+  type="button"
+  class="access-login-btn"
+  onclick="showLoginForm()"
+>
+  Udah punya akun? <strong>Masuk di sini →</strong>
+</button>
 
-    <p id="signup-message" class="signup-message"></p>
+<p id="signup-message" class="signup-message"></p>
 
-    <div id="access-options" class="access-options hidden">
+<div id="access-options" class="access-options hidden">
 
-      <button class="access-option-btn" onclick="claimFreeAccess()">
-        <strong>🎁 Pemakaian Gratis Sementara</strong>
-        <span>+3 pemakaian per materi</span>
-      </button>
+  <button class="access-option-btn" onclick="claimFreeAccess()">
+    <strong>🎁 Pemakaian Gratis Sementara</strong>
+    <span>+3 pemakaian per materi</span>
+  </button>
 
 <button
   class="access-option-btn lifetime"
