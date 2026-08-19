@@ -2310,22 +2310,6 @@ async function forgotMedicPassword() {
     );
 
   if (error) {
-    console.error("Reset password error:", error);
-
-    if (message) {
-      message.innerText =
-        "Gagal mengirim link reset password.";
-    }
-
-    return;
-  }
-
-  if (message) {
-    message.innerText =
-      "Link reset password sudah dikirim ke emailmu ✉️";
-  }
-}
-  if (error) {
     console.error(error);
 
     if (message) {
