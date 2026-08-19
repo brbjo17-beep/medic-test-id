@@ -2310,6 +2310,22 @@ async function forgotMedicPassword() {
     );
 
   if (error) {
+    console.error("Reset password error:", error);
+
+    if (message) {
+      message.innerText =
+        "Gagal mengirim link reset password.";
+    }
+
+    return;
+  }
+
+  if (message) {
+    message.innerText =
+      "Link reset password sudah dikirim ke emailmu ✉️";
+  }
+}
+  if (error) {
     console.error(error);
 
     if (message) {
@@ -15384,7 +15400,7 @@ Biokimia: {
     question: "Seorang pasien dengan botulisme diberikan antitoksin botulinum. Dokter menjelaskan bahwa antitoksin hanya efektif untuk toksin yang belum terikat.\nManakah pernyataan yang paling tepat mengenai botulisme?",
     options: ["Antitoksin botulinum adalah pengobatan utama untuk botulisme", "Botulisme disebabkan oleh toksin yang menghambat pelepasan asetilkolin", "Botulisme menyebabkan kelemahan otot spastik", "Botulisme tidak memerlukan ventilasi mekanik", "Botulisme dapat diobati dengan antibiotik"],
     answer: 1,
-    explanation: "Botulisme disebabkan oleh toksin botulinum (dari Clostridium botulinum) yang memblokir pelepasan asetilkolin di neuromuscular junction dengan memecah SNARE protein. Botulisme menyebabkan kelemahan otot flasid simetris (diplopia, disfagia, dysarthria, kelemahan pernapasan). Penanganan: (1) antitoksin botulinum (menetralkan toksin yang belum terikat), (2) ventilasi mekanik jika diperlukan, (3) antibiotik tidak efektif (toksin, bukan infeksi aktif). Antitoksin hanya efektif jika diberikan sebelum toksin terikat pada presinaptik.\nOpsi A — Antitoksin penting, tetapi ventilasi mekanik juga diperlukan.\nOpsi B — Benar: blokade pelepasan ACh.\nOpsi C — Botulisme menyebabkan kelemahan flasid, bukan spastik.\nOpsi D — Ventilasi mekanik sering diperlukan.\nOpsi E — Antibiotik tidak efektif untuk toksin."
+explanation: "Botulisme disebabkan oleh toksin botulinum (dari Clostridium botulinum) yang memblokir pelepasan asetilkolin di neuromuscular junction dengan memecah SNARE protein. Botulisme menyebabkan kelemahan otot flasid simetris (diplopia, disfagia, dysarthria, kelemahan pernapasan). Antitoksin diberikan sedini mungkin untuk menetralkan toksin yang masih bersirkulasi dan belum berikatan dengan terminal saraf. Ventilasi mekanik dapat diperlukan bila terjadi gagal napas. Antibiotik bukan terapi rutin pada foodborne botulism, tetapi dapat digunakan pada wound botulism bersama debridement luka.\nOpsi A — Kurang tepat: antitoksin merupakan terapi spesifik penting, tetapi tata laksana suportif terutama dukungan ventilasi dapat menjadi sangat penting.\nOpsi B — Benar: toksin botulinum menghambat pelepasan asetilkolin pada terminal saraf presinaptik.\nOpsi C — Salah: botulisme menyebabkan paralisis flasid, bukan spastik.\nOpsi D — Salah: ventilasi mekanik dapat diperlukan pada kelemahan otot pernapasan.\nOpsi E — Terlalu umum: antibiotik bukan terapi untuk menetralkan toksin dan tidak rutin pada foodborne botulism, tetapi dapat digunakan pada wound botulism."
   },
   {
     question: "Seorang pasien dengan myasthenia gravis yang tidak responsif terhadap AChE inhibitor dan prednison diberikan rituximab. Dokter memilih rituximab karena efektif untuk myasthenia gravis refrakter.\nManakah pernyataan yang paling tepat mengenai rituximab?",
