@@ -2640,11 +2640,12 @@ function backFromSupport() {
   </button>
 
 <button
+  type="button"
   class="access-option-btn lifetime"
   onclick="openLifetimePayment()"
 >
   <strong>♾️ Buka Akses Selamanya</strong>
-  <span>Rp4.886 • sekali bayar</span>
+  <span>Rp4.886 • sementara gratis selama pembayaran disiapkan</span>
 </button>
 
     </div>
@@ -13758,6 +13759,14 @@ async function claimFreeAccess() {
 }
  
 async function openLifetimePayment() {
+  const { data: { user }, error } =
+    await supabaseClient.auth.getUser();
+
+  if (error || !user) {
+    alert("Login dulu ya.");
+    return;
+  }
+
   await claimFreeAccess();
 }
 
