@@ -2117,16 +2117,23 @@ const supabaseClient = supabase.createClient(
 
 function showLoginForm() {
   const nameInput = document.getElementById("signup-name");
+  const emailInput = document.getElementById("signup-email");
   const passwordInput = document.getElementById("signup-password");
+  const forgotButton = document.getElementById("forgot-password-btn");
   const mainButton = document.querySelector(".access-main-btn");
+  const loginSwitch = document.querySelector(".access-login-btn");
   const message = document.getElementById("signup-message");
 
   if (nameInput) {
     nameInput.style.display = "none";
   }
 
+  if (emailInput) {
+    emailInput.placeholder = "✉️  Email";
+  }
+
   if (passwordInput) {
-    passwordInput.placeholder = "🔒 Password";
+    passwordInput.placeholder = "🔒  Password";
     passwordInput.autocomplete = "current-password";
   }
 
@@ -2136,6 +2143,14 @@ function showLoginForm() {
       "onclick",
       "loginMedicAccount()"
     );
+  }
+
+  if (forgotButton) {
+    forgotButton.classList.remove("hidden");
+  }
+
+  if (loginSwitch) {
+    loginSwitch.style.display = "none";
   }
 
   if (message) {
@@ -2263,39 +2278,67 @@ async function createMedicAccount() {
 
   console.log("Account:", data.user);
 }
- 
-function showLoginForm() {
-  const nameInput = document.getElementById("signup-name");
-  const emailInput = document.getElementById("signup-email");
-  const passwordInput = document.getElementById("signup-password");
-  const forgotButton = document.getElementById("forgot-password-btn");
 
-  if (nameInput) {
-    nameInput.style.display = "none";
+
+/* ===== LUPA PASSWORD ===== */
+
+async function forgotMedicPassword() {
+  const email =
+    document.getElementById("signup-email")?.value.trim();
+
+  const message =
+    document.getElementById("signup-message");
+
+  if (!email) {
+    if (message) {
+      message.innerText = "Masukkan email akunmu dulu.";
+    }
+    return;
   }
 
-  if (emailInput) {
-    emailInput.placeholder = "✉️  Email";
+  if (message) {
+    message.innerText = "Mengirim link reset password...";
   }
 
-  if (passwordInput) {
-    passwordInput.placeholder = "🔒  Password";
-    passwordInput.autocomplete = "current-password";
-  }
-
-  const createButton = document.querySelector(
-    '[onclick="createMedicAccount()"]'
-  );
-
-  if (createButton) {
-    createButton.innerText = "♡ Masuk Akun";
-    createButton.setAttribute(
-      "onclick",
-      "loginMedicAccount()"
+  const { error } =
+    await supabaseClient.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo:
+          window.location.origin + window.location.pathname
+      }
     );
+
+  if (error) {
+    console.error(error);
+
+    if (message) {
+      message.innerText =
+        "Gagal mengirim link reset password.";
+    }
+
+    return;
   }
-async function loginMedicAccount() {
-  // KODE LOGIN MILIKMU TETAP
+
+  if (message) {
+    message.innerText =
+      "Link reset password sudah dikirim ke emailmu ✉️";
+  }
+}
+
+
+/* ===== TOMBOL KEMBALI ACCESS ===== */
+
+function backFromAccess() {
+  document
+    .getElementById("access-screen")
+    ?.classList.add("hidden");
+
+  document
+    .getElementById("banks")
+    ?.classList.remove("hidden");
+
+  window.scrollTo(0, 0);
 }
 
 
@@ -2575,6 +2618,15 @@ function backFromSupport() {
 <!-- AKSES AKUN -->
 <section id="access-screen" class="hidden">
 
+  <!-- TOMBOL KEMBALI -->
+  <button
+    type="button"
+    class="access-back-btn"
+    onclick="backFromAccess()"
+  >
+    ← Kembali
+  </button>
+
   <div class="access-card">
 
     <div class="access-logo">Medic Test ID ✨</div>
@@ -2613,72 +2665,78 @@ function backFromSupport() {
 
     </div>
 
-<button class="access-main-btn" onclick="createMedicAccount()">
-  ♡ Buat Akun Yuk!
-</button>
+    <!-- BUAT AKUN / NANTI BERUBAH JADI MASUK AKUN -->
+    <button
+      type="button"
+      class="access-main-btn"
+      onclick="createMedicAccount()"
+    >
+      ♡ Buat Akun Yuk!
+    </button>
 
-<div class="guest-divider">
-  <span>atau lanjut tanpa akun</span>
-</div>
+    <!-- LUPA PASSWORD -->
+    <button
+      type="button"
+      id="forgot-password-btn"
+      class="forgot-password-btn hidden"
+      onclick="forgotMedicPassword()"
+    >
+      Lupa password?
+    </button>
 
-<button class="guest-pass-btn" onclick="openGuestPayment()">
-  <strong>👻 Guest Pass</strong>
-  <span>Rp2.886 • +3 NC untuk materi ini</span>
-</button>
-    
-<div class="access-divider">
-  <span>atau</span>
-</div>
+    <div class="guest-divider">
+      <span>atau lanjut tanpa akun</span>
+    </div>
 
-<button
-  type="button"
-  class="access-login-btn"
-  onclick="showLoginForm()"
->
-  Udah punya akun? <strong>Masuk di sini →</strong>
-</button>
+    <button
+      type="button"
+      class="guest-pass-btn"
+      onclick="openGuestPayment()"
+    >
+      <strong>👻 Guest Pass</strong>
+      <span>Rp2.886 • +3 NC untuk materi ini</span>
+    </button>
 
-<button
-  type="button"
-  id="forgot-password-btn"
-  class="forgot-password-btn hidden"
-  onclick="forgotMedicPassword()"
->
-  Lupa password?
-</button>
-   
-<button
-  type="button"
-  id="forgot-password-btn"
-  class="forgot-password-btn hidden"
-  onclick="forgotMedicPassword()"
->
-  Lupa password?
-</button>   
+    <div class="access-divider">
+      <span>atau</span>
+    </div>
 
-<p id="signup-message" class="signup-message"></p>
+    <button
+      type="button"
+      class="access-login-btn"
+      onclick="showLoginForm()"
+    >
+      Udah punya akun? <strong>Masuk di sini →</strong>
+    </button>
 
-<div id="access-options" class="access-options hidden">
+    <p id="signup-message" class="signup-message"></p>
 
-  <button class="access-option-btn" onclick="claimFreeAccess()">
-    <strong>🎁 Pemakaian Gratis Sementara</strong>
-    <span>+3 pemakaian per materi</span>
-  </button>
+    <!-- MUNCUL SETELAH AKUN / LOGIN BERHASIL -->
+    <div id="access-options" class="access-options hidden">
 
-<button
-  type="button"
-  class="access-option-btn lifetime"
-  onclick="openLifetimePayment()"
->
-  <strong>♾️ Buka Akses Selamanya</strong>
-  <span>Rp4.886 • sementara gratis selama pembayaran disiapkan</span>
-</button>
+      <button
+        type="button"
+        class="access-option-btn"
+        onclick="claimFreeAccess()"
+      >
+        <strong>🎁 Pemakaian Gratis Sementara</strong>
+        <span>+3 pemakaian per materi</span>
+      </button>
+
+      <button
+        type="button"
+        class="access-option-btn lifetime"
+        onclick="openLifetimePayment()"
+      >
+        <strong>♾️ Buka Akses Selamanya</strong>
+        <span>Rp4.886 • sementara gratis selama pembayaran disiapkan</span>
+      </button>
 
     </div>
 
   </div>
 
-</section> 
+</section>
 
  <!-- GUEST PAYMENT -->
 <section id="guest-payment-screen" class="hidden">
@@ -2731,11 +2789,26 @@ function backFromSupport() {
 <section id="quiz" class="hidden">
 
 <div class="quiz-top-actions">
-  <span class="back" onclick="backBanks()">← Keluar dari soal</span>
 
-  <span class="back review-history-button" onclick="openPreviousResults()">
+  <span class="back" onclick="backBanks()">
+    ← Keluar dari soal
+  </span>
+
+  <button
+    type="button"
+    class="finish-attempt-btn"
+    onclick="finishAttemptEarly()"
+  >
+    Akhiri Attempt
+  </button>
+
+  <span
+    class="back review-history-button"
+    onclick="openPreviousResults()"
+  >
     Review →
   </span>
+
 </div>
 
 <div class="quiz-box">
@@ -2842,6 +2915,19 @@ function backFromSupport() {
 </div>
 
 <script>
+
+function backFromAccess() {
+  document
+    .getElementById("access-screen")
+    ?.classList.add("hidden");
+
+  document
+    .getElementById("banks")
+    ?.classList.remove("hidden");
+
+  window.scrollTo(0, 0);
+}
+ 
 function showSubjects() {
   const welcome = document.getElementById("welcome-screen");
   const subjects = document.getElementById("subjects");
@@ -2919,6 +3005,49 @@ function updateSubjectAttemptCounter() {
   counter.innerText = remaining + "/3";
 }  
 
+/* ===== AKHIRI ATTEMPT LEBIH AWAL ===== */
+
+function finishAttemptEarly() {
+
+  const answeredCount = answers.filter(
+    answer => answer !== null &&
+              answer !== undefined &&
+              answer !== -1
+  ).length;
+
+  const unansweredCount =
+    questions.length - answeredCount;
+
+  const yakin = confirm(
+    "Akhiri attempt sekarang?\n\n" +
+    answeredCount + " soal sudah dijawab.\n" +
+    unansweredCount +
+    " soal belum dijawab dan akan dihitung salah (0)."
+  );
+
+  if (!yakin) {
+    return;
+  }
+
+  /* Pastikan seluruh soal memiliki jawaban.
+     Yang belum dijawab = -1 = salah */
+  for (let i = 0; i < questions.length; i++) {
+
+    if (
+      answers[i] === undefined ||
+      answers[i] === null
+    ) {
+      answers[i] = -1;
+    }
+
+  }
+
+  /* Attempt resmi selesai */
+  clearQuizProgress();
+
+  showResult();
+}
+ 
 /* SOAL CONTOH */
 const questionBanks = {
 Anatomi: {
@@ -14548,7 +14677,728 @@ Biokimia: {
     explanation: "Rebound hypertension akibat penghentian klonidin terjadi karena peningkatan aktivitas simpatis yang berlebihan. Jika pasien menghentikan klonidin, pengelolaan terbaik adalah memberikan klonidin lagi (segera) dan kemudian menurunkan dosis secara bertahap. Jika klonidin tidak tersedia, obat lain (labetalol, nitroprusid) dapat digunakan untuk mengontrol hipertensi berat.\nOpsi A — Benar: berikan klonidin lagi.\nOpsi B — Nitroprusid dapat digunakan jika klonidin tidak tersedia, tetapi klonidin lagi adalah yang paling tepat.\nOpsi C — Propranolol tidak tepat karena klonidin bekerja di sentral.\nOpsi D — Hidralazin dapat digunakan, tetapi klonidin lagi lebih langsung.\nOpsi E — Furosemid tidak efektif untuk rebound hypertension."
   }
 ],
-  "Bank 2": [],
+"Bank 2": [
+  {
+    question: "Seorang pria berusia 68 tahun dengan penyakit Parkinson stadium awal datang dengan keluhan tremor tangan kanan yang memburuk dan kesulitan memulai gerakan. Dokter memutuskan untuk memulai terapi levodopa-karbidopa. Pasien bertanya mengapa karbidopa perlu diberikan bersama levodopa.\nApa alasan paling tepat penambahan karbidopa?",
+    options: ["Meningkatkan efek antikolinergik levodopa di otak", "Menghambat dekarboksilasi levodopa di perifer → meningkatkan kadar levodopa di otak", "Menghambat reuptake dopamin di sinaps", "Menghambat enzim COMT di otak", "Mengurangi efek samping gastrointestinal levodopa secara langsung"],
+    answer: 1,
+    explanation: "Karbidopa adalah inhibitor dopa dekarboksilase perifer yang tidak dapat menembus sawar darah otak. Levodopa didekarboksilasi menjadi dopamin di perifer oleh enzim dopa dekarboksilase. Dengan karbidopa, lebih banyak levodopa yang mencapai otak karena lebih sedikit yang diubah di perifer → dosis levodopa dapat dikurangi hingga 80% → efek samping perifer (mual, muntah, hipotensi) berkurang.\nOpsi A — Levodopa sendiri bukan antikolinergik; karbidopa tidak memiliki efek antikolinergik.\nOpsi B — Benar: mencegah dekarboksilasi perifer → lebih banyak levodopa mencapai otak.\nOpsi C — Penghambatan reuptake dopamin terjadi pada obat seperti bupropion atau amfetamin, bukan karbidopa.\nOpsi D — Penghambatan COMT terjadi pada entakapon atau tolkapon, bukan karbidopa.\nOpsi E — Karbidopa mengurangi mual tidak secara langsung, tetapi melalui pengurangan pembentukan dopamin di perifer."
+  },
+  {
+    question: "Seorang wanita berusia 72 tahun dengan penyakit Parkinson sedang menjalani terapi levodopa-karbidopa selama 5 tahun. Akhir-akhir ini ia mengalami gerakan involunter pada wajah dan ekstremitas (diskinesia) yang memburuk saat efek obat mencapai puncak. Dokter mencurigai diskinesia terkait dengan pengobatan.\nManakah pernyataan yang paling tepat mengenai diskinesia pada pasien ini?",
+    options: ["Diskinesia terjadi karena kadar dopamin yang terlalu rendah di striatum", "Diskinesia dapat dikurangi dengan menurunkan dosis levodopa atau menambahkan amantadin", "Diskinesia adalah efek samping yang jarang terjadi pada levodopa", "Diskinesia hanya terjadi pada terapi agonis dopamin, bukan levodopa", "Diskinesia tidak dapat diatasi dengan perubahan terapi"],
+    answer: 1,
+    explanation: "Diskinesia (gerakan involunter) adalah efek samping yang umum terjadi pada penggunaan levodopa jangka panjang, terjadi pada 50–80% pasien setelah 5–10 tahun terapi. Diskinesia terjadi karena fluktuasi kadar dopamin di otak (efek puncak dosis). Penurunan dosis levodopa dapat mengurangi diskinesia, tetapi dapat memperburuk gejala parkinson. Amantadin (antiviral dengan efek antagonis NMDA) dapat mengurangi diskinesia tanpa memperburuk parkinsonisme.\nOpsi A — Diskinesia terjadi karena kadar dopamin yang terlalu tinggi (puncak dosis), bukan rendah.\nOpsi B — Benar: kurangi dosis levodopa atau tambahkan amantadin.\nOpsi C — Diskinesia adalah efek samping yang sangat umum pada penggunaan jangka panjang.\nOpsi D — Diskinesia lebih sering terjadi pada levodopa daripada agonis dopamin.\nOpsi E — Diskinesia dapat diatasi dengan modifikasi terapi."
+  },
+  {
+    question: "Seorang pria berusia 65 tahun dengan penyakit Parkinson diberikan pramipeksol sebagai terapi awal. Pasien memiliki riwayat hipertensi dan gagal ginjal kronik stadium 3. Dokter memulai dengan dosis rendah dan melakukan titrasi bertahap.\nManakah pernyataan yang paling tepat mengenai pramipeksol?",
+    options: ["Pramipeksol adalah antagonis reseptor dopamin D2", "Pramipeksol adalah agonis reseptor dopamin yang diekskresi tidak berubah melalui ginjal", "Pramipeksol adalah penghambat MAO-B yang meningkatkan kadar dopamin", "Pramipeksol adalah antikolinergik yang menyeimbangkan dopamin-asetilkolin", "Pramipeksol tidak memerlukan penyesuaian dosis pada gagal ginjal"],
+    answer: 1,
+    explanation: "Pramipeksol adalah agonis reseptor dopamin non-ergot (selektif D3) yang digunakan sebagai terapi awal atau tambahan pada Parkinson. Pramipeksol diekskresi tidak berubah melalui ginjal (sekitar 80–90%), sehingga dosis harus disesuaikan pada pasien dengan gangguan ginjal. Pada gagal ginjal stadium 3 (GFR 30–59 ml/menit), dosis awal harus dikurangi dan titrasi dilakukan lebih lambat.\nOpsi A — Pramipeksol adalah agonis, bukan antagonis dopamin.\nOpsi B — Benar: agonis dopamin dan diekskresi ginjal.\nOpsi C — Penghambat MAO-B adalah selegilin dan rasagilin.\nOpsi D — Antikolinergik adalah triheksifenidil dan benztropin.\nOpsi E — Pramipeksol memerlukan penyesuaian dosis pada gagal ginjal."
+  },
+  {
+    question: "Seorang wanita berusia 70 tahun dengan penyakit Parkinson diberikan selegilin sebagai terapi tambahan. Pasien juga mengonsumsi SSRI (sertralin) untuk depresi. Dokter memperingatkan interaksi obat yang berbahaya.\nApa risiko utama kombinasi selegilin dan SSRI?",
+    options: ["Krisis hipertensi", "Sindrom serotonin", "Sedasi berat", "Diskinesia", "Hipotensi ortostatik"],
+    answer: 1,
+    explanation: "Selegilin adalah penghambat MAO-B selektif. Pada dosis terapi (≤10 mg/hari), selegilin selektif terhadap MAO-B, tetapi pada dosis lebih tinggi atau pada pasien tertentu, selektivitas dapat hilang dan MAO-A juga terhambat. Kombinasi dengan SSRI (sertralin, fluoksetin, paroksetin) atau TCA dapat menyebabkan sindrom serotonin (tremor, hipertermia, delirium, mioklonus, diaforesis). Interaksi ini berbahaya dan dapat mengancam jiwa.\nOpsi A — Krisis hipertensi terjadi jika MAOI dikombinasikan dengan tyramine (makanan), bukan SSRI.\nOpsi B — Benar: sindrom serotonin.\nOpsi C — Sedasi berat tidak khas.\nOpsi D — Diskinesia adalah efek levodopa, bukan interaksi selegilin-SSRI.\nOpsi E — Hipotensi ortostatik dapat terjadi, tetapi sindrom serotonin lebih serius."
+  },
+  {
+    question: "Seorang pria berusia 60 tahun dengan penyakit Parkinson diberikan entakapon sebagai tambahan levodopa-karbidopa. Pasien mengalami peningkatan waktu \"on\" (periode tanpa gejala) dan penurunan waktu \"off\" (periode dengan gejala).\nManakah mekanisme kerja entakapon yang paling tepat?",
+    options: ["Penghambatan MAO-B → meningkatkan kadar dopamin", "Penghambatan COMT perifer → meningkatkan bioavailabilitas levodopa", "Agonis reseptor dopamin → meniru efek dopamin", "Antagonis reseptor muskarinik → menyeimbangkan dopamin-asetilkolin", "Penghambatan reuptake dopamin → meningkatkan kadar dopamin di sinaps"],
+    answer: 1,
+    explanation: "Entakapon adalah penghambat COMT (catechol-O-methyltransferase) perifer. COMT adalah enzim yang mendegradasi levodopa dan dopamin di perifer. Penghambatan COMT → metabolisme levodopa di perifer menurun → kadar levodopa dalam plasma lebih stabil dan tahan lama → meningkatkan waktu \"on\" dan menurunkan waktu \"off\" pada pasien dengan fluktuasi motorik. Entakapon tidak menembus sawar darah otak.\nOpsi A — Penghambatan MAO-B adalah selegilin dan rasagilin.\nOpsi B — Benar: COMT inhibitor perifer → levodopa lebih stabil.\nOpsi C — Agonis dopamin adalah pramipeksol, ropinirol.\nOpsi D — Antikolinergik adalah triheksifenidil.\nOpsi E — Penghambatan reuptake dopamin bukan mekanisme entakapon."
+  },
+  {
+    question: "Seorang wanita berusia 75 tahun dengan penyakit Alzheimer stadium sedang diberikan donepezil. Pasien mengalami perbaikan ringan pada fungsi kognitif dan aktivitas sehari-hari.\nManakah mekanisme kerja donepezil yang paling tepat?",
+    options: ["Agonis reseptor NMDA → meningkatkan neurotransmisi glutamatergik", "Penghambat asetilkolinesterase → meningkatkan kadar asetilkolin di otak", "Agonis reseptor dopamin → meningkatkan dopamin", "Penghambat MAO-B → meningkatkan monoamin", "Penghambat reuptake serotonin → meningkatkan serotonin"],
+    answer: 1,
+    explanation: "Donepezil adalah penghambat asetilkolinesterase (AChE inhibitor) yang bekerja secara reversibel dan selektif terhadap AChE di otak. Penghambatan AChE → degradasi asetilkolin menurun → kadar asetilkolin di sinaps meningkat → meningkatkan neurotransmisi kolinergik. Donepezil digunakan untuk Alzheimer ringan-sedang (dan berat pada dosis 23 mg). Efeknya bersifat simtomatik (memperbaiki gejala) tetapi tidak menghentikan progresi neurodegeneratif.\nOpsi A — Agonis NMDA adalah memantine.\nOpsi B — Benar: AChE inhibitor → asetilkolin ↑.\nOpsi C — Agonis dopamin digunakan untuk Parkinson.\nOpsi D — Penghambat MAO-B adalah selegilin.\nOpsi E — Penghambatan reuptake serotonin adalah SSRI."
+  },
+  {
+    question: "Seorang pria berusia 80 tahun dengan Alzheimer stadium sedang-berat diberikan memantine karena donepezil saja tidak cukup mengontrol gejala. Pasien menunjukkan perbaikan pada fungsi kognitif dan perilaku.\nManakah mekanisme kerja memantine yang paling tepat?",
+    options: ["Agonis reseptor GABA → meningkatkan inhibisi", "Antagonis non-kompetitif reseptor NMDA → mengurangi eksitotoksisitas glutamat", "Penghambat asetilkolinesterase → meningkatkan asetilkolin", "Agonis reseptor serotonin → meningkatkan mood", "Penghambat MAO-B → meningkatkan dopamin"],
+    answer: 1,
+    explanation: "Memantine adalah antagonis non-kompetitif pada reseptor NMDA (N-methyl-D-aspartate) yang bekerja dengan mengikat kanal ion reseptor NMDA dan memblokir aliran Ca²⁺ berlebihan yang disebabkan oleh glutamat. Pada Alzheimer, glutamat berlebihan menyebabkan eksitotoksisitas dan kematian neuron. Memantine mengurangi eksitotoksisitas tanpa mengganggu transmisi glutamat normal. Memantine adalah satu-satunya obat yang disetujui untuk Alzheimer sedang-berat.\nOpsi A — Agonis GABA adalah benzodiazepin atau barbiturat.\nOpsi B — Benar: antagonis NMDA → mengurangi eksitotoksisitas.\nOpsi C — Penghambat AChE adalah donepezil, rivastigmin, galantamin.\nOpsi D — Agonis serotonin adalah buspiron.\nOpsi E — Penghambat MAO-B adalah selegilin."
+  },
+  {
+    question: "Seorang wanita berusia 65 tahun dengan Alzheimer diberikan rivastigmin transdermal. Pasien dan keluarganya senang karena efek samping gastrointestinal lebih minimal dibandingkan dengan rivastigmin oral.\nMengapa rivastigmin transdermal memiliki efek samping gastrointestinal yang lebih rendah?",
+    options: ["Rivastigmin transdermal tidak diabsorbsi ke dalam sirkulasi sistemik", "Rivastigmin transdermal memberikan kadar obat yang lebih stabil dan menghindari puncak konsentrasi", "Rivastigmin transdermal tidak bekerja pada enzim asetilkolinesterase", "Rivastigmin transdermal dimetabolisme di kulit", "Rivastigmin transdermal memiliki dosis yang lebih tinggi"],
+    answer: 1,
+    explanation: "Rivastigmin adalah AChE inhibitor yang digunakan untuk Alzheimer dan Parkinson dementia. Rivastigmin transdermal (patch) memberikan pelepasan obat yang lambat dan stabil selama 24 jam, menghindari fluktuasi kadar obat dan puncak konsentrasi plasma yang sering menyebabkan efek samping gastrointestinal (mual, muntah, diare). Patch juga meningkatkan kepatuhan pasien.\nOpsi A — Rivastigmin transdermal diabsorbsi ke dalam sirkulasi sistemik.\nOpsi B — Benar: kadar stabil → mengurangi efek samping GI.\nOpsi C — Rivastigmin tetap bekerja pada AChE.\nOpsi D — Rivastigmin dimetabolisme di hati, bukan kulit.\nOpsi E — Patch tidak memiliki dosis yang lebih tinggi; justru memberikan pelepasan terkontrol."
+  },
+  {
+    question: "Seorang pria berusia 60 tahun dengan penyakit Parkinson diberikan triheksifenidil untuk mengatasi tremor. Pasien kemudian mengeluh mulut kering dan pandangan kabur.\nManakah efek samping triheksifenidil yang paling menjelaskan keluhan pasien?",
+    options: ["Agonis reseptor dopamin → efek kolinergik berlebihan", "Antagonis reseptor muskarinik → efek antikolinergik sistemik", "Agonis reseptor adrenergik → efek simpatetik berlebihan", "Penghambat MAO-B → peningkatan monoamin", "Penghambat COMT → peningkatan levodopa"],
+    answer: 1,
+    explanation: "Triheksifenidil adalah antagonis reseptor muskarinik (antikolinergik) yang digunakan untuk mengatasi tremor pada Parkinson. Efek samping antikolinergik: mulut kering (xerostomia), pandangan kabur (midriasis dan gangguan akomodasi), konstipasi, retensi urin, sedasi, dan gangguan kognitif. Efek ini terjadi karena blokade reseptor muskarinik di kelenjar saliva, mata, usus, dan kandung kemih.\nOpsi A — Triheksifenidil adalah antikolinergik, bukan agonis dopamin.\nOpsi B — Benar: antagonis muskarinik → efek antikolinergik.\nOpsi C — Agonis adrenergik (simpatetik) menyebabkan takikardia, bukan efek ini.\nOpsi D — Penghambat MAO-B adalah selegilin.\nOpsi E — Penghambat COMT adalah entakapon."
+  },
+  {
+    question: "Seorang wanita berusia 55 tahun dengan Parkinson stadium awal dan tremor dominan diberikan terapi antikolinergik (benztropin). Dokter memilih antikolinergik karena efektif untuk tremor.\nManakah pernyataan yang paling tepat mengenai penggunaan antikolinergik pada Parkinson?",
+    options: ["Antikolinergik efektif untuk semua gejala Parkinson (tremor, rigiditas, bradikinesia)", "Antikolinergik paling efektif untuk tremor dan rigiditas, tetapi kurang efektif untuk bradikinesia", "Antikolinergik paling efektif untuk bradikinesia, tetapi kurang efektif untuk tremor", "Antikolinergik tidak efektif untuk semua gejala Parkinson", "Antikolinergik adalah terapi lini pertama untuk semua pasien Parkinson"],
+    answer: 1,
+    explanation: "Antikolinergik (triheksifenidil, benztropin) bekerja dengan menyeimbangkan dopamin-asetilkolin di striatum (Parkinson = dopamin ↓, asetilkolin relatif ↑). Antikolinergik efektif untuk tremor dan rigiditas (gejala yang berkaitan dengan ketidakseimbangan dopamin-asetilkolin), tetapi kurang efektif untuk bradikinesia dan gangguan postural. Antikolinergik biasanya digunakan pada pasien muda dengan tremor dominan dan sebagai terapi tambahan.\nOpsi A — Tidak efektif untuk bradikinesia.\nOpsi B — Benar: efektif untuk tremor dan rigiditas, kurang untuk bradikinesia.\nOpsi C — Salah: bradikinesia justru kurang responsif.\nOpsi D — Efektif untuk beberapa gejala.\nOpsi E — Bukan lini pertama; digunakan selektif."
+  },
+  {
+    question: "Seorang pria berusia 72 tahun dengan Parkinson mengalami fluktuasi motorik (\"on-off\" phenomenon) meskipun sudah menggunakan levodopa-karbidopa dosis optimal. Dokter menambahkan tolkapon.\nManakah pernyataan yang paling tepat mengenai tolkapon?",
+    options: ["Tolkapon adalah penghambat COMT perifer yang tidak menembus BBB", "Tolkapon adalah penghambat COMT perifer dan sentral → meningkatkan levodopa dan dopamin di otak", "Tolkapon adalah agonis dopamin yang bekerja langsung pada reseptor", "Tolkapon adalah penghambat MAO-B yang meningkatkan dopamin", "Tolkapon adalah antikolinergik yang menyeimbangkan neurotransmisi"],
+    answer: 1,
+    explanation: "Tolkapon adalah penghambat COMT (catechol-O-methyltransferase) yang bekerja baik di perifer maupun di sistem saraf pusat (menembus sawar darah otak). Tolkapon menghambat degradasi levodopa di perifer (meningkatkan bioavailabilitas) dan dopamin di otak (memperpanjang efek). Tolkapon lebih efektif daripada entakapon (yang hanya perifer), tetapi memiliki risiko hepatotoksisitas yang lebih tinggi, sehingga memerlukan pemantauan fungsi hati.\nOpsi A — Entakapon adalah COMT inhibitor perifer, bukan tolkapon.\nOpsi B — Benar: perifer dan sentral.\nOpsi C — Agonis dopamin adalah pramipeksol, ropinirol.\nOpsi D — Penghambat MAO-B adalah selegilin, rasagilin.\nOpsi E — Antikolinergik adalah triheksifenidil."
+  },
+  {
+    question: "Seorang wanita berusia 68 tahun dengan Alzheimer diberikan galantamin. Pasien memiliki riwayat bradikardia dan hipotensi ringan.\nManakah perhatian khusus yang perlu diperhatikan pada pemberian galantamin?",
+    options: ["Galantamin dapat menyebabkan bradikardia lebih berat karena efek vagotonik", "Galantamin dapat menyebabkan takikardia", "Galantamin aman pada pasien dengan bradikardia", "Galantamin tidak mempengaruhi denyut jantung", "Galantamin meningkatkan tekanan darah"],
+    answer: 0,
+    explanation: "Galantamin adalah AChE inhibitor yang juga bekerja sebagai agonis alosterik pada reseptor nikotinik. Karena meningkatkan kadar asetilkolin, galantamin dapat memperkuat efek vagal (parasimpatis) pada jantung → bradikardia dan blok AV. Galantamin harus digunakan dengan hati-hati pada pasien dengan bradikardia, sindrom sinus sakit, atau blok AV. EKG dan denyut jantung harus dipantau.\nOpsi A — Benar: efek vagotonik → bradikardia.\nOpsi B — Galantamin tidak menyebabkan takikardia.\nOpsi C — Tidak aman; harus digunakan dengan hati-hati.\nOpsi D — Galantamin mempengaruhi denyut jantung.\nOpsi E — Galantamin tidak meningkatkan tekanan darah."
+  },
+  {
+    question: "Seorang pria berusia 58 tahun dengan Parkinson yang telah menggunakan levodopa-karbidopa selama 6 tahun mengeluh episode \"freezing\" (tiba-tiba tidak bisa bergerak) dan fluktuasi motorik yang memburuk. Dokter mempertimbangkan penambahan rasagilin.\nManakah pernyataan yang paling tepat mengenai rasagilin?",
+    options: ["Rasagilin adalah COMT inhibitor yang memperpanjang efek levodopa", "Rasagilin adalah MAO-B inhibitor yang memperlambat degradasi dopamin", "Rasagilin adalah agonis dopamin yang bekerja langsung pada reseptor", "Rasagilin adalah antikolinergik yang menyeimbangkan neurotransmisi", "Rasagilin adalah NMDA antagonist yang mengurangi eksitotoksisitas"],
+    answer: 1,
+    explanation: "Rasagilin adalah penghambat MAO-B (monoamine oxidase-B) yang irreversibel dan selektif. MAO-B adalah enzim yang mendegradasi dopamin di otak. Penghambatan MAO-B → degradasi dopamin menurun → kadar dopamin di striatum meningkat → memperbaiki gejala Parkinson. Rasagilin digunakan sebagai terapi awal (monoterapi) atau tambahan levodopa pada pasien dengan fluktuasi motorik. Rasagilin lebih poten dan memiliki onset lebih cepat daripada selegilin.\nOpsi A — COMT inhibitor adalah entakapon, tolkapon.\nOpsi B — Benar: MAO-B inhibitor → dopamin ↑.\nOpsi C — Agonis dopamin adalah pramipeksol, ropinirol.\nOpsi D — Antikolinergik adalah triheksifenidil.\nOpsi E — NMDA antagonist adalah memantine."
+  },
+  {
+    question: "Seorang wanita berusia 74 tahun dengan Alzheimer diberikan donepezil. Setelah beberapa minggu, pasien mengalami kejang tonik-klonik. Dokter mencurigai bahwa obat tersebut mungkin berkontribusi terhadap kejang.\nManakah pernyataan yang paling tepat mengenai hubungan donepezil dengan kejang?",
+    options: ["Donepezil dapat menurunkan ambang kejang pada pasien dengan predisposisi", "Donepezil tidak pernah menyebabkan kejang", "Donepezil adalah antikonvulsan yang mencegah kejang", "Donepezil hanya menyebabkan kejang pada overdosis berat", "Donepezil meningkatkan ambang kejang"],
+    answer: 0,
+    explanation: "AChE inhibitor (donepezil, rivastigmin, galantamin) dapat menurunkan ambang kejang karena peningkatan kadar asetilkolin di otak dapat meningkatkan eksitabilitas neuron. Kejang adalah efek samping yang jarang tetapi dapat terjadi, terutama pada pasien dengan predisposisi kejang. Donepezil harus digunakan dengan hati-hati pada pasien dengan riwayat kejang atau epilepsi.\nOpsi A — Benar: menurunkan ambang kejang.\nOpsi B — Donepezil dapat menyebabkan kejang.\nOpsi C — Donepezil bukan antikonvulsan.\nOpsi D — Kejang dapat terjadi pada dosis terapi.\nOpsi E — Donepezil menurunkan, bukan meningkatkan, ambang kejang."
+  },
+  {
+    question: "Seorang pria berusia 65 tahun dengan Parkinson diberikan amantadin untuk mengurangi diskinesia yang terjadi akibat levodopa jangka panjang.\nManakah mekanisme kerja amantadin yang paling tepat?",
+    options: ["Agonis dopamin → meniru efek dopamin", "Antagonis NMDA dan peningkatan pelepasan dopamin → mengurangi diskinesia", "Penghambat MAO-B → meningkatkan dopamin", "Penghambat COMT → memperpanjang efek levodopa", "Antikolinergik → menyeimbangkan dopamin-asetilkolin"],
+    answer: 1,
+    explanation: "Amantadin adalah obat antiviral yang memiliki efek antiparkinson. Amantadin bekerja dengan: (1) meningkatkan pelepasan dopamin dari terminal saraf, dan (2) antagonis reseptor NMDA (glutamat). Efek antagonis NMDA pada amantadin mengurangi diskinesia yang diinduksi levodopa tanpa memperburuk gejala parkinson. Amantadin juga digunakan pada Parkinson stadium awal (efek ringan) dan sebagai tambahan levodopa.\nOpsi A — Amantadin bukan agonis dopamin langsung.\nOpsi B — Benar: NMDA antagonist + pelepasan dopamin → mengurangi diskinesia.\nOpsi C — Penghambat MAO-B adalah selegilin, rasagilin.\nOpsi D — Penghambat COMT adalah entakapon, tolkapon.\nOpsi E — Antikolinergik adalah triheksifenidil."
+  },
+  {
+    question: "Seorang wanita berusia 70 tahun dengan Alzheimer dan riwayat penyakit jantung koroner diberikan memantine. Dokter memilih memantine karena profil keamanan kardiovaskular yang lebih baik.\nManakah pernyataan yang paling tepat mengenai memantine?",
+    options: ["Memantine tidak mempengaruhi sistem kardiovaskular secara signifikan", "Memantine menyebabkan bradikardia berat", "Memantine menyebabkan hipertensi", "Memantine menyebabkan aritmia", "Memantine dikontraindikasikan pada penyakit jantung koroner"],
+    answer: 0,
+    explanation: "Memantine adalah antagonis NMDA yang memiliki profil keamanan kardiovaskular yang baik. Memantine tidak mempengaruhi denyut jantung, tekanan darah, atau konduksi jantung secara signifikan. Ini berbeda dengan AChE inhibitor (donepezil, galantamin) yang dapat menyebabkan bradikardia. Memantine dapat digunakan pada pasien dengan penyakit jantung koroner dengan aman.\nOpsi A — Benar: profil kardiovaskular yang baik.\nOpsi B — Memantine tidak menyebabkan bradikardia.\nOpsi C — Memantine tidak menyebabkan hipertensi.\nOpsi D — Memantine tidak menyebabkan aritmia.\nOpsi E — Memantine aman pada penyakit jantung koroner."
+  },
+  {
+    question: "Seorang pria berusia 62 tahun dengan Parkinson diberikan ropinirol sebagai terapi awal. Pasien mengeluh mengantuk berlebihan dan tiba-tiba tertidur saat mengemudi.\nManakah efek samping ropinirol yang paling menjelaskan keluhan pasien?",
+    options: ["Ropinirol adalah agonis dopamin yang dapat menyebabkan sedasi dan sleep attacks", "Ropinirol adalah antikolinergik yang menyebabkan sedasi", "Ropinirol adalah penghambat MAO-B yang menyebabkan insomnia", "Ropinirol adalah COMT inhibitor yang menyebabkan kelelahan", "Ropinirol adalah NMDA antagonist yang menyebabkan sedasi"],
+    answer: 0,
+    explanation: "Ropinirol adalah agonis reseptor dopamin D2/D3 yang digunakan untuk Parkinson dan restless leg syndrome. Efek samping yang penting: sedasi, mengantuk, dan sleep attacks (serangan tidur mendadak tanpa peringatan) yang dapat terjadi pada 5–10% pasien. Pasien yang menggunakan agonis dopamin harus diedukasi untuk tidak mengemudi atau mengoperasikan alat berat. Efek samping lain: mual, hipotensi ortostatik, halusinasi.\nOpsi A — Benar: agonis dopamin → sedasi dan sleep attacks.\nOpsi B — Ropinirol bukan antikolinergik.\nOpsi C — Penghambat MAO-B (selegilin) dapat menyebabkan insomnia, bukan ropinirol.\nOpsi D — COMT inhibitor (entakapon) tidak menyebabkan sleep attacks.\nOpsi E — NMDA antagonist (amantadin, memantine) tidak menyebabkan sleep attacks signifikan."
+  },
+  {
+    question: "Seorang wanita berusia 55 tahun dengan Alzheimer diberikan kombinasi donepezil dan memantine. Keluarga pasien bertanya mengapa kedua obat tersebut diberikan bersama.\nManakah pernyataan yang paling tepat mengenai kombinasi donepezil dan memantine?",
+    options: ["Donepezil dan memantine bekerja pada mekanisme yang sama dan memiliki efek aditif", "Donepezil meningkatkan asetilkolin, memantine mengurangi eksitotoksisitas glutamat → efek sinergis", "Donepezil dan memantine tidak boleh diberikan bersama karena interaksi", "Memantine meningkatkan efek donepezil dengan menghambat metabolismenya", "Donepezil dan memantine adalah obat yang sama dengan nama dagang berbeda"],
+    answer: 1,
+    explanation: "Donepezil (AChE inhibitor) dan memantine (NMDA antagonist) bekerja pada mekanisme yang berbeda dan komplementer. Donepezil meningkatkan neurotransmisi kolinergik (asetilkolin), sedangkan memantine mengurangi eksitotoksisitas glutamat (NMDA). Kombinasi keduanya memberikan efek sinergis pada fungsi kognitif, aktivitas sehari-hari, dan perilaku pada Alzheimer sedang-berat. Kombinasi ini disetujui dan tersedia sebagai fixed-dose combination (Namzaric).\nOpsi A — Mekanisme berbeda, bukan sama.\nOpsi B — Benar: kolinergik + glutamatergik → sinergis.\nOpsi C — Kombinasi aman dan efektif.\nOpsi D — Memantine tidak menghambat metabolisme donepezil.\nOpsi E — Donepezil dan memantine adalah obat yang berbeda."
+  },
+  {
+    question: "Seorang pria berusia 66 tahun dengan Parkinson dan depresi diberikan selegilin. Pasien juga mengonsumsi antidepresan SSRI (fluoksetin). Dokter memperingatkan risiko sindrom serotonin dan menyarankan penghentian fluoksetin atau penggantian dengan antidepresan lain.\nMengapa selegilin dan SSRI tidak boleh dikombinasikan?",
+    options: ["Selegilin menghambat MAO-B, tetapi pada dosis tinggi atau individu tertentu, MAO-A juga terhambat → peningkatan serotonin", "Selegilin meningkatkan metabolisme SSRI → toksisitas", "Selegilin dan SSRI memiliki efek antikolinergik aditif", "Selegilin meningkatkan reuptake serotonin → serotonin menurun", "Selegilin adalah agonis serotonin → efek berlebihan"],
+    answer: 0,
+    explanation: "Selegilin adalah MAO-B inhibitor selektif pada dosis terapi (≤10 mg/hari). Namun, pada dosis lebih tinggi atau pada pasien dengan metabolisme lambat, selektivitas MAO-B dapat hilang dan MAO-A juga terhambat. MAO-A adalah enzim utama yang mendegradasi serotonin. Kombinasi dengan SSRI (yang meningkatkan serotonin) → akumulasi serotonin berlebihan → sindrom serotonin (tremor, hipertermia, delirium, mioklonus, diaforesis, kematian).\nOpsi A — Benar: selektivitas MAO-B hilang → MAO-A terhambat → serotonin ↑.\nOpsi B — Selegilin tidak meningkatkan metabolisme SSRI.\nOpsi C — Selegilin tidak memiliki efek antikolinergik.\nOpsi D — Selegilin tidak meningkatkan reuptake serotonin.\nOpsi E — Selegilin bukan agonis serotonin."
+  },
+  {
+    question: "Seorang wanita berusia 60 tahun dengan Alzheimer diberikan galantamin. Dokter menjelaskan bahwa galantamin bekerja dengan dua mekanisme.\nApa dua mekanisme kerja galantamin?",
+    options: ["Penghambat AChE dan agonis alosterik reseptor nikotinik", "Penghambat AChE dan penghambat MAO-B", "Agonis NMDA dan penghambat AChE", "Penghambat AChE dan agonis reseptor dopamin", "Penghambat AChE dan penghambat COMT"],
+    answer: 0,
+    explanation: "Galantamin adalah AChE inhibitor yang juga bekerja sebagai agonis alosterik positif pada reseptor nikotinik (nicotinic acetylcholine receptors, nAChR). Galantamin berikatan dengan situs alosterik pada reseptor nikotinik dan meningkatkan respons terhadap asetilkolin endogen. Mekanisme ganda ini membedakan galantamin dari donepezil dan rivastigmin (yang hanya AChE inhibitor). Galantamin digunakan untuk Alzheimer ringan-sedang.\nOpsi A — Benar: AChE inhibitor + agonis alosterik nikotinik.\nOpsi B — Penghambat MAO-B adalah selegilin.\nOpsi C — Agonis NMDA adalah memantine.\nOpsi D — Agonis dopamin digunakan untuk Parkinson.\nOpsi E — Penghambat COMT adalah entakapon."
+  },
+  {
+    question: "Seorang pria berusia 55 tahun dengan Parkinson diberikan levodopa-karbidopa. Pasien mengalami mual dan muntah yang signifikan pada awal terapi. Dokter menambahkan domperidon untuk mengatasi mual.\nManakah pernyataan yang paling tepat mengenai domperidon?",
+    options: ["Domperidon adalah antagonis dopamin perifer yang tidak menembus BBB → antiemetik tanpa efek parkinson", "Domperidon adalah agonis dopamin sentral → meningkatkan dopamin", "Domperidon adalah antagonis 5-HT3 → antiemetik", "Domperidon adalah antikolinergik → antiemetik", "Domperidon adalah antagonis H1 → antiemetik"],
+    answer: 0,
+    explanation: "Domperidon adalah antagonis reseptor dopamin D2 perifer yang tidak menembus sawar darah otak. Domperidon digunakan sebagai antiemetik untuk mual yang diinduksi levodopa. Karena tidak menembus BBB, domperidon tidak menyebabkan efek samping ekstrapiramidal (seperti metoklopramid yang dapat memperburuk Parkinson). Domperidon bekerja di area postrema (CTZ) di luar BBB dan di saluran cerna (meningkatkan motilitas).\nOpsi A — Benar: antagonis D2 perifer → antiemetik tanpa efek parkinson.\nOpsi B — Domperidon adalah antagonis, bukan agonis dopamin.\nOpsi C — Antagonis 5-HT3 adalah ondansetron.\nOpsi D — Antikolinergik (skopolamin) digunakan untuk mabuk perjalanan.\nOpsi E — Antagonis H1 (difenhidramin) digunakan untuk mabuk perjalanan."
+  },
+  {
+    question: "Seorang wanita berusia 70 tahun dengan Parkinson dan demensia diberikan rivastigmin. Dokter memilih rivastigmin karena obat ini digunakan untuk Parkinson disease dementia (PDD) dan Alzheimer.\nManakah pernyataan yang paling tepat mengenai rivastigmin?",
+    options: ["Rivastigmin adalah AChE inhibitor yang juga menghambat butirilkolinesterase (BuChE)", "Rivastigmin adalah NMDA antagonist yang mengurangi eksitotoksisitas", "Rivastigmin adalah agonis dopamin yang meningkatkan dopamin", "Rivastigmin adalah MAO-B inhibitor yang meningkatkan monoamin", "Rivastigmin adalah antikolinergik yang menyeimbangkan neurotransmisi"],
+    answer: 0,
+    explanation: "Rivastigmin adalah AChE inhibitor yang juga menghambat butirilkolinesterase (BuChE). BuChE adalah enzim yang mendegradasi asetilkolin, terutama pada pasien dengan Alzheimer (aktivitas AChE menurun, tetapi BuChE tetap aktif). Rivastigmin disetujui untuk Alzheimer ringan-sedang dan Parkinson disease dementia (PDD). Rivastigmin tersedia dalam bentuk oral dan transdermal. Efek samping: gastrointestinal (mual, muntah), yang dapat dikurangi dengan patch.\nOpsi A — Benar: AChE + BuChE inhibitor.\nOpsi B — NMDA antagonist adalah memantine.\nOpsi C — Agonis dopamin digunakan untuk Parkinson.\nOpsi D — MAO-B inhibitor adalah selegilin, rasagilin.\nOpsi E — Antikolinergik adalah triheksifenidil."
+  },
+  {
+    question: "Seorang pria berusia 62 tahun dengan Parkinson yang telah menggunakan levodopa-karbidopa selama 8 tahun mengeluh fluktuasi motorik yang memburuk. Dokter menambahkan entakapon.\nManakah efek yang diharapkan dari penambahan entakapon?",
+    options: ["Meningkatkan waktu \"on\" dan menurunkan waktu \"off\"", "Meningkatkan diskinesia", "Menurunkan waktu \"on\" dan meningkatkan waktu \"off\"", "Tidak mempengaruhi fluktuasi motorik", "Mengurangi dosis levodopa secara signifikan"],
+    answer: 0,
+    explanation: "Entakapon (COMT inhibitor perifer) meningkatkan bioavailabilitas levodopa dengan menghambat degradasi levodopa di perifer. Hal ini menghasilkan kadar levodopa yang lebih stabil dalam plasma, yang mengurangi fluktuasi motorik (\"on-off\" phenomenon). Pasien akan mengalami peningkatan waktu \"on\" (periode tanpa gejala) dan penurunan waktu \"off\" (periode dengan gejala). Entakapon juga dapat memungkinkan pengurangan dosis levodopa.\nOpsi A — Benar: waktu \"on\" ↑, waktu \"off\" ↓.\nOpsi B — Entakapon dapat meningkatkan diskinesia (efek samping), tetapi tujuan utamanya adalah mengurangi fluktuasi.\nOpsi C — Sebaliknya.\nOpsi D — Entakapon efektif untuk fluktuasi motorik.\nOpsi E — Entakapon memungkinkan pengurangan dosis levodopa, tetapi efek utama adalah waktu \"on\" ↑."
+  },
+  {
+    question: "Seorang wanita berusia 68 tahun dengan Alzheimer dan riwayat ulkus peptikum diberikan donepezil. Dokter mempertimbangkan risiko gastrointestinal dari donepezil.\nManakah yang paling tepat untuk mengurangi risiko gastrointestinal pada pemberian donepezil?",
+    options: ["Memberikan donepezil dengan antasida", "Memberikan donepezil dengan makanan", "Memulai dengan dosis rendah dan titrasi bertahap", "Memberikan donepezil dengan H2 antagonist", "Memberikan donepezil dengan PPI"],
+    answer: 2,
+    explanation: "Donepezil (dan AChE inhibitor lainnya) dapat menyebabkan efek samping gastrointestinal (mual, muntah, diare, anorexia) karena peningkatan asetilkolin di saluran cerna. Efek samping ini dapat dikurangi dengan memulai dengan dosis rendah dan melakukan titrasi bertahap (misalnya donepezil 5 mg/hari selama 4–6 minggu sebelum ditingkatkan menjadi 10 mg/hari). Pemberian dengan makanan dapat membantu, tetapi titrasi adalah yang paling efektif.\nOpsi A — Antasida tidak mencegah efek gastrointestinal.\nOpsi B — Makanan dapat membantu, tetapi titrasi adalah yang paling efektif.\nOpsi C — Benar: start low, go slow.\nOpsi D — H2 antagonist tidak mencegah efek gastrointestinal.\nOpsi E — PPI tidak mencegah efek gastrointestinal."
+  },
+  {
+    question: "Seorang pria berusia 60 tahun dengan Parkinson diberikan rasagilin. Dokter menjelaskan bahwa rasagilin memiliki efek neuroprotektif potensial selain efek simtomatik.\nManakah pernyataan yang paling tepat mengenai efek neuroprotektif rasagilin?",
+    options: ["Rasagilin melindungi neuron dopaminergik melalui efek antioksidan dan penghambatan MAO-B", "Rasagilin meningkatkan proliferasi sel stem di otak", "Rasagilin memperbaiki regenerasi saraf", "Rasagilin tidak memiliki efek neuroprotektif", "Rasagilin bekerja dengan menghambat apoptosis melalui jalur caspase"],
+    answer: 0,
+    explanation: "Rasagilin adalah MAO-B inhibitor yang memiliki efek neuroprotektif potensial. Efek neuroprotektif ini terkait dengan beberapa mekanisme: (1) penghambatan MAO-B → penurunan produksi radikal bebas (H2O2) dari metabolisme dopamin, (2) efek antioksidan langsung, (3) stabilisasi mitokondria. Efek neuroprotektif ini didukung oleh studi ADAGIO (rasagilin memperlambat progresi Parkinson).\nOpsi A — Benar: antioksidan + MAO-B inhibition.\nOpsi B — Rasagilin tidak meningkatkan proliferasi sel stem.\nOpsi C — Rasagilin tidak memperbaiki regenerasi saraf secara langsung.\nOpsi D — Rasagilin memiliki efek neuroprotektif potensial.\nOpsi E — Efek neuroprotektif rasagilin tidak melalui jalur caspase."
+  },
+  {
+    question: "Seorang wanita berusia 65 tahun dengan Alzheimer diberikan memantine. Pasien juga mengonsumsi amantadin untuk Parkinson ringan.\nManakah interaksi yang paling mungkin terjadi antara memantine dan amantadin?",
+    options: ["Keduanya adalah NMDA antagonist → efek aditif yang dapat menyebabkan toksisitas", "Memantine meningkatkan efek amantadin melalui inhibisi CYP450", "Amantadin meningkatkan efek memantine melalui peningkatan absorbsi", "Tidak ada interaksi antara memantine dan amantadin", "Memantine menghambat ekskresi amantadin di ginjal"],
+    answer: 0,
+    explanation: "Memantine dan amantadin keduanya adalah antagonis reseptor NMDA (walaupun amantadin memiliki mekanisme tambahan). Penggunaan bersamaan dapat menyebabkan efek aditif pada sistem glutamatergik, yang dapat menyebabkan toksisitas: pusing, kebingungan, halusinasi, dan gangguan kognitif. Kombinasi memantine dan amantadin harus digunakan dengan hati-hati dan dengan pemantauan.\nOpsi A — Benar: NMDA antagonist ganda → efek aditif.\nOpsi B — Memantine tidak menghambat CYP450 secara signifikan.\nOpsi C — Amantadin tidak mempengaruhi absorbsi memantine.\nOpsi D — Ada interaksi signifikan.\nOpsi E — Memantine tidak mempengaruhi ekskresi amantadin."
+  },
+  {
+    question: "Seorang pria berusia 58 tahun dengan Parkinson dan restless leg syndrome diberikan ropinirol. Pasien juga memiliki riwayat gangguan tidur.\nManakah pernyataan yang paling tepat mengenai ropinirol?",
+    options: ["Ropinirol adalah agonis dopamin yang digunakan untuk Parkinson dan restless leg syndrome", "Ropinirol adalah antikolinergik yang digunakan untuk tremor", "Ropinirol adalah MAO-B inhibitor yang digunakan sebagai terapi awal", "Ropinirol adalah COMT inhibitor yang digunakan sebagai tambahan levodopa", "Ropinirol adalah NMDA antagonist yang digunakan untuk diskinesia"],
+    answer: 0,
+    explanation: "Ropinirol adalah agonis reseptor dopamin non-ergot (D2/D3) yang digunakan untuk: (1) penyakit Parkinson (terapi awal atau tambahan), dan (2) restless leg syndrome (RLS, sindrom kaki gelisah). Ropinirol efektif untuk RLS dengan dosis yang lebih rendah daripada untuk Parkinson. Efek samping: sedasi, sleep attacks, mual, hipotensi ortostatik.\nOpsi A — Benar: agonis dopamin untuk Parkinson dan RLS.\nOpsi B — Antikolinergik adalah triheksifenidil.\nOpsi C — MAO-B inhibitor adalah selegilin, rasagilin.\nOpsi D — COMT inhibitor adalah entakapon, tolkapon.\nOpsi E — NMDA antagonist (amantadin) digunakan untuk diskinesia."
+  },
+  {
+    question: "Seorang wanita berusia 72 tahun dengan Alzheimer dan halusinasi diberikan antipsikotik atipikal (risperidon) untuk mengelola gejala perilaku. Dokter memilih risperidon dosis rendah karena risiko stroke pada pasien demensia.\nManakah peringatan penting mengenai penggunaan antipsikotik pada pasien demensia?",
+    options: ["Antipsikotik meningkatkan risiko kematian dan stroke pada pasien demensia", "Antipsikotik aman pada pasien demensia", "Antipsikotik hanya menyebabkan efek samping gastrointestinal", "Antipsikotik meningkatkan fungsi kognitif", "Antipsikotik adalah terapi lini pertama untuk gejala perilaku demensia"],
+    answer: 0,
+    explanation: "Antipsikotik (tipikal dan atipikal) memiliki black box warning dari FDA karena meningkatkan risiko kematian dan stroke pada pasien dengan demensia (terutama pasien usia lanjut dengan psikosis terkait demensia). Antipsikotik hanya digunakan jika gejala perilaku sangat berat, mengancam diri sendiri atau orang lain, dan tidak responsif terhadap terapi non-farmakologis. Dosis harus minimal dan penggunaan sesingkat mungkin.\nOpsi A — Benar: risiko kematian dan stroke ↑.\nOpsi B — Antipsikotik tidak aman; harus digunakan dengan hati-hati.\nOpsi C — Efek samping lebih luas dari GI.\nOpsi D — Antipsikotik tidak meningkatkan fungsi kognitif.\nOpsi E — Bukan lini pertama; non-farmakologi adalah pilihan utama."
+  },
+  {
+    question: "Seorang pria berusia 55 tahun dengan Parkinson diberikan levodopa-karbidopa. Pasien kemudian mengalami episode kebingungan dan halusinasi visual. Dokter menurunkan dosis levodopa dan menambahkan antipsikotik.\nManakah antipsikotik yang paling aman untuk pasien Parkinson dengan halusinasi?",
+    options: ["Haloperidol", "Klorpromazin", "Olanzapin", "Kuetiapin", "Risperidon"],
+    answer: 3,
+    explanation: "Kuetiapin adalah antipsikotik atipikal yang paling aman untuk pasien Parkinson dengan psikosis (halusinasi, delusi). Kuetiapin memiliki afinitas rendah terhadap reseptor dopamin D2, sehingga risiko memperburuk gejala Parkinson (efek ekstrapiramidal) lebih rendah dibandingkan antipsikotik lain. Klorpromazin dan haloperidol (antipsikotik tipikal) memiliki risiko tinggi memperburuk Parkinson (efek ekstrapiramidal). Olanzapin dan risperidon juga dapat memperburuk Parkinson, tetapi kuetiapin adalah yang paling aman.\nOpsi A — Haloperidol (tipikal) → risiko EPS tinggi.\nOpsi B — Klorpromazin (tipikal) → risiko EPS tinggi.\nOpsi C — Olanzapin → risiko EPS sedang.\nOpsi D — Benar: kuetiapin → risiko EPS paling rendah.\nOpsi E — Risperidon → risiko EPS dosis-tergantung."
+  },
+  {
+    question: "Seorang wanita berusia 78 tahun dengan Alzheimer dan inkontinensia urin diberikan donepezil. Pasien kemudian mengalami inkontinensia yang memburuk.\nManakah mekanisme yang menjelaskan memburuknya inkontinensia pada pasien ini?",
+    options: ["Donepezil meningkatkan asetilkolin → kontraksi detrusor meningkat → inkontinensia", "Donepezil menurunkan asetilkolin → relaksasi detrusor", "Donepezil adalah antikolinergik → retensi urin", "Donepezil meningkatkan tonus sfingter → retensi urin", "Donepezil tidak mempengaruhi kandung kemih"],
+    answer: 0,
+    explanation: "Donepezil (AChE inhibitor) meningkatkan kadar asetilkolin di sistem saraf pusat dan perifer. Pada kandung kemih, asetilkolin merangsang kontraksi otot detrusor melalui reseptor muskarinik. Peningkatan asetilkolin → kontraksi detrusor meningkat → inkontinensia urin (terutama pada pasien dengan predisposisi). Ini adalah efek samping yang jarang tetapi penting. Sebaliknya, antikolinergik (seperti oksibutinin) digunakan untuk overactive bladder karena menurunkan kontraksi detrusor.\nOpsi A — Benar: asetilkolin ↑ → kontraksi detrusor ↑ → inkontinensia.\nOpsi B — Donepezil meningkatkan, bukan menurunkan, asetilkolin.\nOpsi C — Donepezil bukan antikolinergik.\nOpsi D — Donepezil tidak meningkatkan tonus sfingter.\nOpsi E — Donepezil mempengaruhi kandung kemih melalui peningkatan asetilkolin.\nSEGMEN B: OBAT ANTIEPILEPTIK & STATUS EPILEPTIKUS (Soal #31–#60)"
+  },
+  {
+    question: "Seorang anak laki-laki berusia 8 tahun dengan epilepsi umum tonik-klonik diberikan fenitoin. Dokter memulai dengan dosis loading dan kemudian dosis pemeliharaan. Pasien juga memiliki riwayat defisiensi vitamin D dan sedang mengonsumsi suplemen kalsium.\nManakah interaksi yang paling mungkin terjadi antara fenitoin dan kalsium?",
+    options: ["Fenitoin menurunkan absorbsi kalsium", "Fenitoin meningkatkan metabolisme vitamin D → menurunkan kalsium", "Kalsium meningkatkan absorbsi fenitoin", "Tidak ada interaksi antara fenitoin dan kalsium", "Fenitoin meningkatkan absorbsi kalsium"],
+    answer: 1,
+    explanation: "Fenitoin (dan karbamazepin, fenobarbital) adalah induktor CYP450 yang meningkatkan metabolisme vitamin D di hati. Metabolisme vitamin D meningkat → kadar 25-hidroksi vitamin D menurun → absorbsi kalsium di usus menurun → hipokalsemia dan risiko osteoporosis. Pasien dengan epilepsi yang menggunakan fenitoin jangka panjang harus dipantau kadar vitamin D dan kalsium, serta diberikan suplemen vitamin D dan kalsium.\nOpsi A — Fenitoin tidak secara langsung menurunkan absorbsi kalsium.\nOpsi B — Benar: induksi metabolisme vitamin D → hipokalsemia.\nOpsi C — Kalsium tidak meningkatkan absorbsi fenitoin.\nOpsi D — Ada interaksi signifikan.\nOpsi E — Fenitoin menurunkan, bukan meningkatkan, absorbsi kalsium."
+  },
+  {
+    question: "Seorang wanita berusia 25 tahun dengan epilepsi absans (petit mal) diberikan etosuksimid. Pasien mengalami perbaikan yang signifikan dalam frekuensi serangan absans.\nManakah mekanisme kerja etosuksimid yang paling tepat?",
+    options: ["Penghambat kanal natrium → menurunkan eksitabilitas neuron", "Penghambat kanal kalsium tipe T di talamus → menurunkan aktivitas pacemaker", "Penghambat kanal kalium → meningkatkan repolarisasi", "Agonis reseptor GABA → meningkatkan inhibisi", "Penghambat reuptake GABA → meningkatkan GABA"],
+    answer: 1,
+    explanation: "Etosuksimid adalah obat pilihan untuk epilepsi absans (petit mal). Etosuksimid bekerja dengan menghambat kanal kalsium tipe T di neuron talamus. Kanal kalsium tipe T berperan dalam menghasilkan pola gelombang spike-and-wave pada EEG yang khas untuk epilepsi absans. Penghambatan kanal kalsium tipe T → menurunkan aktivitas pacemaker di talamus → mengurangi serangan absans. Etosuksimid tidak efektif untuk kejang tonik-klonik.\nOpsi A — Penghambat kanal natrium adalah fenitoin, karbamazepin, lamotrigin.\nOpsi B — Benar: penghambat kanal Ca tipe T.\nOpsi C — Penghambat kanal kalium bukan mekanisme etosuksimid.\nOpsi D — Agonis GABA adalah benzodiazepin, barbiturat.\nOpsi E — Penghambat reuptake GABA adalah tiagabin."
+  },
+  {
+    question: "Seorang pria berusia 30 tahun dengan epilepsi parsial kompleks diberikan karbamazepin. Pasien kemudian mengalami ruam kulit yang menyebar, demam, dan limfadenopati. Dokter mencurigai sindrom Stevens-Johnson (SJS).\nManakah pernyataan yang paling tepat mengenai risiko SJS pada karbamazepin?",
+    options: ["Risiko SJS pada karbamazepin terkait dengan alel HLA-B*1502 pada populasi Asia", "Risiko SJS pada karbamazepin terjadi pada semua populasi dengan frekuensi yang sama", "SJS pada karbamazepin hanya terjadi pada pasien dengan alergi penisilin", "SJS pada karbamazepin adalah reaksi yang dapat diprediksi dengan tes kulit", "SJS pada karbamazepin adalah efek samping yang jarang dan tidak berbahaya"],
+    answer: 0,
+    explanation: "Karbamazepin (dan okskarbazepin, fenitoin) dapat menyebabkan reaksi kulit berat: sindrom Stevens-Johnson (SJS) dan nekrolisis epidermal toksik (TEN). Risiko SJS/TEN pada karbamazepin sangat tinggi pada pasien dengan alel HLA-B*1502, terutama pada populasi Asia (Han Chinese, Thai, Malaysia, Filipina). Skrining HLA-B*1502 direkomendasikan sebelum memulai karbamazepin pada pasien dengan latar belakang Asia.\nOpsi A — Benar: HLA-B*1502 pada populasi Asia.\nOpsi B — Risiko tidak sama; lebih tinggi pada populasi Asia.\nOpsi C — Tidak terkait dengan alergi penisilin.\nOpsi D — Tidak dapat diprediksi dengan tes kulit.\nOpsi E — SJS adalah reaksi berat yang mengancam jiwa."
+  },
+  {
+    question: "Seorang pasien dengan status epileptikus datang ke UGD dengan kejang tonik-klonik generalisata yang berlangsung >5 menit. Dokter memberikan diazepam IV sebagai terapi awal.\nManakah yang merupakan mekanisme kerja diazepam?",
+    options: ["Agonis reseptor GABA-A → meningkatkan frekuensi pembukaan kanal klorida → hiperpolarisasi", "Agonis reseptor GABA-A → meningkatkan durasi pembukaan kanal klorida → hiperpolarisasi", "Antagonis reseptor NMDA → menurunkan eksitotoksisitas", "Penghambat kanal natrium → menurunkan eksitabilitas", "Penghambat kanal kalsium tipe T → menurunkan aktivitas talamus"],
+    answer: 0,
+    explanation: "Diazepam adalah benzodiazepin yang bekerja sebagai agonis pada reseptor GABA-A (subunit α-γ). Benzodiazepin meningkatkan frekuensi pembukaan kanal klorida (bukan durasi, seperti barbiturat). Peningkatan aliran Cl⁻ → hiperpolarisasi membran → penurunan eksitabilitas neuron → efek antikonvulsan (dan sedasi, ansiolitik, relaksasi otot). Diazepam adalah obat pilihan pertama untuk status epileptikus, bersama dengan lorazepam.\nOpsi A — Benar: frekuensi pembukaan Cl⁻ ↑.\nOpsi B — Barbiturat meningkatkan durasi pembukaan Cl⁻.\nOpsi C — Antagonis NMDA adalah ketamin, memantine.\nOpsi D — Penghambat kanal natrium adalah fenitoin, karbamazepin.\nOpsi E — Penghambat kanal Ca tipe T adalah etosuksimid."
+  },
+  {
+    question: "Seorang wanita berusia 28 tahun dengan epilepsi umum tonik-klonik yang sedang hamil diberikan asam valproat. Dokter memperingatkan risiko teratogenik.\nManakah malformasi kongenital yang paling terkait dengan asam valproat?",
+    options: ["Cacat tabung saraf (spina bifida)", "Cacat jantung kongenital", "Cleft lip dan palate", "Hipoplasia ekstremitas", "Hidrosefalus"],
+    answer: 0,
+    explanation: "Asam valproat adalah obat antiepilepsi dengan risiko teratogenik tertinggi (kategori D). Malformasi kongenital yang paling terkait: cacat tabung saraf (spina bifida, anensefali), dengan risiko 1–2%. Risiko lainnya: kelainan kraniofasial, kelainan kardiovaskular, dan defisiensi perkembangan kognitif. Asam valproat harus dihindari pada wanita hamil atau yang merencanakan kehamilan, terutama pada trimester pertama. Obat alternatif: lamotrigin, levetiracetam.\nOpsi A — Benar: cacat tabung saraf.\nOpsi B — Cacat jantung terjadi tetapi spina bifida lebih spesifik.\nOpsi C — Cleft lip/palate terjadi pada fenitoin (fetal hydantoin syndrome).\nOpsi D — Hipoplasia ekstremitas tidak terkait.\nOpsi E — Hidrosefalus tidak terkait."
+  },
+  {
+    question: "Seorang pria berusia 45 tahun dengan epilepsi parsial diberikan lamotrigin. Dokter melakukan titrasi dosis secara perlahan untuk mengurangi risiko efek samping.\nManakah efek samping yang paling serius dari lamotrigin yang memerlukan titrasi perlahan?",
+    options: ["Sedasi berat", "Ruam kulit berat (SJS/TEN)", "Hepatotoksisitas", "Agranulositosis", "Gangguan penglihatan"],
+    answer: 1,
+    explanation: "Lamotrigin adalah antiepilepsi yang bekerja sebagai penghambat kanal natrium dan penghambat pelepasan glutamat. Efek samping yang paling serius: ruam kulit berat (sindrom Stevens-Johnson / SJS, nekrolisis epidermal toksik / TEN). Risiko SJS/TEN meningkat jika titrasi dosis terlalu cepat atau jika lamotrigin diberikan bersamaan dengan asam valproat (yang meningkatkan kadar lamotrigin). Titrasi lambat (start low, go slow) sangat penting untuk mengurangi risiko ruam.\nOpsi A — Sedasi ringan dapat terjadi, tetapi tidak serius.\nOpsi B — Benar: SJS/TEN adalah yang paling serius.\nOpsi C — Hepatotoksisitas jarang terjadi.\nOpsi D — Agranulositosis jarang terjadi.\nOpsi E — Gangguan penglihatan jarang terjadi."
+  },
+  {
+    question: "Seorang pasien dengan status epileptikus diberikan lorazepam IV, tetapi kejang masih berlanjut setelah 10 menit. Dokter memberikan fenitoin IV.\nManakah yang harus diperhatikan saat pemberian fenitoin IV?",
+    options: ["Fenitoin IV harus diberikan dengan infus cepat (≤5 menit)", "Fenitoin IV harus diberikan perlahan (≤50 mg/menit) untuk mencegah hipotensi dan aritmia", "Fenitoin IV dapat diberikan melalui infus dalam larutan glukosa 5%", "Fenitoin IV tidak memerlukan monitoring EKG", "Fenitoin IV diberikan secara IM"],
+    answer: 1,
+    explanation: "Fenitoin IV harus diberikan perlahan (maksimal 50 mg/menit) untuk mencegah efek samping kardiovaskular: hipotensi, bradikardia, blok AV, dan aritmia. Fenitoin adalah antiaritmia kelas IB, dan pemberian cepat dapat menyebabkan depresi miokard. Fenitoin juga dapat menyebabkan flebitis dan harus diberikan dalam larutan NaCl 0,9% (bukan glukosa karena dapat mengendap). EKG dan tekanan darah harus dipantau selama infus.\nOpsi A — Fenitoin IV harus diberikan perlahan, bukan cepat.\nOpsi B — Benar: ≤50 mg/menit.\nOpsi C — Fenitoin mengendap dalam larutan glukosa; harus diberikan dengan NaCl 0,9%.\nOpsi D — EKG harus dipantau karena risiko aritmia.\nOpsi E — Fenitoin IV diberikan secara IV, bukan IM (IM tidak dianjurkan)."
+  },
+  {
+    question: "Seorang wanita berusia 32 tahun dengan epilepsi umum tonik-klonik diberikan fenobarbital. Pasien mengeluh mengantuk dan kesulitan berkonsentrasi.\nManakah pernyataan yang paling tepat mengenai fenobarbital?",
+    options: ["Fenobarbital adalah antiepilepsi yang bekerja sebagai agonis GABA-A (memperpanjang durasi pembukaan kanal Cl⁻)", "Fenobarbital adalah penghambat kanal natrium", "Fenobarbital adalah penghambat kanal kalsium tipe T", "Fenobarbital adalah antagonis NMDA", "Fenobarbital adalah penghambat reuptake GABA"],
+    answer: 0,
+    explanation: "Fenobarbital adalah barbiturat yang bekerja pada reseptor GABA-A. Barbiturat (seperti fenobarbital) meningkatkan durasi pembukaan kanal klorida (berbeda dengan benzodiazepin yang meningkatkan frekuensi). Peningkatan aliran Cl⁻ → hiperpolarisasi → efek antikonvulsan. Efek samping: sedasi berat, gangguan kognitif, toleransi, ketergantungan, dan induksi enzim CYP450. Fenobarbital digunakan untuk kejang tonik-klonik dan status epileptikus.\nOpsi A — Benar: meningkatkan durasi pembukaan Cl⁻.\nOpsi B — Penghambat kanal natrium adalah fenitoin, karbamazepin, lamotrigin.\nOpsi C — Penghambat kanal Ca tipe T adalah etosuksimid.\nOpsi D — Antagonis NMDA adalah ketamin, memantine.\nOpsi E — Penghambat reuptake GABA adalah tiagabin."
+  },
+  {
+    question: "Seorang anak laki-laki berusia 10 tahun dengan epilepsi mioklonik juvenil diberikan asam valproat. Pasien menunjukkan perbaikan yang signifikan.\nManakah mekanisme kerja asam valproat yang paling tepat?",
+    options: ["Penghambat kanal natrium dan peningkatan GABA", "Penghambat kanal kalsium tipe T", "Agonis reseptor GABA-A", "Penghambat reuptake GABA", "Agonis reseptor NMDA"],
+    answer: 0,
+    explanation: "Asam valproat memiliki beberapa mekanisme: (1) penghambatan kanal natrium (seperti fenitoin), (2) peningkatan aktivitas GABA (melalui penghambatan GABA transaminase dan peningkatan sintesis GABA), dan (3) penghambatan kanal kalsium tipe T (pada dosis tinggi). Asam valproat efektif untuk kejang absans, mioklonik, tonik-klonik, dan parsial. Efek samping: hepatotoksisitas, hiperamonemia, tremor, penambahan berat badan.\nOpsi A — Benar: kanal Na + GABA.\nOpsi B — Hanya sebagian mekanisme, bukan yang utama.\nOpsi C — Agonis GABA-A adalah benzodiazepin, barbiturat.\nOpsi D — Penghambat reuptake GABA adalah tiagabin.\nOpsi E — Antagonis NMDA adalah ketamin, memantine."
+  },
+  {
+    question: "Seorang pasien dengan status epileptikus yang tidak responsif terhadap diazepam dan fenitoin diberikan propofol IV di ICU. Dokter memantau fungsi kardiovaskular dan pernapasan.\nManakah yang merupakan mekanisme kerja propofol?",
+    options: ["Agonis reseptor GABA-A → meningkatkan transmisi inhibisi", "Antagonis reseptor NMDA → menurunkan eksitotoksisitas", "Penghambat kanal natrium → menurunkan eksitabilitas", "Penghambat kanal kalsium → menurunkan aktivitas neuron", "Agonis reseptor opioid → sedasi"],
+    answer: 0,
+    explanation: "Propofol adalah anestetik umum yang bekerja sebagai agonis pada reseptor GABA-A (memperkuat transmisi GABAergik). Propofol digunakan untuk induksi dan pemeliharaan anestesi, sedasi di ICU, dan status epileptikus refrakter. Efek samping: hipotensi, depresi pernapasan, dan sindrom infus propofol (PRIS) pada penggunaan lama. Propofol adalah pilihan untuk status epileptikus yang tidak responsif terhadap benzodiazepin dan fenitoin.\nOpsi A — Benar: agonis GABA-A.\nOpsi B — Antagonis NMDA adalah ketamin.\nOpsi C — Penghambat kanal Na adalah fenitoin, lidokain.\nOpsi D — Penghambat kanal Ca adalah etosuksimid.\nOpsi E — Agonis opioid adalah morfin, fentanil."
+  },
+  {
+    question: "Seorang wanita berusia 35 tahun dengan epilepsi parsial diberikan okskarbazepin sebagai pengganti karbamazepin karena efek samping yang tidak toleran. Pasien memiliki riwayat hiponatremia.\nManakah perhatian khusus pada pemberian okskarbazepin?",
+    options: ["Okskarbazepin dapat menyebabkan hiponatremia lebih sering daripada karbamazepin", "Okskarbazepin tidak menyebabkan hiponatremia", "Okskarbazepin menyebabkan hipernatremia", "Okskarbazepin tidak mempengaruhi elektrolit", "Okskarbazepin hanya menyebabkan hiponatremia pada anak-anak"],
+    answer: 0,
+    explanation: "Okskarbazepin adalah antiepilepsi yang merupakan turunan karbamazepin, dengan efek samping yang lebih baik (interaksi obat lebih sedikit). Namun, okskarbazepin lebih sering menyebabkan hiponatremia (10–20%) dibandingkan karbamazepin. Hiponatremia terjadi melalui mekanisme efek antidiuretik (SIADH-like). Kadar natrium harus dipantau pada pasien yang menggunakan okskarbazepin, terutama pada awal terapi.\nOpsi A — Benar: hiponatremia lebih sering.\nOpsi B — Okskarbazepin dapat menyebabkan hiponatremia.\nOpsi C — Okskarbazepin tidak menyebabkan hipernatremia.\nOpsi D — Okskarbazepin mempengaruhi elektrolit (natrium).\nOpsi E — Hiponatremia terjadi pada semua usia."
+  },
+  {
+    question: "Seorang pria berusia 40 tahun dengan epilepsi umum tonik-klonik diberikan fenitoin. Pasien mengeluh hiperplasia gingiva (pembengkakan gusi) dan hirsutisme.\nManakah pernyataan yang paling tepat mengenai efek samping fenitoin?",
+    options: ["Hiperplasia gingiva terjadi pada semua pasien yang menggunakan fenitoin", "Hiperplasia gingiva dan hirsutisme adalah efek samping yang umum pada fenitoin", "Hiperplasia gingiva tidak dapat diatasi dengan menjaga kebersihan gigi", "Hirsutisme hanya terjadi pada wanita", "Efek samping fenitoin reversibel dengan penghentian obat"],
+    answer: 1,
+    explanation: "Fenitoin memiliki beberapa efek samping yang khas: (1) hiperplasia gingiva (pembengkakan gusi) pada 20–50% pasien, terkait dengan stimulasi fibroblas dan kolagen; (2) hirsutisme (pertumbuhan rambut berlebihan); (3) fasies kasar (coarse facies); (4) osteomalasia (defisiensi vitamin D); dan (5) neuropati perifer. Hiperplasia gingiva dapat dikurangi dengan menjaga kebersihan gigi dan menghindari siklus sporin (obat imunosupresan). Efek samping fenitoin dapat reversibel dengan penghentian obat.\nOpsi A — Tidak semua pasien, tetapi 20–50%.\nOpsi B — Benar: umum pada fenitoin.\nOpsi C — Kebersihan gigi dapat membantu.\nOpsi D — Hirsutisme terjadi pada pria dan wanita.\nOpsi E — Efek samping dapat reversibel (tidak selalu)."
+  },
+  {
+    question: "Seorang pasien dengan epilepsi diberikan levetiracetam. Pasien melaporkan perbaikan kontrol kejang dengan efek samping minimal, tetapi mengalami perubahan perilaku dan mudah marah.\nManakah pernyataan yang paling tepat mengenai levetiracetam?",
+    options: ["Levetiracetam bekerja dengan menghambat kanal natrium", "Levetiracetam berikatan dengan protein SV2A di vesikel sinaptik → memodulasi pelepasan neurotransmitter", "Levetiracetam adalah agonis reseptor GABA", "Levetiracetam adalah penghambat reuptake GABA", "Levetiracetam adalah penghambat kanal kalsium tipe T"],
+    answer: 1,
+    explanation: "Levetiracetam adalah antiepilepsi generasi baru dengan mekanisme kerja yang unik: berikatan dengan protein SV2A (synaptic vesicle protein 2A) di vesikel sinaptik. Ikatan ini memodulasi pelepasan neurotransmitter (glutamat dan GABA) dan mengurangi eksitabilitas neuron. Levetiracetam efektif untuk kejang parsial, mioklonik, dan tonik-klonik umum. Efek samping: sedasi, pusing, perubahan perilaku (iritabilitas, agresi, psikosis), dan reaksi kulit (jarang).\nOpsi A — Penghambat kanal Na adalah fenitoin, karbamazepin.\nOpsi B — Benar: SV2A binding → modulasi pelepasan neurotransmitter.\nOpsi C — Agonis GABA adalah benzodiazepin, barbiturat.\nOpsi D — Penghambat reuptake GABA adalah tiagabin.\nOpsi E — Penghambat kanal Ca tipe T adalah etosuksimid."
+  },
+  {
+    question: "Seorang wanita berusia 55 tahun dengan epilepsi parsial diberikan gabapentin untuk nyeri neuropatik dan epilepsi. Pasien memiliki riwayat gagal ginjal kronik.\nManakah yang paling tepat mengenai dosis gabapentin pada pasien ini?",
+    options: ["Gabapentin diekskresi tidak berubah melalui ginjal → dosis harus disesuaikan dengan fungsi ginjal", "Gabapentin dimetabolisme di hati → tidak perlu penyesuaian dosis", "Gabapentin diikat protein plasma tinggi → perlu penyesuaian dosis", "Gabapentin tidak memerlukan penyesuaian dosis pada gagal ginjal", "Gabapentin dikontraindikasikan pada gagal ginjal"],
+    answer: 0,
+    explanation: "Gabapentin diekskresi tidak berubah melalui ginjal (filtrasi glomerulus). Tidak ada metabolisme di hati (CYP450 tidak terlibat). Pada pasien dengan gagal ginjal, dosis gabapentin harus disesuaikan berdasarkan klirens kreatinin. Penyesuaian dosis: GFR 30–60 ml/menit: 200–700 mg/hari; GFR 15–30 ml/menit: 100–300 mg/hari; GFR <15 ml/menit: 100–200 mg/hari. Hemodialisis memerlukan dosis tambahan.\nOpsi A — Benar: ekskresi ginjal → penyesuaian dosis.\nOpsi B — Gabapentin tidak dimetabolisme di hati.\nOpsi C — Ikatan protein gabapentin rendah (<3%).\nOpsi D — Memerlukan penyesuaian dosis.\nOpsi E — Gabapentin dapat digunakan dengan penyesuaian dosis."
+  },
+  {
+    question: "Seorang pasien dengan epilepsi absans diberikan etosuksimid, tetapi kejang absans masih berlanjut. Dokter menambahkan asam valproat.\nManakah pernyataan yang paling tepat mengenai kombinasi etosuksimid dan asam valproat?",
+    options: ["Kombinasi ini tidak efektif untuk epilepsi absans", "Kombinasi ini efektif untuk epilepsi absans refrakter", "Asam valproat menurunkan kadar etosuksimid", "Etosuksimid meningkatkan kadar asam valproat", "Kombinasi ini meningkatkan risiko hepatotoksisitas"],
+    answer: 1,
+    explanation: "Etosuksimid adalah obat pilihan untuk epilepsi absans, tetapi beberapa pasien memerlukan terapi tambahan. Kombinasi etosuksimid dengan asam valproat (atau lamotrigin) efektif untuk epilepsi absans refrakter. Asam valproat dan etosuksimid bekerja pada mekanisme yang berbeda (etosuksimid: kanal Ca tipe T; valproat: kanal Na + GABA), sehingga memberikan efek sinergis. Kombinasi ini memerlukan pemantauan kadar obat dan efek samping.\nOpsi A — Kombinasi efektif.\nOpsi B — Benar: efektif untuk absans refrakter.\nOpsi C — Asam valproat dapat meningkatkan kadar etosuksimid (bukan menurunkan).\nOpsi D — Etosuksimid tidak signifikan mempengaruhi kadar valproat.\nOpsi E — Risiko hepatotoksisitas lebih tinggi pada valproat, bukan kombinasi spesifik."
+  },
+  {
+    question: "Seorang anak laki-laki berusia 6 tahun dengan kejang demam berulang diberikan diazepam rektal sebagai obat darurat di rumah. Orang tua bertanya bagaimana cara pemberian dan dosisnya.\nManakah dosis diazepam rektal yang tepat untuk anak usia 6 tahun?",
+    options: ["0,5 mg/kgBB", "0,1–0,2 mg/kgBB", "0,3–0,5 mg/kgBB", "1–2 mg/kgBB", "5–10 mg/kgBB"],
+    answer: 2,
+    explanation: "Diazepam rektal digunakan untuk kejang demam atau kejang berulang di rumah. Dosis diazepam rektal: 0,3–0,5 mg/kgBB (maksimal 20 mg). Untuk anak 6 tahun, dosis dapat diberikan sebagai larutan rektal (diazepam rektal tube). Diazepam rektal memiliki onset cepat (2–5 menit) dan efektif untuk menghentikan kejang. Orang tua harus diedukasi cara pemberian dan kapan harus membawa anak ke rumah sakit.\nOpsi A — Terlalu rendah (0,5 mg/kg adalah dosis IV untuk status).\nOpsi B — Terlalu rendah.\nOpsi C — Benar: 0,3–0,5 mg/kgBB.\nOpsi D — Terlalu tinggi.\nOpsi E — Terlalu tinggi."
+  },
+  {
+    question: "Seorang wanita berusia 40 tahun dengan epilepsi parsial diberikan topiramat. Pasien mengeluh penurunan berat badan yang signifikan dan kesulitan menemukan kata (word-finding difficulty).\nManakah pernyataan yang paling tepat mengenai topiramat?",
+    options: ["Topiramat adalah antiepilepsi yang bekerja pada banyak target (kanal Na, GABA, AMPA/kainat, dan karbonik anhidrase)", "Topiramat hanya bekerja pada kanal natrium", "Topiramat tidak menyebabkan efek samping kognitif", "Topiramat menyebabkan penambahan berat badan", "Topiramat adalah agonis GABA"],
+    answer: 0,
+    explanation: "Topiramat adalah antiepilepsi generasi baru dengan banyak mekanisme: (1) penghambatan kanal natrium, (2) peningkatan aktivitas GABA, (3) penghambatan reseptor AMPA/kainat (glutamat), dan (4) penghambatan karbonik anhidrase. Efek samping: penurunan berat badan (digunakan untuk migrain dan obesitas), gangguan kognitif (word-finding difficulty, penurunan konsentrasi), sedasi, pusing, dan risiko batu ginjal (karena efek karbonik anhidrase).\nOpsi A — Benar: multi-target.\nOpsi B — Tidak hanya kanal Na.\nOpsi C — Topiramat menyebabkan efek kognitif.\nOpsi D — Topiramat menyebabkan penurunan berat badan.\nOpsi E — Topiramat meningkatkan GABA tetapi bukan agonis GABA."
+  },
+  {
+    question: "Seorang pasien dengan epilepsi diberikan fenitoin. Pasien kemudian mengalami ataksia dan nistagmus. Kadar fenitoin dalam darah dilaporkan 25 mcg/mL (normal: 10–20 mcg/mL).\nManakah diagnosis yang paling tepat?",
+    options: ["Efek samping fenitoin pada dosis terapi", "Toksisitas fenitoin akibat kadar yang terlalu tinggi", "Reaksi alergi terhadap fenitoin", "Interaksi fenitoin dengan makanan", "Efek samping fenitoin yang tidak tergantung dosis"],
+    answer: 1,
+    explanation: "Fenitoin memiliki indeks terapeutik yang sempit (10–20 mcg/mL). Kadar >20 mcg/mL menyebabkan toksisitas. Manifestasi toksisitas fenitoin: nistagmus (kadar 20–30 mcg/mL), ataksia, disartria, tremor (kadar 30–40 mcg/mL), dan kejang, koma (kadar >40 mcg/mL). Kadar 25 mcg/mL menunjukkan toksisitas ringan-sedang. Penurunan dosis diperlukan dan kadar harus dipantau.\nOpsi A — Bukan efek terapi; ini toksisitas.\nOpsi B — Benar: toksisitas.\nOpsi C — Reaksi alergi (ruam, SJS) berbeda.\nOpsi D — Makanan tidak menyebabkan kadar 25 mcg/mL.\nOpsi E — Toksisitas tergantung dosis."
+  },
+  {
+    question: "Seorang wanita berusia 30 tahun dengan epilepsi umum tonik-klonik yang sedang hamil diberikan lamotrigin. Dokter memilih lamotrigin karena profil keamanan yang lebih baik.\nManakah pernyataan yang paling tepat mengenai lamotrigin pada kehamilan?",
+    options: ["Lamotrigin adalah antiepilepsi yang paling aman pada kehamilan", "Lamotrigin meningkatkan risiko cacat tabung saraf", "Lamotrigin dikontraindikasikan pada kehamilan", "Lamotrigin dosis harus dikurangi pada kehamilan", "Lamotrigin tidak memiliki risiko teratogenik"],
+    answer: 0,
+    explanation: "Lamotrigin adalah antiepilepsi dengan profil keamanan terbaik pada kehamilan (kategori C, tetapi dianggap pilihan utama). Risiko malformasi kongenital dengan lamotrigin lebih rendah dibandingkan dengan asam valproat dan fenitoin. Namun, kadar lamotrigin dapat menurun selama kehamilan karena peningkatan metabolisme (induksi enzim), sehingga dosis mungkin perlu ditingkatkan dan dipantau kadarnya.\nOpsi A — Benar: paling aman di antara antiepilepsi.\nOpsi B — Cacat tabung saraf terkait dengan asam valproat.\nOpsi C — Lamotrigin tidak dikontraindikasikan.\nOpsi D — Dosis mungkin perlu ditingkatkan (bukan dikurangi).\nOpsi E — Risiko teratogenik rendah, tetapi tidak nol."
+  },
+  {
+    question: "Seorang pria berusia 50 tahun dengan epilepsi parsial diberikan karbamazepin. Pasien juga mengonsumsi warfarin untuk atrial fibrilasi.\nManakah interaksi antara karbamazepin dan warfarin?",
+    options: ["Karbamazepin menurunkan kadar warfarin (induksi CYP2C9) → INR menurun", "Karbamazepin meningkatkan kadar warfarin (inhibisi CYP2C9) → INR meningkat", "Karbamazepin dan warfarin tidak berinteraksi", "Karbamazepin meningkatkan efek warfarin melalui displasemen protein", "Karbamazepin menurunkan absorbsi warfarin"],
+    answer: 0,
+    explanation: "Karbamazepin adalah induktor kuat CYP3A4 dan CYP2C9. Warfarin (S-enantiomer) dimetabolisme oleh CYP2C9. Induksi CYP2C9 oleh karbamazepin → metabolisme warfarin meningkat → kadar warfarin menurun → INR menurun → risiko trombosis. Dosis warfarin harus ditingkatkan dan INR dipantau secara ketat. Ketika karbamazepin dihentikan, dosis warfarin harus dikurangi untuk mencegah perdarahan.\nOpsi A — Benar: induksi CYP2C9 → warfarin ↓ → INR ↓.\nOpsi B — Karbamazepin adalah induktor, bukan inhibitor.\nOpsi C — Interaksi signifikan terjadi.\nOpsi D — Displasemen protein bukan mekanisme utama.\nOpsi E — Absorpsi warfarin tidak terpengaruh."
+  },
+  {
+    question: "Seorang pasien dengan epilepsi diberikan pregabalin untuk nyeri neuropatik dan kejang parsial. Pasien memiliki riwayat gagal ginjal dan sedang menjalani hemodialisis.\nManakah yang paling tepat mengenai dosis pregabalin pada pasien ini?",
+    options: ["Pregabalin diekskresi melalui ginjal → dosis harus disesuaikan dan diberikan setelah hemodialisis", "Pregabalin dimetabolisme di hati → tidak perlu penyesuaian dosis", "Pregabalin tidak memerlukan penyesuaian dosis pada gagal ginjal", "Pregabalin dikontraindikasikan pada gagal ginjal", "Pregabalin diekskresi melalui empedu → aman"],
+    answer: 0,
+    explanation: "Pregabalin diekskresi tidak berubah melalui ginjal (98%). Pada pasien dengan gagal ginjal, dosis pregabalin harus disesuaikan berdasarkan klirens kreatinin. Pada pasien yang menjalani hemodialisis, dosis harus diberikan setelah sesi hemodialisis karena hemodialisis menghilangkan pregabalin dari sirkulasi. Penyesuaian dosis penting untuk mencegah efek samping: sedasi, pusing, edema, dan penambahan berat badan.\nOpsi A — Benar: ekskresi ginjal → penyesuaian dosis + setelah dialisis.\nOpsi B — Pregabalin tidak dimetabolisme di hati.\nOpsi C — Memerlukan penyesuaian dosis.\nOpsi D — Pregabalin dapat digunakan dengan penyesuaian.\nOpsi E — Pregabalin diekskresi ginjal, bukan empedu."
+  },
+  {
+    question: "Seorang wanita berusia 28 tahun dengan epilepsi absans diberikan etosuksimid. Pasien mengalami ruam kulit dan demam. Dokter mencurigai sindrom Stevens-Johnson.\nManakah yang paling tepat dilakukan?",
+    options: ["Menghentikan etosuksimid dan merujuk ke dermatologi", "Memberikan antihistamin dan melanjutkan etosuksimid", "Mengganti etosuksimid dengan asam valproat", "Memberikan kortikosteroid dan melanjutkan etosuksimid", "Menghentikan semua obat dan memberikan antibiotik"],
+    answer: 0,
+    explanation: "Sindrom Stevens-Johnson (SJS) adalah reaksi kulit berat yang mengancam jiwa. Jika SJS dicurigai, obat penyebab harus dihentikan segera dan pasien harus dirujuk ke dermatologi/rumah sakit untuk penanganan lebih lanjut. Etosuksimid dapat menyebabkan SJS, meskipun risiko lebih rendah dibandingkan karbamazepin, fenitoin, dan lamotrigin. Antihistamin dan kortikosteroid tidak cukup untuk SJS; pasien memerlukan perawatan intensif dan penghentian obat penyebab.\nOpsi A — Benar: hentikan obat dan rujuk.\nOpsi B — Antihistamin tidak cukup; hentikan obat.\nOpsi C — Ganti dengan valproat dapat dilakukan, tetapi penghentian SJS adalah prioritas.\nOpsi D — Kortikosteroid tidak cukup; hentikan obat.\nOpsi E — Antibiotik tidak diperlukan; ini reaksi obat."
+  },
+  {
+    question: "Seorang pria berusia 55 tahun dengan epilepsi parsial diberikan lamotrigin. Pasien juga mengonsumsi asam valproat untuk kejang mioklonik.\nManakah interaksi antara lamotrigin dan asam valproat yang paling penting?",
+    options: ["Asam valproat meningkatkan kadar lamotrigin melalui inhibisi metabolisme", "Lamotrigin meningkatkan kadar asam valproat", "Asam valproat menurunkan kadar lamotrigin", "Lamotrigin menurunkan kadar asam valproat", "Tidak ada interaksi antara lamotrigin dan asam valproat"],
+    answer: 0,
+    explanation: "Asam valproat menghambat metabolisme lamotrigin (melalui inhibisi UGT, enzim yang memetabolisme lamotrigin). Kadar lamotrigin dapat meningkat 2–3 kali lipat ketika diberikan bersama asam valproat. Oleh karena itu, dosis lamotrigin harus dikurangi (sekitar 50%) saat dimulai dengan asam valproat untuk mencegah toksisitas (ruam, SJS, sedasi). Kombinasi lamotrigin dan valproat efektif untuk epilepsi absans dan mioklonik, tetapi memerlukan titrasi hati-hati.\nOpsi A — Benar: valproat meningkatkan kadar lamotrigin.\nOpsi B — Lamotrigin tidak signifikan mempengaruhi kadar valproat.\nOpsi C — Valproat meningkatkan, bukan menurunkan, lamotrigin.\nOpsi D — Lamotrigin tidak signifikan mempengaruhi valproat.\nOpsi E — Ada interaksi signifikan."
+  },
+  {
+    question: "Seorang anak laki-laki berusia 4 tahun dengan kejang demam diberikan diazepam rektal di rumah. Orang tua bertanya kapan harus membawa anak ke rumah sakit.\nManakah indikasi untuk membawa anak ke rumah sakit setelah pemberian diazepam rektal?",
+    options: ["Kejang berhenti dan anak sadar penuh", "Kejang berhenti tetapi anak masih mengantuk", "Kejang tidak berhenti setelah 5 menit atau berulang", "Anak tidur setelah kejang", "Anak muntah setelah pemberian diazepam"],
+    answer: 2,
+    explanation: "Diazepam rektal diberikan untuk menghentikan kejang demam atau kejang berulang di rumah. Jika kejang tidak berhenti dalam 5 menit setelah pemberian, atau jika kejang berulang, anak harus segera dibawa ke rumah sakit untuk penanganan lebih lanjut (status epileptikus). Orang tua juga harus membawa anak jika ada tanda bahaya: demam tinggi, penurunan kesadaran, kesulitan bernapas, atau kejang pertama kali.\nOpsi A — Jika kejang berhenti dan anak sadar, orang tua tetap harus membawa anak ke dokter untuk evaluasi, tetapi tidak darurat.\nOpsi B — Mengantuk setelah kejang normal, tetapi tetap evaluasi.\nOpsi C — Benar: kejang tidak berhenti atau berulang → darurat.\nOpsi D — Tidur setelah kejang normal, tetapi evaluasi tetap diperlukan.\nOpsi E — Muntah dapat terjadi; tidak selalu darurat."
+  },
+  {
+    question: "Seorang wanita berusia 35 tahun dengan epilepsi mioklonik diberikan asam valproat. Pasien melaporkan peningkatan nafsu makan dan penambahan berat badan.\nManakah yang paling tepat untuk mengatasi penambahan berat badan akibat asam valproat?",
+    options: ["Menghentikan asam valproat dan mengganti dengan obat lain", "Mengurangi dosis asam valproat", "Edukasi diet dan olahraga, serta pantau berat badan", "Menambahkan metformin", "Menambahkan topiramat"],
+    answer: 2,
+    explanation: "Asam valproat menyebabkan penambahan berat badan pada 30–50% pasien, melalui peningkatan nafsu makan dan efek metabolik. Penambahan berat badan dapat dikelola dengan edukasi diet dan olahraga, serta pemantauan berat badan secara rutin. Jika penambahan berat badan signifikan dan mengganggu, penggantian obat dapat dipertimbangkan (misalnya lamotrigin). Topiramat dapat membantu penurunan berat badan, tetapi tidak boleh ditambahkan hanya untuk alasan ini.\nOpsi A — Penggantian obat dapat dipertimbangkan jika berat badan meningkat signifikan, tetapi bukan langkah pertama.\nOpsi B — Pengurangan dosis dapat dilakukan, tetapi tidak selalu efektif.\nOpsi C — Benar: edukasi diet dan olahraga.\nOpsi D — Metformin tidak indikasi untuk penambahan berat badan valproat.\nOpsi E — Topiramat dapat membantu, tetapi bukan lini pertama dan memiliki efek samping."
+  },
+  {
+    question: "Seorang pasien dengan epilepsi parsial diberikan karbamazepin. Pasien juga mengonsumsi kontrasepsi oral. Dokter memperingatkan interaksi obat.\nManakah interaksi antara karbamazepin dan kontrasepsi oral?",
+    options: ["Karbamazepin menginduksi CYP3A4 → metabolisme estrogen/progestin meningkat → kontrasepsi gagal", "Karbamazepin menghambat CYP3A4 → kadar estrogen meningkat", "Karbamazepin tidak berinteraksi dengan kontrasepsi oral", "Karbamazepin meningkatkan efek kontrasepsi", "Kontrasepsi oral meningkatkan efek karbamazepin"],
+    answer: 0,
+    explanation: "Karbamazepin adalah induktor kuat CYP3A4 (dan CYP2C19). Kontrasepsi oral (etinilestradiol dan progestin) dimetabolisme oleh CYP3A4. Induksi CYP3A4 → metabolisme hormon kontrasepsi meningkat → kadar estrogen/progestin menurun → efektivitas kontrasepsi menurun → risiko kehamilan meningkat. Pasien yang menggunakan karbamazepin harus menggunakan metode kontrasepsi non-hormonal (IUD, kondom) atau kontrasepsi dengan dosis lebih tinggi.\nOpsi A — Benar: induksi CYP3A4 → kontrasepsi gagal.\nOpsi B — Karbamazepin adalah induktor, bukan inhibitor.\nOpsi C — Interaksi signifikan terjadi.\nOpsi D — Karbamazepin menurunkan, bukan meningkatkan, efek kontrasepsi.\nOpsi E — Kontrasepsi oral tidak mempengaruhi karbamazepin secara signifikan."
+  },
+  {
+    question: "Seorang pria berusia 45 tahun dengan epilepsi umum tonik-klonik diberikan fenitoin. Pasien mengalami defisiensi vitamin D dan osteomalasia.\nManakah mekanisme fenitoin yang menyebabkan osteomalasia?",
+    options: ["Fenitoin menghambat absorbsi kalsium di usus", "Fenitoin menginduksi metabolisme vitamin D → penurunan kadar vitamin D aktif", "Fenitoin meningkatkan ekskresi kalsium di ginjal", "Fenitoin menghambat aktivitas osteoblas", "Fenitoin meningkatkan aktivitas osteoklas"],
+    answer: 1,
+    explanation: "Fenitoin (dan karbamazepin, fenobarbital) adalah induktor CYP450 yang meningkatkan metabolisme vitamin D di hati (25-hidroksilasi) dan usus. Metabolisme vitamin D meningkat → kadar 25-hidroksi vitamin D menurun → absorbsi kalsium di usus menurun → hipokalsemia → osteomalasia dan osteoporosis. Pasien dengan fenitoin jangka panjang memerlukan suplementasi vitamin D dan kalsium, serta pemantauan densitas tulang.\nOpsi A — Penurunan absorbsi kalsium adalah efek sekunder dari defisiensi vitamin D.\nOpsi B — Benar: induksi metabolisme vitamin D.\nOpsi C — Fenitoin tidak secara langsung meningkatkan ekskresi kalsium.\nOpsi D — Fenitoin tidak secara langsung menghambat osteoblas.\nOpsi E — Fenitoin tidak secara langsung meningkatkan aktivitas osteoklas."
+  },
+  {
+    question: "Seorang wanita berusia 30 tahun dengan epilepsi absans diberikan etosuksimid. Pasien melaporkan bahwa kejang absansnya berkurang secara signifikan.\nManakah pernyataan yang paling tepat mengenai epilepsi absans?",
+    options: ["Epilepsi absans biasanya responsif terhadap etosuksimid", "Epilepsi absans tidak responsif terhadap obat", "Epilepsi absans hanya terjadi pada anak-anak", "Epilepsi absans tidak memerlukan pengobatan", "Epilepsi absans dapat diobati dengan fenitoin"],
+    answer: 0,
+    explanation: "Epilepsi absans (petit mal) adalah jenis epilepsi umum yang ditandai dengan serangan singkat (5–15 detik) berupa hilangnya kesadaran dan kontak, dengan EEG menunjukkan pola spike-and-wave 3 Hz. Etosuksimid adalah obat pilihan dan efektif pada 70–80% pasien. Jika etosuksimid tidak efektif atau tidak toleran, asam valproat atau lamotrigin dapat digunakan. Epilepsi absans dapat terjadi pada anak-anak dan dewasa (meskipun lebih sering pada anak-anak).\nOpsi A — Benar: responsif terhadap etosuksimid.\nOpsi B — Epilepsi absans responsif terhadap obat.\nOpsi C — Dapat terjadi pada anak-anak dan dewasa.\nOpsi D — Memerlukan pengobatan untuk mencegah dampak pada aktivitas sehari-hari.\nOpsi E — Fenitoin tidak efektif untuk epilepsi absans."
+  },
+  {
+    question: "Seorang pasien dengan status epileptikus diberikan lorazepam IV. Setelah 10 menit, kejang masih berlanjut. Dokter memberikan fenitoin IV. Setelah fenitoin, kejang berhenti.\nManakah urutan terapi status epileptikus yang paling tepat?",
+    options: ["Lorazepam → fenitoin/fosfenitoin → propofol atau barbiturat", "Fenitoin → lorazepam → propofol", "Propofol → lorazepam → fenitoin", "Lorazepam → propofol → fenitoin", "Fenitoin → propofol → lorazepam"],
+    answer: 0,
+    explanation: "Status epileptikus adalah keadaan darurat neurologis. Algoritma penanganan: (1) stabilisasi ABC, (2) benzodiazepin lini pertama: lorazepam IV (0,1 mg/kg) atau diazepam IV, (3) jika kejang berlanjut setelah 10 menit: fenitoin atau fosfenitoin (20 mg/kg IV), (4) jika kejang masih berlanjut: obat anestetik (propofol, barbiturat, atau midazolam) di ICU. Lorazepam lebih disukai daripada diazepam karena durasi kerja lebih panjang (4–6 jam vs 15–30 menit).\nOpsi A — Benar: lorazepam → fenitoin → propofol/barbiturat.\nOpsi B — Fenitoin bukan lini pertama.\nOpsi C — Propofol bukan lini pertama.\nOpsi D — Fenitoin sebelum propofol.\nOpsi E — Fenitoin bukan lini pertama."
+  },
+  {
+    question: "Seorang pria berusia 50 tahun dengan epilepsi parsial diberikan levetiracetam. Pasien melaporkan perbaikan kontrol kejang tetapi mengalami iritabilitas dan agresi.\nManakah yang paling tepat untuk mengatasi efek samping perilaku levetiracetam?",
+    options: ["Menghentikan levetiracetam dan mengganti dengan antiepilepsi lain", "Menambahkan antipsikotik", "Mengurangi dosis levetiracetam", "Menambahkan benzodiazepin", "Memberikan SSRI"],
+    answer: 2,
+    explanation: "Levetiracetam dapat menyebabkan efek samping perilaku: iritabilitas, agresi, mudah marah, psikosis, dan depresi. Efek samping ini bergantung pada dosis. Pengurangan dosis sering kali mengurangi efek samping perilaku tanpa mengorbankan efektivitas antikonvulsan. Jika efek samping tetap terjadi atau berat, penggantian dengan antiepilepsi lain (lamotrigin, topiramat) dapat dipertimbangkan.\nOpsi A — Penggantian dapat dipertimbangkan, tetapi pengurangan dosis adalah langkah pertama.\nOpsi B — Antipsikotik tidak indikasi untuk efek samping levetiracetam.\nOpsi C — Benar: pengurangan dosis.\nOpsi D — Benzodiazepin tidak mengatasi iritabilitas levetiracetam.\nOpsi E — SSRI tidak mengatasi iritabilitas levetiracetam.\nSEGMEN C: OBAT SEDATIF-HIPNOTIK & ANSIOLITIK (Soal #61–#90)"
+  },
+  {
+    question: "Seorang wanita berusia 45 tahun dengan gangguan kecemasan umum diberikan alprazolam. Pasien melaporkan perbaikan yang signifikan dalam kecemasan. Setelah 3 bulan, ia mencoba menghentikan alprazolam dan mengalami gejala kecemasan yang lebih berat, tremor, dan insomnia.\nManakah sindrom yang paling mungkin terjadi pada pasien ini?",
+    options: ["Reaksi alergi", "Sindrom penarikan (withdrawal) benzodiazepin", "Sindrom serotonin", "Sindrom neuroleptik maligna", "Rebound insomnia"],
+    answer: 1,
+    explanation: "Benzodiazepin (alprazolam, diazepam, lorazepam) dapat menyebabkan ketergantungan fisik dan psikologis jika digunakan jangka panjang (>2–4 minggu). Penghentian mendadak → sindrom penarikan: kecemasan rebound, tremor, insomnia, iritabilitas, palpitasi, dan pada kasus berat, kejang. Alprazolam (short-acting) memiliki risiko penarikan yang lebih tinggi daripada diazepam (long-acting). Benzodiazepin harus dihentikan secara bertahap (tapering) untuk mencegah penarikan.\nOpsi A — Reaksi alergi (ruam, pruritus) berbeda.\nOpsi B — Benar: withdrawal benzodiazepin.\nOpsi C — Sindrom serotonin terjadi pada kombinasi SSRI/MAOI.\nOpsi D — NMS terjadi pada antipsikotik.\nOpsi E — Rebound insomnia adalah bagian dari withdrawal, tetapi sindrom penarikan lebih luas."
+  },
+  {
+    question: "Seorang pria berusia 60 tahun dengan insomnia diberikan zolpidem. Pasien mengeluh berjalan dalam tidur (sleepwalking) dan makan dalam tidur (sleep eating) setelah beberapa minggu.\nManakah pernyataan yang paling tepat mengenai zolpidem?",
+    options: ["Zolpidem adalah benzodiazepin yang bekerja pada reseptor GABA-A", "Zolpidem adalah non-benzodiazepin (Z-drug) yang selektif terhadap subunit α1 GABA-A → sedasi dengan efek samping kompleks tidur", "Zolpidem adalah antidepresan dengan efek sedasi", "Zolpidem adalah antihistamin dengan efek sedasi", "Zolpidem adalah agonis reseptor melatonin"],
+    answer: 1,
+    explanation: "Zolpidem (dan zaleplon, eszopiclone) adalah non-benzodiazepin (Z-drugs) yang bekerja pada reseptor GABA-A dengan selektivitas terhadap subunit α1 (sedasi). Zolpidem memiliki onset cepat dan durasi pendek, digunakan untuk insomnia. Efek samping yang penting: kompleks tidur (sleepwalking, sleep eating, sleep driving, amnesia), toleransi, dan ketergantungan. Zolpidem harus digunakan jangka pendek (2–4 minggu).\nOpsi A — Zolpidem bukan benzodiazepin (struktur berbeda).\nOpsi B — Benar: non-benzodiazepin, selektif α1.\nOpsi C — Zolpidem bukan antidepresan.\nOpsi D — Antihistamin (difenhidramin) memiliki efek sedasi, tetapi zolpidem berbeda.\nOpsi E — Agonis melatonin adalah ramelteon."
+  },
+  {
+    question: "Seorang wanita berusia 70 tahun dengan insomnia dan riwayat jatuh diberikan trazodon untuk insomnia. Dokter memilih trazodon karena profil keamanan yang lebih baik pada lansia.\nManakah pernyataan yang paling tepat mengenai trazodon?",
+    options: ["Trazodon adalah antidepresan dengan efek sedasi yang digunakan untuk insomnia", "Trazodon adalah benzodiazepin yang digunakan untuk insomnia", "Trazodon adalah Z-drug yang digunakan untuk insomnia", "Trazodon adalah antihistamin yang digunakan untuk insomnia", "Trazodon adalah agonis melatonin yang digunakan untuk insomnia"],
+    answer: 0,
+    explanation: "Trazodon adalah antidepresan atipikal (antagonis 5-HT2A dan penghambat reuptake serotonin) yang memiliki efek sedasi kuat. Trazodon digunakan untuk insomnia, terutama pada pasien dengan depresi atau pada lansia karena profil keamanan yang lebih baik (risiko ketergantungan lebih rendah daripada benzodiazepin). Efek samping: sedasi, pusing, mulut kering, dan priapisme (jarang).\nOpsi A — Benar: antidepresan dengan efek sedasi.\nOpsi B — Trazodon bukan benzodiazepin.\nOpsi C — Trazodon bukan Z-drug.\nOpsi D — Trazodon bukan antihistamin.\nOpsi E — Agonis melatonin adalah ramelteon."
+  },
+  {
+    question: "Seorang pria berusia 40 tahun dengan gangguan kecemasan sosial diberikan buspiron. Pasien bertanya kapan obat akan mulai bekerja.\nManakah pernyataan yang paling tepat mengenai onset kerja buspiron?",
+    options: ["Buspiron bekerja dalam 1–2 hari", "Buspiron memerlukan 2–4 minggu untuk onset penuh", "Buspiron bekerja dalam 1 jam", "Buspiron bekerja dalam 30 menit", "Buspiron tidak efektif untuk kecemasan"],
+    answer: 1,
+    explanation: "Buspiron adalah agonis parsial reseptor 5-HT1A (serotonin) yang digunakan untuk gangguan kecemasan umum (GAD). Buspiron memiliki onset kerja yang lambat: 2–4 minggu untuk efek penuh. Keuntungan: tidak menyebabkan sedasi, ketergantungan, atau toleransi (berbeda dengan benzodiazepin). Kerugian: onset lambat dan interaksi dengan CYP3A4. Buspiron tidak efektif untuk serangan panik atau kecemasan akut.\nOpsi A — Onset 2–4 minggu, bukan 1–2 hari.\nOpsi B — Benar: 2–4 minggu.\nOpsi C — Benzodiazepin bekerja dalam 1–2 jam.\nOpsi D — Benzodiazepin onset cepat.\nOpsi E — Buspiron efektif untuk GAD."
+  },
+  {
+    question: "Seorang wanita berusia 55 tahun dengan insomnia diberikan temazepam. Pasien memiliki riwayat sleep apnea.\nManakah perhatian khusus pada pemberian temazepam pada pasien dengan sleep apnea?",
+    options: ["Temazepam dapat memperburuk sleep apnea karena efek relaksasi otot saluran napas", "Temazepam aman pada sleep apnea", "Temazepam meningkatkan sleep apnea", "Temazepam tidak mempengaruhi sleep apnea", "Temazepam adalah pengobatan untuk sleep apnea"],
+    answer: 0,
+    explanation: "Benzodiazepin (temazepam, diazepam) dan Z-drugs (zolpidem) memiliki efek relaksasi otot dan depresi pernapasan, yang dapat memperburuk sleep apnea (obstruktif dan sentral). Pada pasien dengan sleep apnea, obat sedatif-hipnotik harus dihindari atau digunakan dengan sangat hati-hati. Sleep apnea adalah kontraindikasi relatif untuk benzodiazepin. Terapi insomnia pada sleep apnea: CPAP, kognitif-perilaku, atau obat non-sedatif (melatonin, ramelteon).\nOpsi A — Benar: relaksasi otot → perburukan sleep apnea.\nOpsi B — Temazepam tidak aman.\nOpsi C — Temazepam memperburuk, bukan meningkatkan, sleep apnea.\nOpsi D — Temazepam mempengaruhi sleep apnea.\nOpsi E — Temazepam bukan pengobatan untuk sleep apnea."
+  },
+  {
+    question: "Seorang pria berusia 35 tahun dengan insomnia datang ke klinik. Ia telah menggunakan difenhidramin OTC untuk tidur selama 6 bulan dan mengalami toleransi.\nManakah pernyataan yang paling tepat mengenai difenhidramin untuk insomnia?",
+    options: ["Difenhidramin adalah antihistamin H1 yang efektif untuk insomnia jangka pendek, tetapi tidak untuk jangka panjang", "Difenhidramin adalah obat pilihan untuk insomnia kronik", "Difenhidramin tidak menyebabkan toleransi", "Difenhidramin aman untuk penggunaan jangka panjang", "Difenhidramin adalah agonis reseptor melatonin"],
+    answer: 0,
+    explanation: "Difenhidramin adalah antihistamin H1 generasi pertama yang menembus sawar darah otak dan menyebabkan sedasi. Difenhidramin digunakan sebagai sedatif OTC untuk insomnia jangka pendek (1–2 minggu). Penggunaan jangka panjang menyebabkan toleransi dan efek samping antikolinergik (mulut kering, konstipasi, retensi urin, gangguan kognitif pada lansia). Difenhidramin tidak direkomendasikan untuk insomnia kronik.\nOpsi A — Benar: jangka pendek, bukan kronik.\nOpsi B — Bukan pilihan untuk insomnia kronik.\nOpsi C — Difenhidramin menyebabkan toleransi.\nOpsi D — Tidak aman untuk jangka panjang.\nOpsi E — Difenhidramin adalah antagonis H1, bukan agonis melatonin."
+  },
+  {
+    question: "Seorang wanita berusia 65 tahun dengan insomnia diberikan ramelteon. Dokter memilih ramelteon karena risiko ketergantungan yang rendah.\nManakah mekanisme kerja ramelteon yang paling tepat?",
+    options: ["Antagonis reseptor GABA", "Agonis reseptor melatonin MT1 dan MT2", "Agonis reseptor 5-HT1A", "Antagonis reseptor H1", "Agonis reseptor GABA-A"],
+    answer: 1,
+    explanation: "Ramelteon adalah agonis reseptor melatonin (MT1 dan MT2) yang bekerja di nukleus suprakiasmatik (jam biologis). Ramelteon digunakan untuk insomnia yang sulit memulai tidur (sleep onset insomnia). Keuntungan: tidak menyebabkan toleransi, ketergantungan, atau penarikan. Efek samping: pusing, sedasi ringan, peningkatan prolaktin. Ramelteon tidak memiliki efek sedasi langsung (tidak seperti benzodiazepin).\nOpsi A — Antagonis GABA tidak digunakan untuk insomnia.\nOpsi B — Benar: agonis melatonin MT1/MT2.\nOpsi C — Agonis 5-HT1A adalah buspiron.\nOpsi D — Antagonis H1 adalah difenhidramin.\nOpsi E — Agonis GABA-A adalah benzodiazepin."
+  },
+  {
+    question: "Seorang pasien dengan overdosis benzodiazepin datang ke UGD dengan depresi pernapasan. Dokter memberikan flumazenil IV.\nManakah mekanisme kerja flumazenil yang paling tepat?",
+    options: ["Agonis reseptor GABA → meningkatkan efek benzodiazepin", "Antagonis kompetitif reseptor GABA → memblokir efek benzodiazepin", "Agonis reseptor opioid → membalikkan depresi napas", "Antagonis reseptor NMDA → membalikkan sedasi", "Penghambat asetilkolinesterase → meningkatkan neurotransmisi"],
+    answer: 1,
+    explanation: "Flumazenil adalah antagonis kompetitif pada reseptor GABA (benzodiazepin binding site). Flumazenil mengikat reseptor GABA tanpa aktivitas agonis, menggeser benzodiazepin dari tempat ikatannya → membalikkan efek sedasi, amnesia, dan depresi napas akibat overdosis benzodiazepin. Flumazenil diberikan IV (0,2 mg, titrasi hingga 3 mg). Durasi kerja flumazenil pendek (20–40 menit), sehingga resedasi dapat terjadi.\nOpsi A — Agonis GABA adalah benzodiazepin, bukan flumazenil.\nOpsi B — Benar: antagonis kompetitif.\nOpsi C — Antagonis opioid adalah nalokson.\nOpsi D — Antagonis NMDA adalah ketamin.\nOpsi E — Penghambat asetilkolinesterase adalah neostigmin."
+  },
+  {
+    question: "Seorang pria berusia 50 tahun dengan gangguan kecemasan dan insomnia diberikan lorazepam. Pasien memiliki riwayat alkoholisme.\nManakah perhatian khusus pada pemberian lorazepam pada pasien dengan alkoholisme?",
+    options: ["Lorazepam meningkatkan efek alkohol → risiko depresi pernapasan", "Lorazepam aman pada pasien dengan alkoholisme", "Lorazepam mengurangi efek alkohol", "Lorazepam adalah pengobatan untuk alkoholisme", "Lorazepam tidak berinteraksi dengan alkohol"],
+    answer: 0,
+    explanation: "Benzodiazepin (lorazepam, diazepam) dan alkohol memiliki efek sinergis pada sistem saraf pusat (depresi SSP). Kombinasi benzodiazepin dan alkohol meningkatkan risiko sedasi berat, gangguan kognitif, depresi pernapasan, dan kematian. Pada pasien dengan alkoholisme, benzodiazepin harus digunakan dengan sangat hati-hati, terutama pada fase detoksifikasi (risiko penarikan alkohol). Lorazepam dapat digunakan untuk detoksifikasi alkohol, tetapi pasien harus dipantau.\nOpsi A — Benar: sinergis → depresi pernapasan.\nOpsi B — Tidak aman; harus digunakan dengan hati-hati.\nOpsi C — Lorazepam tidak mengurangi efek alkohol.\nOpsi D — Lorazepam digunakan untuk detoksifikasi alkohol, tetapi bukan pengobatan alkoholisme.\nOpsi E — Interaksi signifikan terjadi."
+  },
+  {
+    question: "Seorang wanita berusia 30 tahun dengan insomnia diberikan eszopiklon. Pasien melaporkan rasa logam (metalic taste) di mulut.\nManakah pernyataan yang paling tepat mengenai eszopiklon?",
+    options: ["Eszopiklon adalah Z-drug yang menyebabkan rasa logam sebagai efek samping yang umum", "Eszopiklon adalah antidepresan dengan efek sedasi", "Eszopiklon adalah benzodiazepin", "Eszopiklon tidak memiliki efek samping rasa logam", "Eszopiklon adalah agonis melatonin"],
+    answer: 0,
+    explanation: "Eszopiklon adalah Z-drug (non-benzodiazepin) yang digunakan untuk insomnia (sleep onset dan sleep maintenance). Efek samping yang khas dari eszopiklon adalah rasa logam atau rasa pahit di mulut (dysgeusia), terjadi pada 10–30% pasien. Efek samping lain: sedasi, pusing, dan kompleks tidur. Eszopiklon adalah isomer aktif dari zopiklon.\nOpsi A — Benar: Z-drug dengan rasa logam.\nOpsi B — Eszopiklon bukan antidepresan.\nOpsi C — Eszopiklon adalah Z-drug, bukan benzodiazepin.\nOpsi D — Rasa logam adalah efek samping yang umum.\nOpsi E — Agonis melatonin adalah ramelteon."
+  },
+  {
+    question: "Seorang pria berusia 45 tahun dengan gangguan kecemasan umum diberikan buspiron. Pasien juga mengonsumsi eritromisin untuk infeksi. Dokter memperingatkan interaksi obat.\nManakah interaksi antara buspiron dan eritromisin?",
+    options: ["Eritromisin menghambat CYP3A4 → kadar buspiron meningkat → toksisitas", "Eritromisin menginduksi CYP3A4 → kadar buspiron menurun", "Buspiron meningkatkan kadar eritromisin", "Tidak ada interaksi antara buspiron dan eritromisin", "Buspiron menghambat metabolisme eritromisin"],
+    answer: 0,
+    explanation: "Buspiron dimetabolisme oleh CYP3A4. Eritromisin (dan klaritromisin, ketokonazol, jus grapefruit) adalah inhibitor CYP3A4. Inhibisi CYP3A4 → metabolisme buspiron menurun → kadar buspiron meningkat → efek samping (pusing, sedasi, mual). Dosis buspiron harus dikurangi jika diberikan bersama eritromisin. Buspiron memiliki efek samping yang lebih ringan, tetapi interaksi CYP3A4 penting.\nOpsi A — Benar: inhibisi CYP3A4 → buspiron ↑.\nOpsi B — Eritromisin adalah inhibitor, bukan induktor.\nOpsi C — Buspiron tidak mempengaruhi eritromisin.\nOpsi D — Interaksi signifikan terjadi.\nOpsi E — Buspiron tidak menghambat metabolisme eritromisin."
+  },
+  {
+    question: "Seorang wanita berusia 70 tahun dengan insomnia diberikan zolpidem. Pasien mengalami amnesia anterograde (tidak ingat kejadian setelah minum obat) dan berjalan dalam tidur.\nManakah yang paling tepat untuk mencegah amnesia dan kompleks tidur akibat zolpidem?",
+    options: ["Mengurangi dosis zolpidem", "Mengganti zolpidem dengan temazepam", "Menambahkan antidepresan", "Menghentikan zolpidem dan menggunakan terapi non-farmakologis", "Meningkatkan dosis zolpidem"],
+    answer: 3,
+    explanation: "Zolpidem (dan Z-drug lainnya) dapat menyebabkan amnesia anterograde dan kompleks tidur (sleepwalking, sleep eating, sleep driving) yang berbahaya. Jika pasien mengalami efek samping ini, obat harus dihentikan dan terapi non-farmakologis (kognitif-perilaku untuk insomnia) harus digunakan. Pengurangan dosis mungkin membantu, tetapi jika kompleks tidur terjadi, obat harus dihentikan. Terapi non-farmakologis adalah pilihan utama untuk insomnia kronik.\nOpsi A — Pengurangan dosis dapat membantu, tetapi jika kompleks tidur terjadi, hentikan.\nOpsi B — Temazepam (benzodiazepin) juga dapat menyebabkan amnesia.\nOpsi C — Antidepresan tidak mengatasi amnesia.\nOpsi D — Benar: hentikan zolpidem + terapi non-farmakologis.\nOpsi E — Meningkatkan dosis memperburuk efek samping."
+  },
+  {
+    question: "Seorang pria berusia 30 tahun dengan gangguan panik diberikan klonazepam. Pasien melaporkan perbaikan yang signifikan dalam serangan panik.\nManakah pernyataan yang paling tepat mengenai klonazepam?",
+    options: ["Klonazepam adalah benzodiazepin long-acting yang digunakan untuk gangguan panik dan epilepsi", "Klonazepam adalah Z-drug yang digunakan untuk insomnia", "Klonazepam adalah antidepresan yang digunakan untuk gangguan panik", "Klonazepam adalah antihistamin yang digunakan untuk kecemasan", "Klonazepam adalah agonis serotonin yang digunakan untuk gangguan panik"],
+    answer: 0,
+    explanation: "Klonazepam adalah benzodiazepin long-acting (waktu paruh 20–40 jam) yang digunakan untuk: (1) gangguan panik, (2) epilepsi (kejang absans, mioklonik, tonik-klonik, dan kejang parsial), dan (3) gangguan kecemasan. Klonazepam memiliki onset yang relatif cepat dan durasi yang panjang. Efek samping: sedasi, ataksia, toleransi, ketergantungan, dan penarikan. Klonazepam tidak boleh dihentikan mendadak.\nOpsi A — Benar: benzodiazepin long-acting.\nOpsi B — Z-drug adalah zolpidem, eszopiklon.\nOpsi C — Antidepresan (SSRI, SNRI) digunakan untuk gangguan panik, tetapi klonazepam adalah benzodiazepin.\nOpsi D — Antihistamin (hidroksizin) digunakan untuk kecemasan ringan.\nOpsi E — Agonis serotonin (buspiron) digunakan untuk GAD, bukan panik."
+  },
+  {
+    question: "Seorang wanita berusia 55 tahun dengan insomnia dan kecemasan diberikan diazepam. Pasien bertanya berapa lama diazepam dapat digunakan.\nManakah pernyataan yang paling tepat mengenai durasi penggunaan diazepam?",
+    options: ["Diazepam dapat digunakan jangka panjang (>6 bulan) tanpa risiko", "Diazepam direkomendasikan untuk penggunaan jangka pendek (2–4 minggu)", "Diazepam tidak menyebabkan ketergantungan", "Diazepam aman untuk semua pasien", "Diazepam dapat digunakan seumur hidup"],
+    answer: 1,
+    explanation: "Benzodiazepin (termasuk diazepam) direkomendasikan untuk penggunaan jangka pendek (2–4 minggu) untuk insomnia dan kecemasan akut. Penggunaan jangka panjang menyebabkan toleransi, ketergantungan fisik dan psikologis, penarikan, dan efek samping kognitif pada lansia. Untuk insomnia dan kecemasan kronik, terapi non-farmakologis (kognitif-perilaku) dan antidepresan (SSRI, SNRI) lebih disukai.\nOpsi A — Tidak aman; risiko ketergantungan.\nOpsi B — Benar: 2–4 minggu.\nOpsi C — Diazepam menyebabkan ketergantungan.\nOpsi D — Tidak aman untuk semua pasien (sleep apnea, alkoholisme).\nOpsi E — Tidak boleh digunakan seumur hidup."
+  },
+  {
+    question: "Seorang pria berusia 65 tahun dengan insomnia diberikan melatonin. Pasien bertanya tentang efek samping dan keamanan melatonin.\nManakah pernyataan yang paling tepat mengenai melatonin?",
+    options: ["Melatonin adalah hormon yang diproduksi oleh kelenjar pineal yang digunakan untuk insomnia", "Melatonin adalah agonis reseptor GABA", "Melatonin adalah antidepresan", "Melatonin menyebabkan ketergantungan", "Melatonin adalah obat yang kuat untuk insomnia berat"],
+    answer: 0,
+    explanation: "Melatonin adalah hormon yang diproduksi oleh kelenjar pineal, terutama pada malam hari, yang mengatur siklus tidur-bangun (ritme sirkadian). Melatonin digunakan untuk insomnia ringan, gangguan ritme sirkadian, dan jet lag. Melatonin memiliki efek samping minimal (pusing, sakit kepala) dan tidak menyebabkan ketergantungan. Melatonin tidak seefektif benzodiazepin atau Z-drug untuk insomnia berat, tetapi lebih aman untuk penggunaan jangka panjang.\nOpsi A — Benar: hormon pineal.\nOpsi B — Melatonin bekerja pada reseptor MT1/MT2, bukan GABA.\nOpsi C — Melatonin bukan antidepresan.\nOpsi D — Melatonin tidak menyebabkan ketergantungan.\nOpsi E — Melatonin tidak sekuat benzodiazepin."
+  },
+  {
+    question: "Seorang wanita berusia 40 tahun dengan gangguan kecemasan umum diberikan buspiron. Pasien juga mengonsumsi ketokonazol untuk infeksi jamur.\nManakah interaksi antara buspiron dan ketokonazol?",
+    options: ["Ketokonazol menghambat CYP3A4 → kadar buspiron meningkat", "Ketokonazol menginduksi CYP3A4 → kadar buspiron menurun", "Buspiron meningkatkan kadar ketokonazol", "Tidak ada interaksi antara buspiron dan ketokonazol", "Buspiron menghambat metabolisme ketokonazol"],
+    answer: 0,
+    explanation: "Buspiron dimetabolisme oleh CYP3A4. Ketokonazol (dan itrakonazol, eritromisin, jus grapefruit) adalah inhibitor CYP3A4. Inhibisi CYP3A4 → metabolisme buspiron menurun → kadar buspiron meningkat → efek samping (pusing, sedasi, mual). Dosis buspiron harus dikurangi jika diberikan bersama inhibitor CYP3A4.\nOpsi A — Benar: inhibisi CYP3A4 → buspiron ↑.\nOpsi B — Ketokonazol adalah inhibitor, bukan induktor.\nOpsi C — Buspiron tidak mempengaruhi ketokonazol.\nOpsi D — Interaksi signifikan terjadi.\nOpsi E — Buspiron tidak mempengaruhi metabolisme ketokonazol."
+  },
+  {
+    question: "Seorang pria berusia 60 tahun dengan insomnia diberikan zaleplon. Pasien melaporkan bahwa obat membantu tidur, tetapi ia bangun di tengah malam dan tidak bisa kembali tidur.\nManakah pernyataan yang paling tepat mengenai zaleplon?",
+    options: ["Zaleplon adalah Z-drug dengan durasi kerja sangat pendek → efektif untuk sleep onset, tetapi tidak untuk sleep maintenance", "Zaleplon adalah benzodiazepin long-acting", "Zaleplon adalah antidepresan dengan efek sedasi", "Zaleplon adalah agonis melatonin", "Zaleplon efektif untuk sleep maintenance"],
+    answer: 0,
+    explanation: "Zaleplon adalah Z-drug (non-benzodiazepin) dengan durasi kerja yang sangat pendek (t½ ~1 jam). Zaleplon efektif untuk sleep onset insomnia (kesulitan memulai tidur) karena onset cepat dan durasi pendek. Namun, zaleplon tidak efektif untuk sleep maintenance (bangun di tengah malam) karena durasi kerja yang pendek. Untuk sleep maintenance, eszopiklon atau zolpidem CR (extended-release) lebih efektif.\nOpsi A — Benar: durasi pendek → sleep onset saja.\nOpsi B — Zaleplon adalah Z-drug, bukan benzodiazepin.\nOpsi C — Zaleplon bukan antidepresan.\nOpsi D — Zaleplon bekerja pada GABA, bukan melatonin.\nOpsi E — Zaleplon tidak efektif untuk sleep maintenance."
+  },
+  {
+    question: "Seorang wanita berusia 50 tahun dengan gangguan kecemasan diberikan buspiron. Pasien juga mengonsumsi jus grapefruit setiap pagi. Dokter memperingatkan untuk menghindari jus grapefruit.\nManakah alasan peringatan jus grapefruit pada buspiron?",
+    options: ["Jus grapefruit menginduksi CYP3A4 → kadar buspiron menurun", "Jus grapefruit menghambat CYP3A4 → kadar buspiron meningkat", "Jus grapefruit meningkatkan ekskresi buspiron", "Jus grapefruit menurunkan absorbsi buspiron", "Jus grapefruit tidak berinteraksi dengan buspiron"],
+    answer: 1,
+    explanation: "Jus grapefruit mengandung furanokumarin yang menghambat CYP3A4 di usus dan hati. Buspiron dimetabolisme oleh CYP3A4. Inhibisi CYP3A4 → metabolisme buspiron menurun → kadar buspiron meningkat → efek samping. Jus grapefruit juga meningkatkan kadar banyak obat lain (statins, CCB, imunosupresan). Pasien harus menghindari jus grapefruit selama menggunakan buspiron.\nOpsi A — Jus grapefruit adalah inhibitor, bukan induktor.\nOpsi B — Benar: inhibisi CYP3A4 → buspiron ↑.\nOpsi C — Jus grapefruit tidak mempengaruhi ekskresi.\nOpsi D — Jus grapefruit tidak menurunkan absorbsi.\nOpsi E — Interaksi signifikan terjadi."
+  },
+  {
+    question: "Seorang pria berusia 70 tahun dengan insomnia diberikan doksepin (dosis rendah 3–6 mg). Dokter memilih doksepin karena profil keamanan pada lansia.\nManakah pernyataan yang paling tepat mengenai doksepin dosis rendah?",
+    options: ["Doksepin adalah antidepresan TCA dengan efek sedasi pada dosis rendah untuk insomnia", "Doksepin adalah agonis melatonin", "Doksepin adalah Z-drug", "Doksepin adalah antihistamin H1 yang digunakan untuk insomnia", "Doksepin adalah antipsikotik dengan efek sedasi"],
+    answer: 0,
+    explanation: "Doksepin adalah antidepresan trisiklik (TCA) yang pada dosis rendah (3–6 mg) digunakan untuk insomnia (sleep maintenance). Pada dosis rendah, doksepin terutama bekerja sebagai antagonis H1 (histamin), menyebabkan sedasi. Doksepin dosis rendah adalah satu-satunya antidepresan yang disetujui FDA untuk insomnia. Efek samping: sedasi, mulut kering, pusing.\nOpsi A — Benar: TCA dosis rendah untuk insomnia.\nOpsi B — Agonis melatonin adalah ramelteon.\nOpsi C — Z-drug adalah zolpidem, eszopiklon.\nOpsi D — Doksepin adalah TCA, bukan antihistamin (walaupun memiliki efek H1).\nOpsi E — Antipsikotik (kuetiapin) juga digunakan untuk insomnia, tetapi doksepin adalah TCA."
+  },
+  {
+    question: "Seorang wanita berusia 35 tahun dengan insomnia dan depresi diberikan mirtazapin. Pasien melaporkan peningkatan nafsu makan dan penambahan berat badan.\nManakah pernyataan yang paling tepat mengenai mirtazapin?",
+    options: ["Mirtazapin adalah antidepresan dengan efek sedasi yang digunakan untuk insomnia dan depresi", "Mirtazapin adalah Z-drug untuk insomnia", "Mirtazapin adalah agonis melatonin", "Mirtazapin adalah benzodiazepin", "Mirtazapin tidak menyebabkan penambahan berat badan"],
+    answer: 0,
+    explanation: "Mirtazapin adalah antidepresan atipikal (NaSSA: noradrenergic and specific serotonergic antidepressant) yang memiliki efek sedasi kuat (antagonis H1) dan digunakan untuk depresi dan insomnia. Mirtazapin juga menyebabkan peningkatan nafsu makan dan penambahan berat badan (efek samping yang umum). Mirtazapin digunakan pada pasien dengan depresi dan insomnia, serta pada pasien dengan penurunan berat badan.\nOpsi A — Benar: antidepresan dengan sedasi.\nOpsi B — Mirtazapin bukan Z-drug.\nOpsi C — Agonis melatonin adalah ramelteon.\nOpsi D — Mirtazapin bukan benzodiazepin.\nOpsi E — Mirtazapin menyebabkan penambahan berat badan."
+  },
+  {
+    question: "Seorang pria berusia 55 tahun dengan gangguan kecemasan dan insomnia diberikan lorazepam. Pasien telah menggunakan lorazepam selama 2 tahun dan ingin berhenti karena efek sedasi yang mengganggu.\nManakah yang paling tepat untuk menghentikan lorazepam?",
+    options: ["Menghentikan lorazepam secara mendadak (cold turkey)", "Mengurangi dosis secara bertahap (tapering) selama 4–6 minggu", "Mengganti dengan antidepresan dan menghentikan lorazepam", "Mengganti dengan Z-drug dan menghentikan lorazepam", "Menghentikan lorazepam dan memberikan flumazenil"],
+    answer: 1,
+    explanation: "Benzodiazepin (lorazepam, diazepam, alprazolam) yang digunakan jangka panjang menyebabkan ketergantungan fisik dan psikologis. Penghentian harus dilakukan secara bertahap (tapering) selama 4–6 minggu atau lebih untuk mencegah sindrom penarikan (kecemasan rebound, tremor, insomnia, kejang). Tapering dapat dilakukan dengan mengurangi dosis 10–25% setiap 1–2 minggu. Penggantian dengan antidepresan (SSRI) dapat membantu, tetapi tapering tetap diperlukan.\nOpsi A — Penghentian mendadak menyebabkan withdrawal.\nOpsi B — Benar: tapering bertahap.\nOpsi C — Penggantian dengan antidepresan dapat membantu, tetapi tetap perlu tapering.\nOpsi D — Z-drug juga menyebabkan ketergantungan.\nOpsi E — Flumazenil digunakan untuk overdosis, bukan penghentian kronik."
+  },
+  {
+    question: "Seorang wanita berusia 40 tahun dengan gangguan kecemasan umum diberikan buspiron. Pasien melaporkan bahwa buspiron tidak membantu kecemasannya. Setelah ditelusuri, pasien mengonsumsi buspiron hanya saat diperlukan (as needed) untuk serangan kecemasan.\nManakah kesalahan dalam penggunaan buspiron?",
+    options: ["Buspiron harus digunakan setiap hari, bukan as needed", "Buspiron harus diberikan dalam dosis tinggi", "Buspiron harus diberikan dengan makanan", "Buspiron tidak efektif untuk kecemasan", "Buspiron harus diberikan dengan benzodiazepin"],
+    answer: 0,
+    explanation: "Buspiron memiliki onset kerja yang lambat (2–4 minggu) dan tidak efektif jika digunakan \"as needed\" atau untuk serangan kecemasan akut. Buspiron harus digunakan setiap hari untuk mencapai efek terapeutik. Jika pasien memerlukan obat untuk kecemasan akut, benzodiazepin (alprazolam, lorazepam) lebih tepat.\nOpsi A — Benar: harus digunakan setiap hari.\nOpsi B — Dosis tidak harus tinggi; onset lambat adalah masalah.\nOpsi C — Makanan tidak mempengaruhi onset.\nOpsi D — Buspiron efektif untuk GAD jika digunakan dengan benar.\nOpsi E — Buspiron tidak perlu dikombinasikan dengan benzodiazepin secara rutin."
+  },
+  {
+    question: "Seorang pria berusia 60 tahun dengan insomnia diberikan zolpidem. Pasien memiliki riwayat gagal hati.\nManakah yang paling tepat mengenai zolpidem pada gagal hati?",
+    options: ["Zolpidem dimetabolisme di hati → dosis harus dikurangi pada gagal hati", "Zolpidem diekskresi ginjal → tidak perlu penyesuaian dosis", "Zolpidem aman pada gagal hati", "Zolpidem dikontraindikasikan pada gagal hati", "Zolpidem tidak dimetabolisme di hati"],
+    answer: 0,
+    explanation: "Zolpidem dimetabolisme di hati oleh CYP3A4 menjadi metabolit tidak aktif. Pada pasien dengan gagal hati, metabolisme zolpidem menurun → kadar zolpidem meningkat → risiko efek samping (sedasi, amnesia, kompleks tidur). Dosis zolpidem harus dikurangi pada pasien dengan gangguan hati (misalnya 5 mg, bukan 10 mg). Zolpidem juga harus digunakan dengan hati-hati pada lansia.\nOpsi A — Benar: metabolisme hati → dosis dikurangi.\nOpsi B — Zolpidem dimetabolisme di hati, bukan diekskresi ginjal.\nOpsi C — Tidak aman; perlu penyesuaian dosis.\nOpsi D — Tidak dikontraindikasikan, tetapi perlu penyesuaian dosis.\nOpsi E — Zolpidem dimetabolisme di hati."
+  },
+  {
+    question: "Seorang wanita berusia 45 tahun dengan insomnia diberikan doksepin 6 mg. Pasien melaporkan tidur yang lebih nyenyak dan tidak ada efek samping.\nManakah pernyataan yang paling tepat mengenai doksepin?",
+    options: ["Doksepin adalah antidepresan trisiklik yang pada dosis rendah bekerja sebagai antagonis H1", "Doksepin adalah SSRI", "Doksepin adalah SNRI", "Doksepin adalah MAOI", "Doksepin adalah agonis reseptor melatonin"],
+    answer: 0,
+    explanation: "Doksepin adalah antidepresan trisiklik (TCA) yang pada dosis tinggi digunakan untuk depresi. Pada dosis rendah (3–6 mg), doksepin bekerja terutama sebagai antagonis reseptor H1 (histamin) → sedasi. Doksepin dosis rendah disetujui oleh FDA untuk insomnia. Doksepin tidak memiliki efek antikolinergik yang signifikan pada dosis rendah.\nOpsi A — Benar: TCA dosis rendah → H1 antagonis.\nOpsi B — Doksepin adalah TCA, bukan SSRI.\nOpsi C — Doksepin adalah TCA, bukan SNRI.\nOpsi D — Doksepin bukan MAOI.\nOpsi E — Agonis melatonin adalah ramelteon."
+  },
+  {
+    question: "Seorang pria berusia 30 tahun dengan insomnia dan kecemasan diberikan alprazolam. Pasien melaporkan perbaikan yang signifikan. Setelah 4 minggu, ia mencoba menghentikan alprazolam dan mengalami kecemasan yang lebih berat.\nManakah yang paling tepat untuk mengatasi kecemasan rebound?",
+    options: ["Menghentikan alprazolam dan memberikan SSRI", "Mengurangi dosis alprazolam secara bertahap dan menambahkan SSRI", "Meningkatkan dosis alprazolam", "Mengganti alprazolam dengan buspiron", "Menghentikan alprazolam dan memberikan beta-blocker"],
+    answer: 1,
+    explanation: "Alprazolam (benzodiazepin short-acting) menyebabkan kecemasan rebound yang berat jika dihentikan mendadak. Pendekatan yang tepat: (1) mengurangi dosis alprazolam secara bertahap (tapering), dan (2) menambahkan SSRI (misalnya sertralin, paroksetin) untuk mengelola kecemasan jangka panjang. SSRI adalah lini pertama untuk gangguan panik dan kecemasan, sedangkan benzodiazepin hanya untuk jangka pendek.\nOpsi A — Menghentikan alprazolam mendadak menyebabkan withdrawal; tapering diperlukan.\nOpsi B — Benar: tapering alprazolam + SSRI.\nOpsi C — Meningkatkan dosis tidak menyelesaikan masalah.\nOpsi D — Buspiron onset lambat dan tidak efektif untuk panik.\nOpsi E — Beta-blocker mengatasi gejala fisik, bukan kecemasan."
+  },
+  {
+    question: "Seorang wanita berusia 55 tahun dengan insomnia diberikan eszopiklon. Pasien mengeluh rasa pahit dan logam di mulut.\nManakah yang paling tepat untuk mengatasi rasa logam pada eszopiklon?",
+    options: ["Mengganti eszopiklon dengan zolpidem", "Menghentikan eszopiklon", "Mengurangi dosis eszopiklon", "Menjelaskan bahwa rasa logam adalah efek samping yang umum dan tidak berbahaya", "Menambahkan permen mint"],
+    answer: 3,
+    explanation: "Rasa logam (dysgeusia) adalah efek samping yang umum dari eszopiklon (10–30%) dan tidak berbahaya. Pasien harus diedukasi bahwa efek ini bukan reaksi alergi dan tidak memerlukan penghentian obat. Jika rasa logam sangat mengganggu, penggantian dengan Z-drug lain (zolpidem, zaleplon) dapat dipertimbangkan, tetapi edukasi adalah langkah pertama.\nOpsi A — Penggantian dapat dipertimbangkan jika sangat mengganggu, tetapi edukasi adalah langkah pertama.\nOpsi B — Tidak perlu menghentikan eszopiklon.\nOpsi C — Pengurangan dosis tidak selalu menghilangkan rasa logam.\nOpsi D — Benar: edukasi bahwa ini normal.\nOpsi E — Permen mint tidak efektif."
+  },
+  {
+    question: "Seorang pria berusia 40 tahun dengan gangguan kecemasan umum diberikan buspiron. Pasien juga mengonsumsi rifampisin untuk TB.\nManakah interaksi antara buspiron dan rifampisin?",
+    options: ["Rifampisin menginduksi CYP3A4 → kadar buspiron menurun", "Rifampisin menghambat CYP3A4 → kadar buspiron meningkat", "Buspiron meningkatkan kadar rifampisin", "Tidak ada interaksi antara buspiron dan rifampisin", "Buspiron menghambat metabolisme rifampisin"],
+    answer: 0,
+    explanation: "Buspiron dimetabolisme oleh CYP3A4. Rifampisin adalah induktor kuat CYP3A4. Induksi CYP3A4 → metabolisme buspiron meningkat → kadar buspiron menurun → efektivitas buspiron menurun. Dosis buspiron mungkin perlu ditingkatkan jika diberikan bersama rifampisin. Interaksi ini juga terjadi pada banyak obat lain yang dimetabolisme oleh CYP3A4.\nOpsi A — Benar: induksi CYP3A4 → buspiron ↓.\nOpsi B — Rifampisin adalah induktor, bukan inhibitor.\nOpsi C — Buspiron tidak mempengaruhi rifampisin.\nOpsi D — Interaksi signifikan terjadi.\nOpsi E — Buspiron tidak mempengaruhi metabolisme rifampisin."
+  },
+  {
+    question: "Seorang wanita berusia 65 tahun dengan insomnia diberikan ramelteon. Pasien memiliki riwayat depresi.\nManakah pernyataan yang paling tepat mengenai ramelteon pada depresi?",
+    options: ["Ramelteon adalah agonis melatonin yang aman pada depresi", "Ramelteon dapat memperburuk depresi", "Ramelteon adalah antidepresan", "Ramelteon dikontraindikasikan pada depresi", "Ramelteon tidak efektif untuk insomnia pada depresi"],
+    answer: 0,
+    explanation: "Ramelteon adalah agonis reseptor melatonin (MT1/MT2) yang digunakan untuk insomnia. Ramelteon aman pada pasien dengan depresi karena tidak memiliki efek sedatif langsung (tidak seperti benzodiazepin) dan tidak menyebabkan ketergantungan. Namun, insomnia pada depresi sering diobati dengan antidepresan sedatif (mirtazapin, trazodon) atau SSRI. Ramelteon dapat digunakan sebagai tambahan jika diperlukan.\nOpsi A — Benar: aman pada depresi.\nOpsi B — Ramelteon tidak memperburuk depresi.\nOpsi C — Ramelteon bukan antidepresan.\nOpsi D — Tidak dikontraindikasikan.\nOpsi E — Ramelteon efektif untuk insomnia, termasuk pada depresi."
+  },
+  {
+    question: "Seorang pria berusia 50 tahun dengan gangguan kecemasan dan insomnia diberikan lorazepam. Pasien juga mengonsumsi karbamazepin untuk epilepsi.\nManakah interaksi antara lorazepam dan karbamazepin?",
+    options: ["Karbamazepin menginduksi CYP3A4 → kadar lorazepam menurun", "Karbamazepin menghambat CYP3A4 → kadar lorazepam meningkat", "Lorazepam meningkatkan kadar karbamazepin", "Tidak ada interaksi antara lorazepam dan karbamazepin", "Lorazepam menghambat metabolisme karbamazepin"],
+    answer: 0,
+    explanation: "Lorazepam dimetabolisme oleh glukuronidasi (UGT), tetapi juga dimetabolisme oleh CYP3A4 (minor). Karbamazepin adalah induktor CYP3A4. Induksi CYP3A4 → metabolisme lorazepam meningkat → kadar lorazepam menurun → efektivitas lorazepam menurun. Namun, lorazepam juga memiliki jalur glukuronidasi, sehingga efek induksi mungkin lebih kecil dibandingkan dengan alprazolam atau midazolam (yang lebih tergantung pada CYP3A4).\nOpsi A — Benar: induksi CYP3A4 → lorazepam ↓.\nOpsi B — Karbamazepin adalah induktor, bukan inhibitor.\nOpsi C — Lorazepam tidak mempengaruhi karbamazepin.\nOpsi D — Interaksi signifikan terjadi.\nOpsi E — Lorazepam tidak mempengaruhi metabolisme karbamazepin."
+  },
+  {
+    question: "Seorang wanita berusia 30 tahun dengan insomnia diberikan zolpidem. Pasien hamil 8 minggu dan tidak mengetahui kehamilannya. Dokter meresepkan zolpidem dan pasien khawatir tentang efek pada janin.\nManakah pernyataan yang paling tepat mengenai zolpidem pada kehamilan?",
+    options: ["Zolpidem adalah kategori C → risiko pada janin tidak dapat dikesampingkan", "Zolpidem adalah kategori A → aman pada kehamilan", "Zolpidem adalah kategori X → kontraindikasi absolut", "Zolpidem aman pada semua trimester", "Zolpidem tidak diekskresi dalam ASI"],
+    answer: 0,
+    explanation: "Zolpidem termasuk dalam kategori kehamilan C (FDA), yang berarti studi pada hewan menunjukkan efek merugikan pada janin, tetapi tidak ada studi terkontrol pada manusia. Zolpidem harus digunakan pada kehamilan hanya jika manfaat lebih besar daripada risiko. Zolpidem diekskresi dalam ASI dalam jumlah kecil, tetapi harus digunakan dengan hati-hati pada ibu menyusui. Terapi non-farmakologis lebih disukai untuk insomnia pada kehamilan.\nOpsi A — Benar: kategori C.\nOpsi B — Kategori A adalah vitamin (folat).\nOpsi C — Kategori X adalah talidomid, isotretinoin.\nOpsi D — Tidak aman untuk semua trimester.\nOpsi E — Zolpidem diekskresi dalam ASI.\nSEGMEN D: OBAT NEUROMUSKULAR BLOKER & ANTIDOTUM (Soal #91–#120)"
+  },
+  {
+    question: "Seorang pasien akan menjalani operasi elektif dan diberikan suksinilkolin untuk memfasilitasi intubasi endotrakeal. Dokter memilih suksinilkolin karena onset yang cepat dan durasi yang pendek.\nManakah mekanisme kerja suksinilkolin yang paling tepat?",
+    options: ["Antagonis kompetitif pada reseptor nikotinik di neuromuscular junction", "Agonis reseptor nikotinik → depolarisasi berkelanjutan → blokade depolarisasi", "Penghambat asetilkolinesterase → peningkatan asetilkolin", "Penghambat pelepasan asetilkolin dari terminal saraf", "Agonis reseptor muskarinik → relaksasi otot"],
+    answer: 1,
+    explanation: "Suksinilkolin adalah depolarizing neuromuscular blocker (NMB) yang bekerja sebagai agonis pada reseptor nikotinik di motor end-plate. Suksinilkolin menyebabkan depolarisasi berkelanjutan pada membran otot, yang diikuti oleh blokade (karena kanal natrium menjadi inaktif). Depolarisasi berkelanjutan → otot berkontraksi singkat (fasikulasi) kemudian relaksasi (flasid). Suksinilkolin memiliki onset sangat cepat (30–60 detik) dan durasi pendek (5–10 menit).\nOpsi A — Antagonis kompetitif adalah non-depolarizing NMB (tubokurarin, atrakurium).\nOpsi B — Benar: agonis → depolarisasi → blokade.\nOpsi C — Penghambat asetilkolinesterase (neostigmin) meningkatkan asetilkolin.\nOpsi D — Penghambat pelepasan asetilkolin bukan mekanisme NMB.\nOpsi E — Agonis muskarinik bukan NMB."
+  },
+  {
+    question: "Seorang pasien dengan myasthenia gravis diberikan neostigmin. Pasien melaporkan perbaikan kekuatan otot setelah pemberian neostigmin.\nManakah mekanisme kerja neostigmin yang paling tepat?",
+    options: ["Agonis reseptor nikotinik → meningkatkan transmisi neuromuskular", "Penghambat asetilkolinesterase reversibel → meningkatkan kadar asetilkolin di sinaps", "Penghambat asetilkolinesterase ireversibel → meningkatkan asetilkolin", "Agonis reseptor muskarinik → meningkatkan transmisi", "Penghambat pelepasan asetilkolin → meningkatkan asetilkolin"],
+    answer: 1,
+    explanation: "Neostigmin adalah penghambat asetilkolinesterase (AChE) reversibel yang bekerja di neuromuscular junction. Penghambatan AChE → degradasi asetilkolin menurun → kadar asetilkolin di sinaps meningkat → kompetisi yang lebih besar dengan antibodi pada reseptor nikotinik pada myasthenia gravis → perbaikan transmisi neuromuskular dan kekuatan otot. Neostigmin juga memiliki efek muskarinik (bradikardia, bronkokonstriksi), sehingga sering diberikan dengan atropin.\nOpsi A — Neostigmin bukan agonis nikotinik.\nOpsi B — Benar: AChE inhibitor reversibel.\nOpsi C — AChE inhibitor ireversibel adalah organofosfat.\nOpsi D — Neostigmin memiliki efek muskarinik sebagai efek samping, tetapi mekanisme utama adalah AChE.\nOpsi E — Neostigmin tidak menghambat pelepasan asetilkolin."
+  },
+  {
+    question: "Seorang pasien di ICU dengan sindrom neuroleptik maligna (NMS) diberikan dantrolen. Dokter memilih dantrolen karena mekanisme kerjanya yang spesifik pada otot rangka.\nManakah mekanisme kerja dantrolen yang paling tepat?",
+    options: ["Penghambat reseptor nikotinik di neuromuscular junction", "Penghambat pelepasan kalsium dari retikulum sarkoplasmik (reseptor ryanodine)", "Penghambat kanal kalsium di otot polos", "Agonis reseptor GABA di sistem saraf pusat", "Penghambat asetilkolinesterase"],
+    answer: 1,
+    explanation: "Dantrolen bekerja pada otot rangka dengan menghambat pelepasan kalsium dari retikulum sarkoplasmik melalui inhibisi reseptor ryanodine (RyR1). Dantrolen menurunkan kontraksi otot dengan mengurangi Ca²⁺ sitosol. Dantrolen digunakan untuk: (1) sindrom neuroleptik maligna (NMS), (2) hipertermia maligna (MH), dan (3) spastisitas. Dantrolen tidak mempengaruhi otot jantung atau otot polos.\nOpsi A — Penghambat nikotinik adalah NMB.\nOpsi B — Benar: penghambatan pelepasan Ca²⁺ dari SR.\nOpsi C — Penghambat kanal Ca di otot polos adalah CCB.\nOpsi D — Agonis GABA adalah benzodiazepin.\nOpsi E — AChE inhibitor adalah neostigmin."
+  },
+  {
+    question: "Seorang pasien dengan hipertermia maligna (MH) selama anestesi diberikan dantrolen IV. Dokter memantau fungsi hati karena efek samping dantrolen.\nManakah efek samping dantrolen yang paling penting?",
+    options: ["Hepatotoksisitas", "Nefrotoksisitas", "Kardiomiopati", "Neuropati perifer", "Sedasi"],
+    answer: 0,
+    explanation: "Dantrolen dapat menyebabkan hepatotoksisitas (kerusakan hati), yang merupakan efek samping yang paling penting dan dapat fatal. Risiko hepatotoksisitas meningkat pada wanita >35 tahun dan pada penggunaan dosis tinggi atau jangka panjang. Pemantauan fungsi hati (SGOT/SGPT) diperlukan selama terapi dantrolen. Hepatotoksisitas biasanya reversibel jika obat dihentikan, tetapi dapat menjadi fatal.\nOpsi A — Benar: hepatotoksisitas.\nOpsi B — Nefrotoksisitas jarang terjadi.\nOpsi C — Kardiomiopati tidak terkait.\nOpsi D — Neuropati perifer jarang terjadi.\nOpsi E — Sedasi dapat terjadi, tetapi hepatotoksisitas lebih serius."
+  },
+  {
+    question: "Seorang pasien dengan myasthenia gravis diberikan piridostigmin. Pasien melaporkan perbaikan kekuatan otot tetapi mengalami kram perut dan diare.\nManakah efek samping piridostigmin yang menjelaskan keluhan pasien?",
+    options: ["Efek nikotinik berlebihan → kontraksi otot polos", "Efek muskarinik berlebihan → peningkatan motilitas usus", "Efek antikolinergik → penurunan motilitas usus", "Efek alfa-adrenergik → vasokonstriksi", "Efek beta-adrenergik → relaksasi otot polos"],
+    answer: 1,
+    explanation: "Piridostigmin adalah penghambat asetilkolinesterase (AChE inhibitor) yang digunakan untuk myasthenia gravis. Penghambatan AChE → peningkatan asetilkolin di sinaps. Efek samping muskarinik (ACh berlebihan pada reseptor muskarinik): kram perut, diare, hipersalivasi, bronkokonstriksi, bradikardia. Untuk mengurangi efek samping muskarinik, atropin (antagonis muskarinik) sering diberikan bersama AChE inhibitor.\nOpsi A — Efek nikotinik (fasikulasi, kelemahan) bukan penyebab kram perut.\nOpsi B — Benar: efek muskarinik → motilitas usus ↑.\nOpsi C — Antikolinergik menurunkan motilitas, bukan piridostigmin.\nOpsi D — Alfa-adrenergik tidak terkait.\nOpsi E — Beta-adrenergik tidak terkait."
+  },
+  {
+    question: "Seorang pasien di operasi diberikan atrakurium untuk relaksasi otot selama prosedur bedah. Dokter memilih atrakurium karena eliminasi yang tidak tergantung pada fungsi ginjal dan hati.\nManakah pernyataan yang paling tepat mengenai atrakurium?",
+    options: ["Atrakurium adalah depolarizing NMB yang dieliminasi melalui ginjal", "Atrakurium adalah non-depolarizing NMB yang dieliminasi melalui degradasi Hofmann (ester hidrolisis) dan eliminasi ginjal", "Atrakurium adalah non-depolarizing NMB yang dimetabolisme di hati", "Atrakurium adalah depolarizing NMB yang dieliminasi melalui hati", "Atrakurium adalah antikolinergik yang digunakan untuk relaksasi otot"],
+    answer: 1,
+    explanation: "Atrakurium adalah non-depolarizing NMB (antagonis kompetitif pada reseptor nikotinik) yang dieliminasi melalui dua jalur: (1) degradasi Hofmann (eliminasi spontan pada pH dan suhu tubuh), dan (2) hidrolisis ester (oleh esterase plasma). Atrakurium tidak tergantung pada fungsi ginjal atau hati, sehingga aman digunakan pada pasien dengan gangguan ginjal atau hati. Metabolit atrakurium (laudanosin) dapat menyebabkan kejang pada dosis tinggi.\nOpsi A — Atrakurium adalah non-depolarizing, bukan depolarizing.\nOpsi B — Benar: non-depolarizing + degradasi Hofmann.\nOpsi C — Atrakurium tidak dimetabolisme di hati secara signifikan.\nOpsi D — Atrakurium bukan depolarizing.\nOpsi E — Atrakurium adalah NMB, bukan antikolinergik."
+  },
+  {
+    question: "Seorang pasien dengan myasthenia gravis datang dengan kelemahan otot yang memburuk, kesulitan bernapas, dan kesulitan menelan. Dokter mencurigai krisis myasthenik.\nManakah terapi yang paling tepat untuk krisis myasthenik?",
+    options: ["Pemberian neostigmin atau piridostigmin dosis tinggi", "Pemberian atropin untuk mengatasi efek muskarinik", "Pemberian kortikosteroid dosis tinggi", "Pemberian imunoglobulin IV dan plasmaferesis", "Pemberian antikolinergik"],
+    answer: 3,
+    explanation: "Krisis myasthenik adalah keadaan darurat dengan kelemahan otot yang mengancam jiwa (kesulitan bernapas dan menelan). Penanganan: (1) stabilisasi ABC, (2) pemberian imunoglobulin IV (IVIG) atau plasmaferesis untuk mengurangi antibodi terhadap reseptor nikotinik, (3) pemberian kortikosteroid (prednison) untuk imunosupresi, dan (4) AChE inhibitor (neostigmin, piridostigmin) dapat diberikan, tetapi harus dipantau karena risiko efek muskarinik. Plasmaferesis dan IVIG adalah terapi utama untuk krisis myasthenik.\nOpsi A — AChE inhibitor dapat diberikan, tetapi terapi utama adalah IVIG/plasmaferesis.\nOpsi B — Atropin mengatasi efek muskarinik, bukan terapi utama.\nOpsi C — Kortikosteroid dapat diberikan, tetapi IVIG/plasmaferesis lebih cepat.\nOpsi D — Benar: IVIG dan plasmaferesis.\nOpsi E — Antikolinergik tidak digunakan."
+  },
+  {
+    question: "Seorang pasien di operasi diberikan vekuronium untuk relaksasi otot. Setelah operasi, pasien masih mengalami blokade neuromuskular yang berkepanjangan. Dokter memberikan neostigmin untuk membalikkan blokade.\nManakah mekanisme neostigmin dalam membalikkan blokade non-depolarizing?",
+    options: ["Neostigmin menghambat AChE → meningkatkan asetilkolin → bersaing dengan vekuronium pada reseptor nikotinik", "Neostigmin adalah agonis reseptor nikotinik → menggantikan vekuronium", "Neostigmin adalah antagonis reseptor nikotinik → memblokir vekuronium", "Neostigmin menghambat pelepasan asetilkolin", "Neostigmin adalah antikolinergik → meningkatkan transmisi"],
+    answer: 0,
+    explanation: "Neostigmin adalah AChE inhibitor yang digunakan untuk membalikkan blokade neuromuskular non-depolarizing (vekuronium, atrakurium, rokuronium). Neostigmin meningkatkan kadar asetilkolin di sinaps, yang kemudian bersaing dengan non-depolarizing NMB pada reseptor nikotinik. Peningkatan asetilkolin membalikkan blokade. Neostigmin sering diberikan bersama atropin untuk mencegah efek muskarinik (bradikardia, hipersalivasi, bronkokonstriksi).\nOpsi A — Benar: AChE → asetilkolin ↑ → kompetisi.\nOpsi B — Neostigmin bukan agonis nikotinik.\nOpsi C — Neostigmin bukan antagonis nikotinik.\nOpsi D — Neostigmin tidak menghambat pelepasan asetilkolin.\nOpsi E — Neostigmin adalah AChE inhibitor, bukan antikolinergik."
+  },
+  {
+    question: "Seorang pasien dengan hipertermia maligna (MH) selama anestesi diberikan dantrolen. Pasien juga memiliki riwayat miopati.\nManakah perhatian khusus pada pemberian dantrolen pada pasien dengan miopati?",
+    options: ["Dantrolen dapat memperburuk kelemahan otot pada pasien dengan miopati", "Dantrolen aman pada miopati", "Dantrolen efektif untuk miopati", "Dantrolen tidak mempengaruhi otot rangka", "Dantrolen hanya bekerja pada otot polos"],
+    answer: 0,
+    explanation: "Dantrolen bekerja dengan menghambat pelepasan kalsium di otot rangka, sehingga menurunkan kontraksi otot. Pada pasien dengan miopati (kelemahan otot bawaan), dantrolen dapat memperburuk kelemahan otot. Dantrolen harus digunakan dengan sangat hati-hati pada pasien dengan miopati atau kelemahan otot. Pada hipertermia maligna, dantrolen tetap merupakan pengobatan lini pertama, tetapi efek samping harus dipantau.\nOpsi A — Benar: memperburuk kelemahan otot.\nOpsi B — Tidak aman; harus digunakan dengan hati-hati.\nOpsi C — Dantrolen tidak digunakan untuk miopati.\nOpsi D — Dantrolen mempengaruhi otot rangka.\nOpsi E — Dantrolen bekerja pada otot rangka, bukan otot polos."
+  },
+  {
+    question: "Seorang pasien dengan myasthenia gravis diberikan prednison (kortikosteroid) sebagai terapi jangka panjang. Pasien melaporkan perbaikan kekuatan otot setelah beberapa minggu.\nManakah mekanisme kerja prednison pada myasthenia gravis?",
+    options: ["Meningkatkan pelepasan asetilkolin", "Menghambat produksi antibodi terhadap reseptor nikotinik (imunosupresi)", "Menghambat AChE → meningkatkan asetilkolin", "Agonis reseptor nikotinik → meningkatkan transmisi", "Menghambat pelepasan kalsium dari retikulum sarkoplasmik"],
+    answer: 1,
+    explanation: "Myasthenia gravis adalah penyakit autoimun yang disebabkan oleh antibodi terhadap reseptor nikotinik di neuromuscular junction. Prednison (kortikosteroid) bekerja dengan imunosupresi: menghambat produksi antibodi, mengurangi inflamasi, dan menurunkan aktivitas sel B dan sel T. Prednison digunakan untuk myasthenia gravis jangka panjang, terutama pada pasien yang tidak responsif terhadap AChE inhibitor. Efek imunosupresi membutuhkan waktu (minggu) untuk onset.\nOpsi A — Peningkatan pelepasan asetilkolin bukan mekanisme prednison.\nOpsi B — Benar: imunosupresi → antibodi ↓.\nOpsi C — AChE inhibitor adalah neostigmin.\nOpsi D — Agonis nikotinik bukan prednison.\nOpsi E — Penghambatan Ca²⁺ adalah dantrolen."
+  },
+  {
+    question: "Seorang pasien di operasi diberikan rokuronium untuk intubasi. Dokter memilih rokuronium karena onset cepat (60–90 detik).\nManakah pernyataan yang paling tepat mengenai rokuronium?",
+    options: ["Rokuronium adalah depolarizing NMB dengan onset cepat", "Rokuronium adalah non-depolarizing NMB dengan onset cepat yang dapat dibalik dengan sugammadeks", "Rokuronium adalah non-depolarizing NMB yang dimetabolisme di hati", "Rokuronium adalah depolarizing NMB yang dieliminasi melalui ginjal", "Rokuronium adalah antikolinergik"],
+    answer: 1,
+    explanation: "Rokuronium adalah non-depolarizing NMB (antagonis kompetitif reseptor nikotinik) dengan onset cepat (60–90 detik) dan durasi sedang (30–60 menit). Rokuronium digunakan untuk intubasi endotrakeal (alternatif suksinilkolin). Keunggulan rokuronium: dapat dibalik dengan sugammadeks, yang merupakan cyclodextrin yang mengikat rokuronium secara spesifik dan membalikkan blokade dengan cepat (1–3 menit). Sugammadeks adalah antidotum yang lebih baik daripada neostigmin untuk rokuronium dan vekuronium.\nOpsi A — Rokuronium adalah non-depolarizing, bukan depolarizing.\nOpsi B — Benar: non-depolarizing + sugammadeks.\nOpsi C — Rokuronium diekskresi melalui ginjal dan hati, tetapi tidak dimetabolisme signifikan.\nOpsi D — Rokuronium bukan depolarizing.\nOpsi E — Rokuronium adalah NMB, bukan antikolinergik."
+  },
+  {
+    question: "Seorang pasien dengan keracunan organofosfat datang ke UGD dengan kelemahan otot, fasikulasi, dan bradikardia. Dokter memberikan atropin dan pra lidoksim (2-PAM).\nManakah mekanisme kerja pra lidoksim pada keracunan organofosfat?",
+    options: ["Antagonis reseptor muskarinik → mengurangi efek asetilkolin", "Reaktivasi asetilkolinesterase yang terikat organofosfat", "Penghambat pelepasan asetilkolin", "Agonis reseptor nikotinik → meningkatkan transmisi", "Penghambat sintesis asetilkolin"],
+    answer: 1,
+    explanation: "Organofosfat (insektisida, senyawa saraf) adalah penghambat asetilkolinesterase (AChE) ireversibel. Pra lidoksim (2-PAM, pralidoxime) adalah reaktivator AChE yang melepaskan organofosfat dari enzim AChE, memulihkan aktivitas AChE. Pra lidoksim harus diberikan segera sebelum organofosfat terikat secara ireversibel (\"aging\"). Atropin diberikan untuk mengatasi efek muskarinik (bradikardia, bronkokonstriksi, hipersalivasi).\nOpsi A — Atropin adalah antagonis muskarinik, bukan pra lidoksim.\nOpsi B — Benar: reaktivasi AChE.\nOpsi C — Pra lidoksim tidak menghambat pelepasan asetilkolin.\nOpsi D — Pra lidoksim bukan agonis nikotinik.\nOpsi E — Pra lidoksim tidak menghambat sintesis asetilkolin."
+  },
+  {
+    question: "Seorang pasien dengan myasthenia gravis diberikan piridostigmin. Pasien mengalami kelemahan otot yang memburuk setelah pemberian piridostigmin. Dokter mencurigai krisis kolinergik (overdosis AChE inhibitor).\nManakah yang paling tepat untuk membedakan krisis myasthenik dan krisis kolinergik?",
+    options: ["Tes edrofonium (Tensilon test)", "Tes neostigmin", "Tes atropin", "Tes dantrolen", "Tes sugammadeks"],
+    answer: 0,
+    explanation: "Pada pasien myasthenia gravis, krisis myasthenik (kelemahan otot karena kurangnya transmisi) dan krisis kolinergik (kelemahan otot karena overdosis AChE inhibitor) memiliki gejala yang mirip. Tes edrofonium (Tensilon test) digunakan untuk membedakan keduanya: (1) pada krisis myasthenik, pemberian edrofonium (AChE inhibitor short-acting) → perbaikan kekuatan otot; (2) pada krisis kolinergik, pemberian edrofonium → perburukan kelemahan otot. Edrofonium memiliki onset cepat (30–60 detik) dan durasi pendek (5–10 menit).\nOpsi A — Benar: Tensilon test.\nOpsi B — Neostigmin adalah AChE inhibitor, tetapi digunakan sebagai terapi, bukan tes.\nOpsi C — Atropin mengatasi efek muskarinik, bukan membedakan krisis.\nOpsi D — Dantrolen untuk hipertermia maligna.\nOpsi E — Sugammadeks untuk balik blokade NMB."
+  },
+  {
+    question: "Seorang pasien di operasi diberikan suksinilkolin dan mengalami hiperkalemia berat yang menyebabkan aritmia. Dokter mencurigai hiperkalemia akibat suksinilkolin.\nManakah pasien yang paling berisiko mengalami hiperkalemia akibat suksinilkolin?",
+    options: ["Pasien dengan luka bakar", "Pasien dengan diabetes", "Pasien dengan hipertensi", "Pasien dengan asma", "Pasien dengan gangguan ginjal"],
+    answer: 0,
+    explanation: "Suksinilkolin dapat menyebabkan hiperkalemia yang berbahaya pada pasien dengan: (1) luka bakar luas (>24–48 jam), (2) trauma berat, (3) denervasi otot (stroke, cedera medula spinalis), (4) distrofi otot, dan (5) sepsis berat. Hiperkalemia terjadi karena peningkatan ekspresi reseptor nikotinik ekstrajunctional di otot yang mengalami denervasi atau kerusakan, sehingga suksinilkolin menyebabkan pelepasan K⁺ yang besar. Suksinilkolin harus dihindari pada pasien dengan risiko hiperkalemia.\nOpsi A — Benar: luka bakar → risiko hiperkalemia.\nOpsi B — Diabetes bukan kontraindikasi utama.\nOpsi C — Hipertensi tidak terkait.\nOpsi D — Asma tidak terkait.\nOpsi E — Gagal ginjal tidak meningkatkan risiko hiperkalemia akibat suksinilkolin."
+  },
+  {
+    question: "Seorang pasien dengan botulisme datang dengan kelemahan otot simetris, diplopia, dan kesulitan menelan. Dokter mencurigai botulisme.\nManakah mekanisme kerja toksin botulinum?",
+    options: ["Agonis reseptor nikotinik → blokade depolarisasi", "Penghambat pelepasan asetilkolin dari terminal saraf (memblokir SNARE protein)", "Penghambat AChE → peningkatan asetilkolin", "Antagonis reseptor muskarinik → blokade transmisi", "Penghambat kanal kalsium di presinaptik"],
+    answer: 1,
+    explanation: "Toksin botulinum (dari Clostridium botulinum) bekerja dengan memblokir pelepasan asetilkolin dari terminal saraf di neuromuscular junction. Toksin botulinum memecah SNARE protein (SNAP-25, sintaksin, VAMP) yang diperlukan untuk fusi vesikel asetilkolin dengan membran prasinaps. Blokade pelepasan asetilkolin → blokade transmisi neuromuskular → kelemahan otot flasid simetris (diplopia, disfagia, dysarthria, kelemahan pernapasan). Botulisme adalah keadaan darurat medis.\nOpsi A — Agonis nikotinik adalah suksinilkolin.\nOpsi B — Benar: blokade SNARE → pelepasan ACh ↓.\nOpsi C — AChE inhibitor meningkatkan asetilkolin.\nOpsi D — Antagonis muskarinik adalah atropin.\nOpsi E — Penghambat kanal Ca adalah NMB seperti magnesium."
+  },
+  {
+    question: "Seorang pasien di operasi diberikan atrakurium, tetapi setelah operasi pasien masih mengalami blokade neuromuskular. Dokter memberikan neostigmin, tetapi blokade tidak membaik.\nManakah penyebab paling mungkin dari blokade yang tidak membaik dengan neostigmin?",
+    options: ["Pasien adalah slow acetylator", "Pasien mengalami blokade depolarisasi (fase II) atau telah menggunakan aminoglikosida", "Pasien memiliki alergi terhadap neostigmin", "Pasien mengalami hipertermia maligna", "Pasien mengalami krisis kolinergik"],
+    answer: 1,
+    explanation: "Neostigmin (AChE inhibitor) efektif untuk membalikkan blokade non-depolarizing (vekuronium, atrakurium, rokuronium) tetapi tidak efektif untuk blokade depolarizing (suksinilkolin) atau fase II blokade depolarizing. Selain itu, beberapa obat dapat memperkuat blokade NMB dan membuat neostigmin tidak efektif: aminoglikosida (gentamisin, tobramisin), magnesium, dan anestesi inhalasi. Pada pasien yang tidak responsif terhadap neostigmin, sugammadeks (untuk rokuronium/vekuronium) atau ventilasi mekanik diperlukan sampai blokade menghilang.\nOpsi A — Slow acetylator mempengaruhi metabolisme obat seperti INH, bukan NMB.\nOpsi B — Benar: blokade depolarizing atau aminoglikosida.\nOpsi C — Alergi jarang terjadi.\nOpsi D — Hipertermia maligna terkait dengan dantrolen, bukan neostigmin.\nOpsi E — Krisis kolinergik terjadi pada overdosis AChE inhibitor."
+  },
+  {
+    question: "Seorang pasien dengan tetanus datang dengan spasme otot yang parah dan trismus (lockjaw). Dokter memberikan diazepam dan vekuronium untuk mengontrol spasme.\nManakah pernyataan yang paling tepat mengenai pengobatan tetanus?",
+    options: ["Diazepam adalah agen lini pertama untuk mengontrol spasme otot", "Vekuronium adalah agen lini pertama untuk tetanus", "Tetanus tidak memerlukan pengobatan farmakologis", "Antitoksin tetanus adalah satu-satunya pengobatan", "Antibiotik tidak diperlukan untuk tetanus"],
+    answer: 0,
+    explanation: "Tetanus disebabkan oleh toksin tetanospasmin dari Clostridium tetani, yang menghambat pelepasan GABA dan glisin di sistem saraf pusat → spasme otot. Penanganan: (1) diazepam (benzodiazepin) adalah agen lini pertama untuk mengontrol spasme otot dan kejang; (2) antikonvulsan lain (barbiturat, propofol); (3) NMB (vekuronium, atrakurium) untuk kasus berat; (4) antitoksin tetanus (ATS); dan (5) antibiotik (metronidazol atau penisilin). Diazepam bekerja dengan meningkatkan GABA.\nOpsi A — Benar: diazepam lini pertama.\nOpsi B — Vekuronium untuk kasus berat, bukan lini pertama.\nOpsi C — Memerlukan pengobatan farmakologis.\nOpsi D — Antitoksin penting, tetapi diazepam juga diperlukan.\nOpsi E — Antibiotik diperlukan untuk eradikasi Clostridium tetani."
+  },
+  {
+    question: "Seorang pasien dengan myasthenia gravis diberikan prednison. Pasien juga menggunakan AChE inhibitor (piridostigmin). Dokter memantau efek samping prednison.\nManakah efek samping yang paling penting dari prednison pada myasthenia gravis?",
+    options: ["Perburukan myasthenia gravis pada awal terapi", "Hiperkalemia", "Bradikardia", "Peningkatan asetilkolin", "Sedasi"],
+    answer: 0,
+    explanation: "Prednison (kortikosteroid) dapat menyebabkan perburukan myasthenia gravis pada awal terapi (2–4 minggu pertama) karena efek imunosupresi yang memicu peningkatan antibodi sementara. Oleh karena itu, prednison harus dimulai dengan dosis rendah dan ditingkatkan secara bertahap, dan pasien harus dipantau secara ketat. AChE inhibitor (piridostigmin) mungkin perlu ditingkatkan sementara untuk mengatasi perburukan. Efek samping lain: penambahan berat badan, osteoporosis, hiperglikemia, imunosupresi.\nOpsi A — Benar: perburukan awal.\nOpsi B — Prednison menyebabkan hiperglikemia, bukan hiperkalemia.\nOpsi C — Prednison tidak menyebabkan bradikardia.\nOpsi D — Prednison tidak meningkatkan asetilkolin.\nOpsi E — Prednison tidak menyebabkan sedasi."
+  },
+  {
+    question: "Seorang pasien di operasi diberikan suksinilkolin dan mengalami fasikulasi otot yang diikuti oleh relaksasi. Pasien kemudian mengalami nyeri otot pascaoperasi.\nManakah yang paling tepat untuk mengurangi fasikulasi dan nyeri otot akibat suksinilkolin?",
+    options: ["Memberikan dantrolen sebelum suksinilkolin", "Memberikan dosis kecil non-depolarizing NMB sebelum suksinilkolin (precurarization)", "Memberikan atropin sebelum suksinilkolin", "Memberikan neostigmin setelah suksinilkolin", "Memberikan sugammadeks setelah suksinilkolin"],
+    answer: 1,
+    explanation: "Suksinilkolin menyebabkan fasikulasi otot (kontraksi singkat) karena depolarisasi awal, yang kemudian menyebabkan nyeri otot pascaoperasi. Fasikulasi dapat dikurangi dengan memberikan dosis kecil non-depolarizing NMB (misalnya atrakurium, vekuronium, rokuronium) 3–5 menit sebelum suksinilkolin (precurarization). Non-depolarizing NMB mengurangi jumlah reseptor nikotinik yang tersedia untuk suksinilkolin, sehingga mengurangi depolarisasi dan fasikulasi.\nOpsi A — Dantrolen untuk hipertermia maligna, bukan fasikulasi.\nOpsi B — Benar: precurarization.\nOpsi C — Atropin mengatasi bradikardia, bukan fasikulasi.\nOpsi D — Neostigmin membalikkan blokade non-depolarizing.\nOpsi E — Sugammadeks untuk rokuronium/vekuronium."
+  },
+  {
+    question: "Seorang pasien dengan myasthenia gravis diberikan piridostigmin. Pasien juga memiliki riwayat asma.\nManakah perhatian khusus pada pemberian piridostigmin pada pasien dengan asma?",
+    options: ["Piridostigmin dapat menyebabkan bronkokonstriksi karena efek muskarinik", "Piridostigmin aman pada asma", "Piridostigmin adalah bronkodilator", "Piridostigmin tidak mempengaruhi saluran napas", "Piridostigmin adalah antagonis muskarinik"],
+    answer: 0,
+    explanation: "Piridostigmin (AChE inhibitor) meningkatkan asetilkolin, yang merangsang reseptor muskarinik di saluran napas → bronkokonstriksi dan hipersekresi mukus. Pada pasien dengan asma, piridostigmin harus digunakan dengan hati-hati dan efek pada saluran napas dipantau. Atropin (antagonis muskarinik) dapat diberikan bersamaan untuk mengurangi efek bronkokonstriksi.\nOpsi A — Benar: efek muskarinik → bronkokonstriksi.\nOpsi B — Tidak aman; harus digunakan dengan hati-hati.\nOpsi C — Piridostigmin bukan bronkodilator.\nOpsi D — Piridostigmin mempengaruhi saluran napas.\nOpsi E — Piridostigmin adalah AChE inhibitor, bukan antagonis muskarinik."
+  },
+  {
+    question: "Seorang pasien di operasi diberikan rokuronium dan setelah operasi diberikan sugammadeks untuk membalikkan blokade. Pasien mengalami pemulihan cepat dari blokade neuromuskular.\nManakah mekanisme kerja sugammadeks yang paling tepat?",
+    options: ["Sugammadeks adalah AChE inhibitor → meningkatkan asetilkolin", "Sugammadeks adalah cyclodextrin yang mengikat rokuronium → membentuk kompleks yang diekskresi ginjal", "Sugammadeks adalah antagonis reseptor nikotinik → memblokir rokuronium", "Sugammadeks adalah agonis reseptor nikotinik → meningkatkan transmisi", "Sugammadeks adalah antikolinergik → meningkatkan transmisi"],
+    answer: 1,
+    explanation: "Sugammadeks adalah cyclodextrin (modifikasi γ-cyclodextrin) yang mengikat rokuronium (dan vekuronium) secara spesifik dengan membentuk kompleks yang tidak aktif. Kompleks sugammadeks-rokuronium kemudian diekskresi melalui ginjal. Sugammadeks membalikkan blokade neuromuskular dengan cepat (1–3 menit), lebih cepat daripada neostigmin. Sugammadeks tidak bekerja pada suksinilkolin atau NMB lainnya.\nOpsi A — AChE inhibitor adalah neostigmin.\nOpsi B — Benar: cyclodextrin + rokuronium → ekskresi ginjal.\nOpsi C — Sugammadeks bukan antagonis nikotinik.\nOpsi D — Sugammadeks bukan agonis nikotinik.\nOpsi E — Sugammadeks bukan antikolinergik."
+  },
+  {
+    question: "Seorang pasien dengan keracunan organofosfat diberikan atropin. Pasien mengalami takikardia, midriasis, dan mulut kering.\nManakah efek atropin yang menjelaskan gejala ini?",
+    options: ["Agonis reseptor muskarinik → efek simpatetik", "Antagonis reseptor muskarinik → blokade efek asetilkolin", "Agonis reseptor nikotinik → blokade neuromuskular", "Penghambat AChE → peningkatan asetilkolin", "Agonis reseptor adrenergik → vasokonstriksi"],
+    answer: 1,
+    explanation: "Atropin adalah antagonis kompetitif reseptor muskarinik. Pada keracunan organofosfat, terjadi akumulasi asetilkolin berlebihan yang merangsang reseptor muskarinik dan nikotinik. Atropin memblokir efek muskarinik: (1) takikardia (blokade M2 di jantung), (2) midriasis (blokade M3 di iris), (3) mulut kering (blokade M3 di kelenjar saliva), (4) relaksasi otot polos usus dan kandung kemih. Atropin tidak mempengaruhi efek nikotinik (fasikulasi, kelemahan otot).\nOpsi A — Atropin adalah antagonis, bukan agonis muskarinik.\nOpsi B — Benar: antagonis muskarinik → blokade asetilkolin.\nOpsi C — Atropin tidak bekerja pada reseptor nikotinik.\nOpsi D — Penghambat AChE adalah organofosfat, bukan atropin.\nOpsi E — Atropin bukan agonis adrenergik."
+  },
+  {
+    question: "Seorang pasien dengan myasthenia gravis dan pneumonia diberikan gentamisin (aminoglikosida). Setelah beberapa hari, pasien mengalami kelemahan otot yang memburuk.\nManakah interaksi antara gentamisin dan myasthenia gravis?",
+    options: ["Gentamisin memperburuk myasthenia gravis dengan menghambat pelepasan asetilkolin", "Gentamisin adalah AChE inhibitor → meningkatkan asetilkolin", "Gentamisin adalah agen imunosupresan → mengurangi antibodi", "Gentamisin adalah agonis reseptor nikotinik → blokade depolarisasi", "Gentamisin tidak mempengaruhi myasthenia gravis"],
+    answer: 0,
+    explanation: "Aminoglikosida (gentamisin, tobramisin, amikasin) dapat memperburuk myasthenia gravis dengan menghambat pelepasan asetilkolin di terminal saraf (efek presinaptik) dan memblokade reseptor nikotinik (efek postsinaptik). Aminoglikosida dikontraindikasikan atau digunakan dengan sangat hati-hati pada pasien dengan myasthenia gravis. Antibiotik lain yang dapat memperburuk myasthenia: fluorokuinolon, makrolida, dan tetrasiklin.\nOpsi A — Benar: aminoglikosida → pelepasan ACh ↓.\nOpsi B — Aminoglikosida bukan AChE inhibitor.\nOpsi C — Aminoglikosida bukan imunosupresan.\nOpsi D — Aminoglikosida bukan agonis nikotinik.\nOpsi E — Aminoglikosida mempengaruhi myasthenia gravis."
+  },
+  {
+    question: "Seorang pasien di operasi diberikan vekuronium. Setelah operasi, blokade neuromuskular dibalik dengan neostigmin dan atropin. Dokter memberikan neostigmin dan atropin bersama.\nMengapa atropin diberikan bersama neostigmin?",
+    options: ["Atropin meningkatkan efek neostigmin", "Atropin mencegah efek muskarinik neostigmin (bradikardia, hipersalivasi)", "Atropin adalah antidotum untuk neostigmin", "Atropin meningkatkan pelepasan asetilkolin", "Atropin dan neostigmin bekerja secara sinergis pada reseptor nikotinik"],
+    answer: 1,
+    explanation: "Neostigmin adalah AChE inhibitor yang meningkatkan asetilkolin di neuromuscular junction (efek nikotinik) dan di organ lain (efek muskarinik). Efek muskarinik neostigmin: bradikardia, hipersalivasi, bronkokonstriksi, kram perut, dan diare. Atropin (antagonis muskarinik) diberikan bersama neostigmin untuk mencegah efek muskarinik tanpa mengganggu efek nikotinik (pembalikan blokade NMB). Atropin diberikan sebelum atau bersama neostigmin.\nOpsi A — Atropin tidak meningkatkan efek neostigmin.\nOpsi B — Benar: atropin mencegah efek muskarinik.\nOpsi C — Antidotum neostigmin bukan atropin (antidotum organofosfat adalah pra lidoksim).\nOpsi D — Atropin tidak meningkatkan pelepasan asetilkolin.\nOpsi E — Tidak sinergis; atropin menekan efek samping."
+  },
+  {
+    question: "Seorang pasien dengan sindrom Lambert-Eaton myasthenic (LEMS) diberikan 3,4-diaminopyridine (amifampridine). Pasien melaporkan perbaikan kekuatan otot.\nManakah mekanisme kerja 3,4-diaminopyridine?",
+    options: ["Penghambat AChE → meningkatkan asetilkolin", "Penghambat kanal kalium di presinaptik → memperpanjang potensial aksi → meningkatkan pelepasan asetilkolin", "Agonis reseptor nikotinik → meningkatkan transmisi", "Penghambat pelepasan kalsium → menurunkan transmisi", "Antagonis reseptor muskarinik → meningkatkan transmisi"],
+    answer: 1,
+    explanation: "Sindrom Lambert-Eaton myasthenic (LEMS) adalah penyakit autoimun yang menyerang kanal kalsium voltase-gate di presinaptik, menyebabkan penurunan pelepasan asetilkolin. 3,4-diaminopyridine (amifampridine) adalah penghambat kanal kalium di presinaptik yang memperpanjang durasi potensial aksi, sehingga lebih banyak Ca²⁺ masuk dan pelepasan asetilkolin meningkat. LEMS responsif terhadap 3,4-diaminopyridine, berbeda dengan myasthenia gravis (yang responsif terhadap AChE inhibitor).\nOpsi A — AChE inhibitor (neostigmin) digunakan untuk myasthenia gravis, bukan LEMS.\nOpsi B — Benar: penghambat kanal K⁺ → pelepasan ACh ↑.\nOpsi C — Agonis nikotinik bukan mekanisme.\nOpsi D — Penghambatan pelepasan Ca²⁺ memperburuk LEMS.\nOpsi E — Antagonis muskarinik tidak digunakan."
+  },
+  {
+    question: "Seorang pasien dengan keracunan organofosfat diberikan pra lidoksim (2-PAM). Dokter memantau kadar enzim AChE.\nManakah pernyataan yang paling tepat mengenai pra lidoksim?",
+    options: ["Pra lidoksim hanya efektif jika diberikan sebelum aging (ikatan irreversibel organofosfat dengan AChE)", "Pra lidoksim bekerja pada reseptor nikotinik", "Pra lidoksim adalah antagonis muskarinik", "Pra lidoksim adalah penghambat AChE", "Pra lidoksim tidak memiliki efek pada AChE"],
+    answer: 0,
+    explanation: "Pra lidoksim (2-PAM, pralidoxime) adalah reaktivator AChE yang melepaskan organofosfat dari enzim AChE. Pra lidoksim hanya efektif jika diberikan sebelum organofosfat terikat secara irreversibel pada AChE (proses \"aging\"), yang terjadi dalam hitungan jam (tergantung pada organofosfat). Setelah aging, AChE tidak dapat direaktivasi dan memerlukan sintesis AChE baru (yang memakan waktu). Atropin diberikan untuk efek muskarinik, dan pra lidoksim untuk reaktivasi AChE.\nOpsi A — Benar: efektif sebelum aging.\nOpsi B — Pra lidoksim bekerja pada AChE, bukan reseptor nikotinik.\nOpsi C — Antagonis muskarinik adalah atropin.\nOpsi D — Pra lidoksim adalah reaktivator, bukan inhibitor.\nOpsi E — Pra lidoksim bekerja pada AChE."
+  },
+  {
+    question: "Seorang pasien di operasi diberikan suksinilkolin. Setelah pemberian, pasien mengalami bradikardia berat. Dokter memberikan atropin.\nManakah yang menyebabkan bradikardia pada pemberian suksinilkolin?",
+    options: ["Suksinilkolin merangsang reseptor nikotinik di jantung", "Suksinilkolin merangsang reseptor muskarinik di jantung (efek vagal)", "Suksinilkolin menyebabkan hiperkalemia", "Suksinilkolin menghambat pelepasan norepinefrin", "Suksinilkolin adalah agonis β1"],
+    answer: 1,
+    explanation: "Suksinilkolin adalah agonis pada reseptor nikotinik, tetapi juga memiliki efek muskarinik (vagal) karena struktur mirip asetilkolin. Efek vagal → bradikardia, terutama pada anak-anak, pemberian dosis kedua, atau pemberian cepat. Atropin (antagonis muskarinik) diberikan untuk mengatasi bradikardia. Bradikardia juga dapat terjadi karena suksinilkolin merangsang ganglion simpatis, tetapi efek vagal lebih dominan.\nOpsi A — Suksinilkolin bekerja pada reseptor nikotinik di NMI, tetapi efek vagal pada jantung adalah muskarinik.\nOpsi B — Benar: efek muskarinik → bradikardia.\nOpsi C — Hiperkalemia terjadi pada pasien dengan risiko, tetapi tidak langsung menyebabkan bradikardia.\nOpsi D — Suksinilkolin tidak menghambat norepinefrin.\nOpsi E — Suksinilkolin bukan agonis β1."
+  },
+  {
+    question: "Seorang pasien dengan botulisme diberikan antitoksin botulinum. Dokter menjelaskan bahwa antitoksin hanya efektif untuk toksin yang belum terikat.\nManakah pernyataan yang paling tepat mengenai botulisme?",
+    options: ["Antitoksin botulinum adalah pengobatan utama untuk botulisme", "Botulisme disebabkan oleh toksin yang menghambat pelepasan asetilkolin", "Botulisme menyebabkan kelemahan otot spastik", "Botulisme tidak memerlukan ventilasi mekanik", "Botulisme dapat diobati dengan antibiotik"],
+    answer: 1,
+    explanation: "Botulisme disebabkan oleh toksin botulinum (dari Clostridium botulinum) yang memblokir pelepasan asetilkolin di neuromuscular junction dengan memecah SNARE protein. Botulisme menyebabkan kelemahan otot flasid simetris (diplopia, disfagia, dysarthria, kelemahan pernapasan). Penanganan: (1) antitoksin botulinum (menetralkan toksin yang belum terikat), (2) ventilasi mekanik jika diperlukan, (3) antibiotik tidak efektif (toksin, bukan infeksi aktif). Antitoksin hanya efektif jika diberikan sebelum toksin terikat pada presinaptik.\nOpsi A — Antitoksin penting, tetapi ventilasi mekanik juga diperlukan.\nOpsi B — Benar: blokade pelepasan ACh.\nOpsi C — Botulisme menyebabkan kelemahan flasid, bukan spastik.\nOpsi D — Ventilasi mekanik sering diperlukan.\nOpsi E — Antibiotik tidak efektif untuk toksin."
+  },
+  {
+    question: "Seorang pasien dengan myasthenia gravis yang tidak responsif terhadap AChE inhibitor dan prednison diberikan rituximab. Dokter memilih rituximab karena efektif untuk myasthenia gravis refrakter.\nManakah pernyataan yang paling tepat mengenai rituximab?",
+    options: ["Rituximab adalah antibodi monoklonal yang menargetkan CD20 pada sel B → menurunkan produksi antibodi", "Rituximab adalah AChE inhibitor", "Rituximab adalah kortikosteroid", "Rituximab adalah imunosupresan yang menargetkan sel T", "Rituximab adalah plasmaferesis"],
+    answer: 0,
+    explanation: "Rituximab adalah antibodi monoklonal yang menargetkan CD20 (antigen pada sel B). Rituximab menghancurkan sel B yang menghasilkan antibodi, termasuk antibodi terhadap reseptor nikotinik pada myasthenia gravis. Rituximab digunakan untuk myasthenia gravis refrakter (tidak responsif terhadap AChE inhibitor, kortikosteroid, dan imunosupresan lain). Efek samping: infus reaksi, infeksi, dan leukoensefalopati multifokal progresif (PML).\nOpsi A — Benar: anti-CD20 → sel B ↓ → antibodi ↓.\nOpsi B — AChE inhibitor adalah neostigmin, piridostigmin.\nOpsi C — Kortikosteroid adalah prednison.\nOpsi D — Rituximab menargetkan sel B, bukan sel T.\nOpsi E — Plasmaferesis adalah prosedur, bukan rituximab."
+  },
+  {
+    question: "Seorang pasien di operasi diberikan rokuronium untuk intubasi. Setelah operasi, dokter memberikan sugammadeks untuk membalikkan blokade. Pasien memiliki riwayat alergi terhadap sugammadeks.\nManakah yang paling tepat untuk dilakukan jika pasien alergi terhadap sugammadeks?",
+    options: ["Memberikan neostigmin dan atropin untuk membalikkan blokade rokuronium", "Memberikan dantrolen untuk membalikkan blokade", "Memberikan suksinilkolin untuk membalikkan blokade", "Memberikan atropin saja", "Menunggu sampai blokade menghilang secara spontan"],
+    answer: 0,
+    explanation: "Sugammadeks adalah cyclodextrin yang mengikat rokuronium (dan vekuronium) secara spesifik. Jika pasien alergi terhadap sugammadeks, neostigmin (AChE inhibitor) dan atropin dapat digunakan untuk membalikkan blokade rokuronium. Neostigmin meningkatkan asetilkolin, yang bersaing dengan rokuronium pada reseptor nikotinik. Neostigmin diberikan dengan atropin untuk mencegah efek muskarinik. Neostigmin memiliki onset lebih lambat daripada sugammadeks (10–15 menit vs 1–3 menit).\nOpsi A — Benar: neostigmin + atropin.\nOpsi B — Dantrolen untuk hipertermia maligna.\nOpsi C — Suksinilkolin adalah depolarizing NMB, tidak membalikkan blokade.\nOpsi D — Atropin tidak membalikkan blokade NMB.\nOpsi E — Menunggu spontan tidak ideal; neostigmin dapat digunakan."
+  },
+]
   "Bank 3": [],
   "Bank 4": [],
   "Bank 5": []
