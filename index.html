@@ -2207,6 +2207,7 @@ background:
 
 
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://niatujddqynppnazovra.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_kZXvoJsMa9JLi6D2D3fCag_K_KR7xva";
@@ -2234,7 +2235,7 @@ function showResetPasswordScreen() {
   window.scrollTo(0, 0);
 }
 
-supabaseClient.auth.onAuthStateChange((event) => {
+window.supabaseClient.auth.onAuthStateChange((event) => {
   if (event === "PASSWORD_RECOVERY") {
     setTimeout(showResetPasswordScreen, 0);
   }
@@ -2263,7 +2264,7 @@ async function updateMedicPassword() {
 
   if (message) message.innerText = "Menyimpan password baru...";
 
-  const { error } = await supabaseClient.auth.updateUser({ password });
+  const { error } = await window.supabaseClient.auth.updateUser({ password });
 
   if (error) {
     console.error("Update password error:", error);
@@ -2279,7 +2280,7 @@ async function updateMedicPassword() {
   }
 
   setTimeout(async () => {
-    await supabaseClient.auth.signOut();
+    await window.supabaseClient.auth.signOut();
 
     document
       .getElementById("reset-password-screen")
@@ -25127,7 +25128,7 @@ function resetSubjectAttemptsForTesting(subject) {
 
 async function claimFreeAccess() {
   const { data: { user }, error: userError } =
-    await supabaseClient.auth.getUser();
+    await window.supabaseClient.auth.getUser();
 
   if (userError || !user) {
     alert("Akun belum terbaca. Coba login ulang.");
@@ -25135,7 +25136,7 @@ async function claimFreeAccess() {
   }
 
   const { data, error } =
-    await supabaseClient.rpc("claim_free_access");
+    await window.supabaseClient.rpc("claim_free_access");
 
   if (error) {
     console.error(error);
@@ -25156,7 +25157,7 @@ async function claimFreeAccess() {
  
 async function openLifetimePayment() {
   const { data: { user }, error } =
-    await supabaseClient.auth.getUser();
+    await window.supabaseClient.auth.getUser();
 
   if (error || !user) {
     alert("Login dulu ya.");
