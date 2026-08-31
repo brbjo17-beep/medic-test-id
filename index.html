@@ -2208,20 +2208,37 @@ background:
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-const SUPABASE_URL = "https://niatujddqynppnazovra.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_kZXvoJsMa9JLi6D2D3fCag_K_KR7xva";
+/* =========================================================
+   MEDIC TEST ID — SUPABASE + LOGIN / SIGNUP
+   ========================================================= */
 
-window.supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);
+const SUPABASE_URL =
+  "https://niatujddqynppnazovra.supabase.co";
 
-/* ===== PASSWORD RECOVERY ===== */
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_kZXvoJsMa9JLi6D2D3fCag_K_KR7xva";
+
+/* Buat client HANYA SEKALI */
+window.supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/* =========================================================
+   PASSWORD RECOVERY
+   ========================================================= */
 
 function showResetPasswordScreen() {
-  const resetScreen = document.getElementById("reset-password-screen");
-  const welcome = document.getElementById("welcome-screen");
+
+  const resetScreen =
+    document.getElementById("reset-password-screen");
+
+  const welcome =
+    document.getElementById("welcome-screen");
 
   if (welcome) {
     welcome.style.display = "none";
@@ -2235,81 +2252,176 @@ function showResetPasswordScreen() {
   window.scrollTo(0, 0);
 }
 
-window.supabaseClient.auth.onAuthStateChange((event) => {
-  if (event === "PASSWORD_RECOVERY") {
-    setTimeout(showResetPasswordScreen, 0);
+
+/* Dengarkan link reset password dari email */
+window.supabaseClient.auth.onAuthStateChange(
+  (event) => {
+
+    console.log("AUTH EVENT:", event);
+
+    if (event === "PASSWORD_RECOVERY") {
+
+      setTimeout(() => {
+        showResetPasswordScreen();
+      }, 0);
+
+    }
+
   }
-});
+);
+
+
+/* =========================================================
+   UPDATE PASSWORD
+   ========================================================= */
 
 async function updateMedicPassword() {
-  const password = document.getElementById("new-password")?.value || "";
+
+  const password =
+    document.getElementById("new-password")?.value || "";
+
   const confirmPassword =
-    document.getElementById("confirm-new-password")?.value || "";
-  const message = document.getElementById("reset-password-message");
+    document.getElementById(
+      "confirm-new-password"
+    )?.value || "";
+
+  const message =
+    document.getElementById(
+      "reset-password-message"
+    );
 
   if (!password || !confirmPassword) {
-    if (message) message.innerText = "Isi kedua kolom password dulu.";
+
+    if (message) {
+      message.innerText =
+        "Isi kedua kolom password dulu.";
+    }
+
     return;
   }
 
   if (password.length < 6) {
-    if (message) message.innerText = "Password minimal 6 karakter.";
+
+    if (message) {
+      message.innerText =
+        "Password minimal 6 karakter.";
+    }
+
     return;
   }
 
   if (password !== confirmPassword) {
-    if (message) message.innerText = "Password yang kamu masukkan belum sama.";
-    return;
-  }
 
-  if (message) message.innerText = "Menyimpan password baru...";
-
-  const { error } = await window.supabaseClient.auth.updateUser({ password });
-
-  if (error) {
-    console.error("Update password error:", error);
     if (message) {
-      message.innerText = "Password belum berhasil diperbarui.";
+      message.innerText =
+        "Password yang kamu masukkan belum sama.";
     }
+
     return;
   }
 
   if (message) {
     message.innerText =
-      "Password berhasil diperbarui 🎉 Sekarang kamu bisa login.";
+      "Menyimpan password baru...";
   }
 
-  setTimeout(async () => {
-    await window.supabaseClient.auth.signOut();
+  try {
 
-    document
-      .getElementById("reset-password-screen")
-      ?.classList.add("hidden");
+    const { error } =
+      await window.supabaseClient.auth.updateUser({
+        password: password
+      });
 
-    document
-      .getElementById("welcome-screen")
-      ?.style.setProperty("display", "flex");
+    if (error) {
 
-    window.history.replaceState(
-      {},
-      document.title,
-      window.location.pathname
+      console.error(
+        "UPDATE PASSWORD ERROR:",
+        error
+      );
+
+      if (message) {
+        message.innerText =
+          error.message ||
+          "Password belum berhasil diperbarui.";
+      }
+
+      return;
+    }
+
+    if (message) {
+      message.innerText =
+        "Password berhasil diperbarui 🎉";
+    }
+
+    setTimeout(async () => {
+
+      await window.supabaseClient.auth.signOut();
+
+      document
+        .getElementById("reset-password-screen")
+        ?.classList.add("hidden");
+
+      const welcome =
+        document.getElementById("welcome-screen");
+
+      if (welcome) {
+        welcome.style.display = "flex";
+      }
+
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+      );
+
+      window.scrollTo(0, 0);
+
+    }, 1200);
+
+  } catch (error) {
+
+    console.error(
+      "UPDATE PASSWORD EXCEPTION:",
+      error
     );
 
-    window.scrollTo(0, 0);
-  }, 1200);
+    if (message) {
+      message.innerText =
+        "Gagal memperbarui password: " +
+        error.message;
+    }
+
+  }
+
 }
 
-/* ===== LOGIN / SIGNUP ===== */
+
+/* =========================================================
+   MODE LOGIN
+   ========================================================= */
 
 function showLoginForm() {
-  const nameInput = document.getElementById("signup-name");
-  const emailInput = document.getElementById("signup-email");
-  const passwordInput = document.getElementById("signup-password");
-  const forgotButton = document.getElementById("forgot-password-btn");
-  const mainButton = document.querySelector(".access-main-btn");
-  const loginSwitch = document.querySelector(".access-login-btn");
-  const message = document.getElementById("signup-message");
+
+  const nameInput =
+    document.getElementById("signup-name");
+
+  const emailInput =
+    document.getElementById("signup-email");
+
+  const passwordInput =
+    document.getElementById("signup-password");
+
+  const forgotButton =
+    document.getElementById("forgot-password-btn");
+
+  const mainButton =
+    document.querySelector(".access-main-btn");
+
+  const loginSwitch =
+    document.querySelector(".access-login-btn");
+
+  const message =
+    document.getElementById("signup-message");
 
   if (nameInput) {
     nameInput.style.display = "none";
@@ -2317,18 +2429,33 @@ function showLoginForm() {
   }
 
   if (emailInput) {
-    emailInput.placeholder = "✉️  Email";
-    emailInput.autocomplete = "email";
+
+    emailInput.placeholder =
+      "✉️  Email";
+
+    emailInput.autocomplete =
+      "email";
+
   }
 
   if (passwordInput) {
-    passwordInput.placeholder = "🔒  Password";
-    passwordInput.autocomplete = "current-password";
+
+    passwordInput.placeholder =
+      "🔒  Password";
+
+    passwordInput.autocomplete =
+      "current-password";
+
   }
 
   if (mainButton) {
-    mainButton.innerHTML = "♡ Masuk Akun";
-    mainButton.onclick = loginMedicAccount;
+
+    mainButton.innerHTML =
+      "♡ Masuk Akun";
+
+    mainButton.onclick =
+      loginMedicAccount;
+
   }
 
   if (forgotButton) {
@@ -2342,29 +2469,56 @@ function showLoginForm() {
   if (message) {
     message.innerText = "";
   }
+
 }
 
 
+/* =========================================================
+   MODE BUAT AKUN
+   ========================================================= */
+
 function showSignupForm() {
-  const nameInput = document.getElementById("signup-name");
-  const passwordInput = document.getElementById("signup-password");
-  const forgotButton = document.getElementById("forgot-password-btn");
-  const mainButton = document.querySelector(".access-main-btn");
-  const loginSwitch = document.querySelector(".access-login-btn");
-  const message = document.getElementById("signup-message");
+
+  const nameInput =
+    document.getElementById("signup-name");
+
+  const passwordInput =
+    document.getElementById("signup-password");
+
+  const forgotButton =
+    document.getElementById("forgot-password-btn");
+
+  const mainButton =
+    document.querySelector(".access-main-btn");
+
+  const loginSwitch =
+    document.querySelector(".access-login-btn");
+
+  const message =
+    document.getElementById("signup-message");
 
   if (nameInput) {
     nameInput.style.display = "";
   }
 
   if (passwordInput) {
-    passwordInput.placeholder = "🔒  Buat password";
-    passwordInput.autocomplete = "new-password";
+
+    passwordInput.placeholder =
+      "🔒  Buat password";
+
+    passwordInput.autocomplete =
+      "new-password";
+
   }
 
   if (mainButton) {
-    mainButton.innerHTML = "♡ Buat Akun Yuk!";
-    mainButton.onclick = createMedicAccount;
+
+    mainButton.innerHTML =
+      "♡ Buat Akun Yuk!";
+
+    mainButton.onclick =
+      createMedicAccount;
+
   }
 
   if (forgotButton) {
@@ -2378,54 +2532,212 @@ function showSignupForm() {
   if (message) {
     message.innerText = "";
   }
+
 }
 
 
-/* ===== LOGIN AKUN ===== */
+/* =========================================================
+   BUAT AKUN
+   ========================================================= */
 
-async function loginMedicAccount() {
+async function createMedicAccount() {
+
+  const name =
+    document.getElementById(
+      "signup-name"
+    )?.value.trim();
 
   const email =
-    document.getElementById("signup-email")?.value.trim();
+    document.getElementById(
+      "signup-email"
+    )?.value.trim();
 
   const password =
-    document.getElementById("signup-password")?.value;
+    document.getElementById(
+      "signup-password"
+    )?.value;
 
   const message =
-    document.getElementById("signup-message");
+    document.getElementById(
+      "signup-message"
+    );
 
-  if (!email || !password) {
+  if (!name || !email || !password) {
+
     if (message) {
       message.innerText =
-        "Isi email dan password dulu.";
+        "Isi nama, email, dan password dulu.";
     }
+
+    return;
+  }
+
+  if (password.length < 6) {
+
+    if (message) {
+      message.innerText =
+        "Password minimal 6 karakter.";
+    }
+
     return;
   }
 
   if (message) {
-    message.innerText = "Sedang masuk...";
+    message.innerText =
+      "Membuat akun...";
   }
 
   try {
 
     const { data, error } =
-      await window.supabaseClient.auth.signInWithPassword({
+      await window.supabaseClient.auth.signUp({
         email: email,
-        password: password
+        password: password,
+
+        options: {
+          data: {
+            name: name
+          }
+        }
+
       });
 
     if (error) {
-      console.error("LOGIN ERROR:", error);
+
+      console.error(
+        "SIGNUP ERROR:",
+        error
+      );
 
       if (message) {
         message.innerText =
-          error.message || "Login gagal.";
+          error.message ||
+          "Akun gagal dibuat.";
       }
 
       return;
     }
 
-    console.log("LOGIN BERHASIL:", data.user);
+
+    /*
+      Kalau Supabase membutuhkan
+      konfirmasi email, identitas user
+      tetap dibuat tetapi session bisa null.
+    */
+
+    if (data?.session) {
+
+      if (message) {
+        message.innerText =
+          "Akun berhasil dibuat 🎉";
+      }
+
+      const accessOptions =
+        document.getElementById(
+          "access-options"
+        );
+
+      if (accessOptions) {
+        accessOptions.classList.remove("hidden");
+      }
+
+    } else {
+
+      if (message) {
+        message.innerText =
+          "Akun berhasil dibuat 🎉 Cek emailmu untuk konfirmasi.";
+      }
+
+    }
+
+    console.log(
+      "ACCOUNT CREATED:",
+      data?.user
+    );
+
+  } catch (error) {
+
+    console.error(
+      "SIGNUP EXCEPTION:",
+      error
+    );
+
+    if (message) {
+      message.innerText =
+        "Gagal membuat akun: " +
+        error.message;
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+async function loginMedicAccount() {
+
+  const email =
+    document.getElementById(
+      "signup-email"
+    )?.value.trim();
+
+  const password =
+    document.getElementById(
+      "signup-password"
+    )?.value;
+
+  const message =
+    document.getElementById(
+      "signup-message"
+    );
+
+  if (!email || !password) {
+
+    if (message) {
+      message.innerText =
+        "Isi email dan password dulu.";
+    }
+
+    return;
+  }
+
+  if (message) {
+    message.innerText =
+      "Sedang masuk...";
+  }
+
+  try {
+
+    const { data, error } =
+      await window.supabaseClient.auth
+        .signInWithPassword({
+          email: email,
+          password: password
+        });
+
+    if (error) {
+
+      console.error(
+        "LOGIN ERROR:",
+        error
+      );
+
+      if (message) {
+        message.innerText =
+          error.message ||
+          "Login gagal.";
+      }
+
+      return;
+    }
+
+    console.log(
+      "LOGIN BERHASIL:",
+      data?.user
+    );
 
     if (message) {
       message.innerText =
@@ -2433,7 +2745,9 @@ async function loginMedicAccount() {
     }
 
     const accessOptions =
-      document.getElementById("access-options");
+      document.getElementById(
+        "access-options"
+      );
 
     if (accessOptions) {
       accessOptions.classList.remove("hidden");
@@ -2441,31 +2755,45 @@ async function loginMedicAccount() {
 
   } catch (error) {
 
-    console.error("LOGIN EXCEPTION:", error);
+    console.error(
+      "LOGIN EXCEPTION:",
+      error
+    );
 
     if (message) {
       message.innerText =
-        "Login gagal: " + error.message;
+        "Login gagal: " +
+        error.message;
     }
+
   }
+
 }
 
 
-/* ===== LUPA PASSWORD ===== */
+/* =========================================================
+   LUPA PASSWORD
+   ========================================================= */
 
 async function forgotMedicPassword() {
 
   const email =
-    document.getElementById("signup-email")?.value.trim();
+    document.getElementById(
+      "signup-email"
+    )?.value.trim();
 
   const message =
-    document.getElementById("signup-message");
+    document.getElementById(
+      "signup-message"
+    );
 
   if (!email) {
+
     if (message) {
       message.innerText =
         "Masukkan email akunmu dulu.";
     }
+
     return;
   }
 
@@ -2477,15 +2805,17 @@ async function forgotMedicPassword() {
   try {
 
     const { error } =
-      await window.supabaseClient.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo:
-            "https://brbjo17-beep.github.io/medic-test-id/"
-        }
-      );
+      await window.supabaseClient.auth
+        .resetPasswordForEmail(
+          email,
+          {
+            redirectTo:
+              "https://brbjo17-beep.github.io/medic-test-id/"
+          }
+        );
 
     if (error) {
+
       console.error(
         "RESET PASSWORD ERROR:",
         error
@@ -2499,13 +2829,18 @@ async function forgotMedicPassword() {
             ?.toLowerCase()
             .includes("rate limit")
         ) {
+
           message.innerText =
             "Terlalu banyak permintaan reset. Tunggu sebentar lalu coba lagi.";
+
         } else {
+
           message.innerText =
             error.message ||
             "Gagal mengirim link reset password.";
+
         }
+
       }
 
       return;
@@ -2528,36 +2863,75 @@ async function forgotMedicPassword() {
         "Gagal mengirim link reset password: " +
         error.message;
     }
+
   }
+
 }
 
 
-/* ===== ACCESS / SUPPORT ===== */
+/* =========================================================
+   KEMBALI DARI ACCESS
+   ========================================================= */
 
 function backFromAccess() {
-  document.getElementById("access-screen")?.classList.add("hidden");
-  document.getElementById("banks")?.classList.remove("hidden");
+
+  document
+    .getElementById("access-screen")
+    ?.classList.add("hidden");
+
+  document
+    .getElementById("banks")
+    ?.classList.remove("hidden");
+
   window.scrollTo(0, 0);
+
 }
+
+
+/* =========================================================
+   SUPPORT
+   ========================================================= */
 
 function openSupportPage() {
-  hideAll();
 
-  const supportScreen = document.getElementById("support-screen");
+  if (typeof hideAll === "function") {
+    hideAll();
+  }
+
+  const supportScreen =
+    document.getElementById(
+      "support-screen"
+    );
 
   if (supportScreen) {
-    supportScreen.classList.remove("hidden");
+
+    supportScreen.classList.remove(
+      "hidden"
+    );
+
     window.scrollTo(0, 0);
+
   }
+
 }
 
+
 function backFromSupport() {
-  hideAll();
-  document.getElementById("banks")?.classList.remove("hidden");
+
+  if (typeof hideAll === "function") {
+    hideAll();
+  }
+
+  document
+    .getElementById("banks")
+    ?.classList.remove("hidden");
+
   window.scrollTo(0, 0);
+
 }
 
 </script>
+
 
 </head>
 
