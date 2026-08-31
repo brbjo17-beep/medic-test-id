@@ -2100,42 +2100,114 @@ background:
   font-weight: 700;
 }
 
-<style>
 
-  /* CSS web-mu yang sudah ada */
-  body {
-    ...
-  }
 
-  /* CSS RESET PASSWORD — TAMBAHKAN DI SINI */
 
-  #reset-password-screen {
-    min-height: 100vh;
-    width: 100%;
-    padding: 40px 20px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* ===== PEMBAHASAN RICH TEXT & TABEL ===== */
 
-    background:
-      radial-gradient(circle at 15% 15%, #dff4ff 0, transparent 32%),
-      radial-gradient(circle at 85% 20%, #eee5ff 0, transparent 34%),
-      linear-gradient(135deg, #f8fcff, #fbf8ff);
-  }
+.explanation-status {
+  font-weight: 800;
+  margin-bottom: 12px;
+}
 
-  #reset-password-screen.hidden {
-    display: none !important;
-  }
+.explanation-answer {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f1f5f9;
+}
 
-/* BARU SETELAH ITU */
+.explanation-body,
+.review-explanation {
+  margin-top: 14px;
+  line-height: 1.75;
+}
+
+.explanation-body > strong,
+.review-explanation > strong {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.explanation-body p,
+.review-explanation p {
+  margin: 0 0 10px;
+}
+
+.explanation-body h4,
+.review-explanation h4 {
+  margin: 18px 0 10px;
+  font-size: 16px;
+}
+
+.explanation-body ul,
+.explanation-body ol,
+.review-explanation ul,
+.review-explanation ol {
+  margin: 8px 0 14px 22px;
+  padding: 0;
+}
+
+.explanation-body li,
+.review-explanation li {
+  margin: 4px 0;
+}
+
+.explanation-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 14px 0 20px;
+  border-radius: 12px;
+}
+
+.explanation-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  background: #ffffff;
+  font-size: 14px;
+}
+
+.explanation-table th,
+.explanation-table td {
+  border: 1px solid #d9e0e8;
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.explanation-table th {
+  font-weight: 700;
+  background: #f1f5f9;
+}
+
+.explanation-table tr:nth-child(even) td {
+  background: #fafafa;
+}
+
+.finish-attempt-btn {
+  border: 1px solid #d7dbe3;
+  background: #ffffff;
+  color: #475569;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.finish-attempt-btn:hover {
+  background: #f8fafc;
+}
+
 </style>
-
 </head>
  
-</style>
+
+
   
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
 <script>
 const SUPABASE_URL = "https://niatujddqynppnazovra.supabase.co";
@@ -2146,90 +2218,70 @@ const supabaseClient = supabase.createClient(
   SUPABASE_PUBLISHABLE_KEY
 );
 
-/* ===== PASSWORD RECOVERY LISTENER ===== */
+/* ===== PASSWORD RECOVERY ===== */
 
-supabaseClient.auth.onAuthStateChange((event, session) => {
+function showResetPasswordScreen() {
+  const resetScreen = document.getElementById("reset-password-screen");
+  const welcome = document.getElementById("welcome-screen");
 
-  if (event === "PASSWORD_RECOVERY") {
-
-    hideAll();
-
-    const resetScreen =
-      document.getElementById("reset-password-screen");
-
-    if (resetScreen) {
-      resetScreen.classList.remove("hidden");
-    }
-
-    window.scrollTo(0, 0);
+  if (welcome) {
+    welcome.style.display = "none";
   }
 
+  if (resetScreen) {
+    resetScreen.classList.remove("hidden");
+    resetScreen.style.display = "flex";
+  }
+
+  window.scrollTo(0, 0);
+}
+
+supabaseClient.auth.onAuthStateChange((event) => {
+  if (event === "PASSWORD_RECOVERY") {
+    setTimeout(showResetPasswordScreen, 0);
+  }
 });
 
-/* ===== SIMPAN PASSWORD BARU ===== */
-
 async function updateMedicPassword() {
-
-  const password =
-    document.getElementById("new-password")?.value;
-
+  const password = document.getElementById("new-password")?.value || "";
   const confirmPassword =
-    document.getElementById("confirm-new-password")?.value;
-
-  const message =
-    document.getElementById("reset-password-message");
+    document.getElementById("confirm-new-password")?.value || "";
+  const message = document.getElementById("reset-password-message");
 
   if (!password || !confirmPassword) {
-    if (message) {
-      message.innerText =
-        "Isi kedua kolom password dulu.";
-    }
+    if (message) message.innerText = "Isi kedua kolom password dulu.";
     return;
   }
 
   if (password.length < 6) {
-    if (message) {
-      message.innerText =
-        "Password minimal 6 karakter.";
-    }
+    if (message) message.innerText = "Password minimal 6 karakter.";
     return;
   }
 
   if (password !== confirmPassword) {
-    if (message) {
-      message.innerText =
-        "Password yang kamu masukkan belum sama.";
-    }
+    if (message) message.innerText = "Password yang kamu masukkan belum sama.";
     return;
   }
 
-  if (message) {
-    message.innerText =
-      "Menyimpan password baru...";
-  }
+  if (message) message.innerText = "Menyimpan password baru...";
 
-  const { data, error } =
-    await supabaseClient.auth.updateUser({
-      password: password
-    });
+  const { error } = await supabaseClient.auth.updateUser({ password });
 
   if (error) {
-    console.error(error);
-
+    console.error("Update password error:", error);
     if (message) {
-      message.innerText =
-        "Password belum berhasil diperbarui.";
+      message.innerText = "Password belum berhasil diperbarui.";
     }
-
     return;
   }
 
   if (message) {
     message.innerText =
-      "Password berhasil diperbarui 🎉";
+      "Password berhasil diperbarui 🎉 Sekarang kamu bisa login.";
   }
 
-  setTimeout(() => {
+  setTimeout(async () => {
+    await supabaseClient.auth.signOut();
 
     document
       .getElementById("reset-password-screen")
@@ -2237,7 +2289,7 @@ async function updateMedicPassword() {
 
     document
       .getElementById("welcome-screen")
-      ?.classList.remove("hidden");
+      ?.style.setProperty("display", "flex");
 
     window.history.replaceState(
       {},
@@ -2246,11 +2298,10 @@ async function updateMedicPassword() {
     );
 
     window.scrollTo(0, 0);
-
   }, 1200);
-} 
- 
-/* ===== AKUN MEDIC TEST ID ===== */
+}
+
+/* ===== LOGIN / SIGNUP ===== */
 
 function showLoginForm() {
   const nameInput = document.getElementById("signup-name");
@@ -2263,10 +2314,12 @@ function showLoginForm() {
 
   if (nameInput) {
     nameInput.style.display = "none";
+    nameInput.value = "";
   }
 
   if (emailInput) {
     emailInput.placeholder = "✉️  Email";
+    emailInput.autocomplete = "email";
   }
 
   if (passwordInput) {
@@ -2276,10 +2329,7 @@ function showLoginForm() {
 
   if (mainButton) {
     mainButton.innerHTML = "♡ Masuk Akun";
-    mainButton.setAttribute(
-      "onclick",
-      "loginMedicAccount()"
-    );
+    mainButton.onclick = loginMedicAccount;
   }
 
   if (forgotButton) {
@@ -2295,165 +2345,151 @@ function showLoginForm() {
   }
 }
 
+function showSignupForm() {
+  const nameInput = document.getElementById("signup-name");
+  const passwordInput = document.getElementById("signup-password");
+  const forgotButton = document.getElementById("forgot-password-btn");
+  const mainButton = document.querySelector(".access-main-btn");
+  const loginSwitch = document.querySelector(".access-login-btn");
+  const message = document.getElementById("signup-message");
+
+  if (nameInput) {
+    nameInput.style.display = "";
+  }
+
+  if (passwordInput) {
+    passwordInput.placeholder = "🔒  Buat password";
+    passwordInput.autocomplete = "new-password";
+  }
+
+  if (mainButton) {
+    mainButton.innerHTML = "♡ Buat Akun Yuk!";
+    mainButton.onclick = createMedicAccount;
+  }
+
+  if (forgotButton) {
+    forgotButton.classList.add("hidden");
+  }
+
+  if (loginSwitch) {
+    loginSwitch.style.display = "";
+  }
+
+  if (message) {
+    message.innerText = "";
+  }
+}
 
 async function loginMedicAccount() {
-  const email =
-    document.getElementById("signup-email")?.value.trim();
-
-  const password =
-    document.getElementById("signup-password")?.value;
-
-  const message =
-    document.getElementById("signup-message");
+  const email = document.getElementById("signup-email")?.value.trim();
+  const password = document.getElementById("signup-password")?.value || "";
+  const message = document.getElementById("signup-message");
 
   if (!email || !password) {
-    if (message) {
-      message.innerText = "Isi email dan password dulu.";
-    }
+    if (message) message.innerText = "Isi email dan password dulu.";
     return;
   }
 
-  if (message) {
-    message.innerText = "Sedang masuk...";
-  }
+  if (message) message.innerText = "Sedang masuk...";
 
-  const { data, error } =
-    await supabaseClient.auth.signInWithPassword({
-      email: email,
-      password: password
-    });
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
 
   if (error) {
-    console.error(error);
-
-    if (message) {
-      message.innerText = "Email atau password salah.";
-    }
-
+    console.error("Login error:", error);
+    if (message) message.innerText = "Email atau password salah.";
     return;
   }
 
-  if (message) {
-    message.innerText = "Berhasil masuk 🎉";
-  }
+  if (message) message.innerText = "Berhasil masuk 🎉";
 
-  const accessOptions =
-    document.getElementById("access-options");
-
-  if (accessOptions) {
-    accessOptions.classList.remove("hidden");
-  }
+  const accessOptions = document.getElementById("access-options");
+  if (accessOptions) accessOptions.classList.remove("hidden");
 
   console.log("Login:", data.user);
 }
 
-
 async function createMedicAccount() {
-  const name =
-    document.getElementById("signup-name")?.value.trim();
-
-  const email =
-    document.getElementById("signup-email")?.value.trim();
-
-  const password =
-    document.getElementById("signup-password")?.value;
-
-  const message =
-    document.getElementById("signup-message");
+  const name = document.getElementById("signup-name")?.value.trim();
+  const email = document.getElementById("signup-email")?.value.trim();
+  const password = document.getElementById("signup-password")?.value || "";
+  const message = document.getElementById("signup-message");
 
   if (!name || !email || !password) {
-    if (message) {
-      message.innerText =
-        "Isi nama, email, dan password dulu.";
-    }
+    if (message) message.innerText = "Isi nama, email, dan password dulu.";
     return;
   }
 
   if (password.length < 6) {
-    if (message) {
-      message.innerText =
-        "Password minimal 6 karakter.";
-    }
+    if (message) message.innerText = "Password minimal 6 karakter.";
     return;
   }
 
-  if (message) {
-    message.innerText = "Membuat akun...";
-  }
+  if (message) message.innerText = "Membuat akun...";
 
-  const { data, error } =
-    await supabaseClient.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          name: name
-        }
-      }
-    });
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { name }
+    }
+  });
 
   if (error) {
-    console.error(error);
-
-    if (message) {
-      message.innerText = error.message;
-    }
-
+    console.error("Signup error:", error);
+    if (message) message.innerText = error.message;
     return;
   }
 
-  if (message) {
-    message.innerText = "Akun berhasil dibuat 🎉";
+  if (data.session) {
+    if (message) message.innerText = "Akun berhasil dibuat 🎉";
+  } else {
+    if (message) {
+      message.innerText =
+        "Akun berhasil dibuat 🎉 Silakan cek email bila verifikasi diperlukan.";
+    }
   }
 
-  const accessOptions =
-    document.getElementById("access-options");
-
-  if (accessOptions) {
-    accessOptions.classList.remove("hidden");
-  }
+  const accessOptions = document.getElementById("access-options");
+  if (accessOptions) accessOptions.classList.remove("hidden");
 
   console.log("Account:", data.user);
 }
 
-
 /* ===== LUPA PASSWORD ===== */
 
 async function forgotMedicPassword() {
-  const email =
-    document.getElementById("signup-email")?.value.trim();
-
-  const message =
-    document.getElementById("signup-message");
+  const email = document.getElementById("signup-email")?.value.trim();
+  const message = document.getElementById("signup-message");
 
   if (!email) {
-    if (message) {
-      message.innerText = "Masukkan email akunmu dulu.";
-    }
+    if (message) message.innerText = "Masukkan email akunmu dulu.";
     return;
   }
 
-  if (message) {
-    message.innerText = "Mengirim link reset password...";
-  }
+  if (message) message.innerText = "Mengirim link reset password...";
 
-  const { error } =
-    await supabaseClient.auth.resetPasswordForEmail(
-      email,
-      {
-        redirectTo:
-          window.location.origin + window.location.pathname
-      }
-    );
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: "https://brbjo17-beep.github.io/medic-test-id/"
+  });
 
   if (error) {
-    console.error(error);
+    console.error("Reset password error:", error);
 
     if (message) {
-      message.innerText =
-        "Gagal mengirim link reset password.";
+      if (
+        error.status === 429 ||
+        error.message?.toLowerCase().includes("rate limit")
+      ) {
+        message.innerText =
+          "Terlalu banyak permintaan reset. Tunggu sebentar lalu coba lagi.";
+      } else {
+        message.innerText =
+          "Gagal mengirim link reset password. Coba lagi nanti.";
+      }
     }
-
     return;
   }
 
@@ -2463,84 +2499,18 @@ async function forgotMedicPassword() {
   }
 }
 
-
-/* ===== TOMBOL KEMBALI ACCESS ===== */
+/* ===== ACCESS / SUPPORT ===== */
 
 function backFromAccess() {
-  document
-    .getElementById("access-screen")
-    ?.classList.add("hidden");
-
-  document
-    .getElementById("banks")
-    ?.classList.remove("hidden");
-
+  document.getElementById("access-screen")?.classList.add("hidden");
+  document.getElementById("banks")?.classList.remove("hidden");
   window.scrollTo(0, 0);
 }
-
-
-/* ===== LUPA PASSWORD ===== */
-
-async function forgotMedicPassword() {
-  const email =
-    document.getElementById("signup-email")?.value.trim();
-
-  const message =
-    document.getElementById("signup-message");
-
-  if (!email) {
-    if (message) {
-      message.innerText = "Masukkan email akunmu dulu.";
-    }
-    return;
-  }
-
-  if (message) {
-    message.innerText = "Mengirim link reset password...";
-  }
-
-const { error } =
-  await supabaseClient.auth.resetPasswordForEmail(
-    email,
-    {
-      redirectTo:
-        "https://brbjo17-beep.github.io/medic-test-id/"
-    }
-  );
-
-if (error) {
-  console.error("Reset password error:", error);
-
-  if (message) {
-    if (
-      error.status === 429 ||
-      error.message?.toLowerCase().includes("rate limit")
-    ) {
-      message.innerText =
-        "Terlalu banyak permintaan reset. Tunggu sebentar lalu coba lagi.";
-    } else {
-      message.innerText =
-        "Gagal mengirim link reset password. Coba lagi nanti.";
-    }
-  }
-
-  return;
-}
-
-  if (message) {
-    message.innerText =
-      "Link reset password sudah dikirim ke emailmu ✉️";
-  }
-}
-
-
-/* ===== SUPPORT PAGE ===== */
 
 function openSupportPage() {
   hideAll();
 
-  const supportScreen =
-    document.getElementById("support-screen");
+  const supportScreen = document.getElementById("support-screen");
 
   if (supportScreen) {
     supportScreen.classList.remove("hidden");
@@ -2550,11 +2520,7 @@ function openSupportPage() {
 
 function backFromSupport() {
   hideAll();
-
-  document
-    .getElementById("banks")
-    ?.classList.remove("hidden");
-
+  document.getElementById("banks")?.classList.remove("hidden");
   window.scrollTo(0, 0);
 }
 
@@ -3063,6 +3029,7 @@ function backFromSupport() {
 </div>
 
 <script>
+
 
 function backFromAccess() {
   document
@@ -23930,7 +23897,7 @@ function backBanks(){
 }
   
 function getProgressKey() {
-  return "medicTestProgress_" + currentSubject + "_" + currentBank;
+  return "medicTestProgress_v2_" + currentSubject + "_" + currentBank;
 }
 
 function getScoreHistoryKey() {
@@ -24042,107 +24009,63 @@ function updateAnswerProgress() {
   return copy;
 }
 
-function prepareRandomQuestions(originalQuestions) {
-  const prepared = originalQuestions.map(function(q) {
+function normalizeAnswerIndex(question) {
+  if (!question || !Array.isArray(question.options)) return -1;
 
-    const optionObjects = q.options.map(function(option, index) {
-      return {
-        text: option,
-        correct: index === q.answer
-      };
-    });
+  const raw = question.answer;
 
-    const shuffledOptions = shuffleArray(optionObjects);
+  if (typeof raw === "number" && Number.isInteger(raw)) {
+    return raw >= 0 && raw < question.options.length ? raw : -1;
+  }
 
-    const newAnswer = shuffledOptions.findIndex(function(option) {
-      return option.correct;
-    });
+  if (typeof raw !== "string") return -1;
 
-    return {
-      ...q,
-      options: shuffledOptions.map(function(option) {
-        return option.text;
-      }),
-      answer: newAnswer
-    };
+  const clean = raw
+    .trim()
+    .replace(/^[A-E]\.\s*/i, "")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+
+  return question.options.findIndex(function(option) {
+    return String(option)
+      .trim()
+      .replace(/^[A-E]\.\s*/i, "")
+      .replace(/\s+/g, " ")
+      .toLowerCase() === clean;
   });
-
-  return shuffleArray(prepared);
 }
 
-function openPreviousResults() {
-  const history = getScoreHistory();
+function prepareRandomQuestions(originalQuestions) {
+  return shuffleArray(
+    originalQuestions.map(function(q) {
+      const correctIndex = normalizeAnswerIndex(q);
 
-  if (!history || history.length === 0) {
-    alert("Belum ada hasil sebelumnya untuk bank ini.");
-    return;
-  }
+      if (correctIndex === -1) {
+        console.error("Kunci jawaban tidak ditemukan:", q);
+      }
 
-  // Simpan posisi quiz agar saat kembali tidak kehilangan progress
-  saveQuizProgress();
-
-  hideAll();
-
-  const resultSection = document.getElementById("result");
-  if (resultSection) {
-    resultSection.classList.remove("hidden");
-  }
-
-  const review = document.getElementById("review");
-
-  if (review) {
-    review.style.display = "none";
-    review.innerHTML = "";
-  }
-
-  const scoreBox = document.getElementById("score");
-  const historyBox = document.getElementById("score-history");
-
-  if (scoreBox) {
-    const latest = history[history.length - 1];
-
-    scoreBox.innerHTML = `
-      <div class="score-main">
-        ${latest.score}%
-      </div>
-
-      <div class="score-label">
-        Hasil terakhir
-      </div>
-    `;
-  }
-
-  if (historyBox) {
-    historyBox.innerHTML = "";
-
-    history
-      .slice()
-      .reverse()
-      .forEach(function(item, index) {
-        const attemptNumber = history.length - index;
-
-        const date = new Date(item.date);
-
-        const button = document.createElement("button");
-        button.className = "score-history-item";
-
-        button.innerHTML = `
-          Percobaan ${attemptNumber}
-          — <strong>${item.score}%</strong>
-          — ${date.toLocaleDateString("id-ID")}
-        `;
-
-        button.onclick = function() {
-          showSavedAttempt(item);
+      const optionObjects = q.options.map(function(option, index) {
+        return {
+          text: option,
+          correct: index === correctIndex
         };
-
-        historyBox.appendChild(button);
       });
-  }
 
-  drawScoreChart(history);
-}  
-  
+      const shuffledOptions = shuffleArray(optionObjects);
+
+      return {
+        ...q,
+        options: shuffledOptions.map(function(option) {
+          return option.text;
+        }),
+        answer: shuffledOptions.findIndex(function(option) {
+          return option.correct;
+        })
+      };
+    })
+  );
+}
+
 function startQuiz(bankName){
 
 currentBank = bankName;
@@ -24243,206 +24166,406 @@ function updateQuizQuote() {
   quoteBox.innerText = quizQuotes[randomIndex];
 }
   
-  function showQuestion(){
-    
-updateQuizQuote();
-selected = null;
-
-const oldExplanation = document.getElementById("instant-explanation");
-
-if (oldExplanation) {
-  oldExplanation.remove();
+  function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
-let q = questions[currentQuestion];
+function formatDisplayText(value) {
+  if (value === null || value === undefined) return "";
 
-document.getElementById("progress").innerText =
-"Soal " + (currentQuestion + 1) + " dari " + questions.length;
+  let text = String(value)
+    .replace(/\u00ad/g, "")
+    .replace(/\u200b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
-document.getElementById("question").innerText = q.question;
+  /*
+   * Perbaikan kata yang sering nyambung dari hasil copy/export.
+   * Dibuat konservatif supaya istilah medis yang sah tidak ikut rusak.
+   */
+  const gluedPatterns = [
+    [/\bdan(?=akhirnya|kemudian|sehingga|merupakan|adalah|dapat|tidak|akan|memiliki|mengandung|menjadi|berfungsi|terjadi|terdapat)\b/gi, "dan "],
+    [/\byang(?=akhirnya|kemudian|merupakan|adalah|dapat|tidak|akan|memiliki|mengandung|menjadi|berfungsi|terjadi|terdapat)\b/gi, "yang "],
+    [/\bdengan(?=akhirnya|kemudian|merupakan|adalah|dapat|tidak|akan|memiliki|mengandung|menjadi|berfungsi|terjadi|terdapat)\b/gi, "dengan "],
+    [/\bkarena(?=itu|adanya|adalah|dapat|menyebabkan|terjadi)\b/gi, "karena "],
+    [/\bsehingga(?=terjadi|menyebabkan|dapat|akan)\b/gi, "sehingga "],
+    [/\bdalam(?=keadaan|kondisi|proses|tubuh|darah|jaringan|sistem)\b/gi, "dalam "],
+    [/\bdi(?=dalam|antara|bawah|atas|sekitar|dekat|sepanjang)\b/gi, "di "],
+    [/\bke(?=dalam|luar|atas|bawah|seluruh|paru|jantung|otak)\b/gi, "ke "]
+  ];
 
-let optionHTML = "";
+  gluedPatterns.forEach(function([pattern, replacement]) {
+    text = text.replace(pattern, replacement);
+  });
 
-q.options.forEach((option,index)=>{
+  return escapeHtml(text);
+}
 
-optionHTML +=
-`<button class="option"
-onclick="selectOption(${index},this)">
-${String.fromCharCode(65+index)}. ${option}
-</button>`;
+function formatExplanation(value) {
+  if (value === null || value === undefined || String(value).trim() === "") {
+    return "<em>Pembahasan belum tersedia.</em>";
+  }
 
-});
+  let raw = String(value)
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/\u00ad/g, "")
+    .replace(/\u200b/g, "");
 
-document.getElementById("options").innerHTML = optionHTML;
+  /*
+   * Markdown table support:
+   * | Kolom | Kolom |
+   * | --- | --- |
+   * | isi | isi |
+   */
+  const lines = raw.split("\n");
+  const output = [];
+  let i = 0;
 
+  while (i < lines.length) {
+    const line = lines[i].trim();
+
+    const isTableHeader =
+      line.includes("|") &&
+      i + 1 < lines.length &&
+      /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(lines[i + 1]);
+
+    if (isTableHeader) {
+      const headerCells = line
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map(cell => cell.trim());
+
+      i += 2;
+
+      const rows = [];
+      while (i < lines.length && lines[i].includes("|")) {
+        rows.push(
+          lines[i]
+            .trim()
+            .replace(/^\|/, "")
+            .replace(/\|$/, "")
+            .split("|")
+            .map(cell => cell.trim())
+        );
+        i++;
+      }
+
+      let tableHTML = '<div class="explanation-table-wrap"><table class="explanation-table"><thead><tr>';
+      headerCells.forEach(cell => {
+        tableHTML += `<th>${formatDisplayText(cell)}</th>`;
+      });
+      tableHTML += "</tr></thead><tbody>";
+
+      rows.forEach(row => {
+        tableHTML += "<tr>";
+        headerCells.forEach((_, idx) => {
+          tableHTML += `<td>${formatDisplayText(row[idx] ?? "")}</td>`;
+        });
+        tableHTML += "</tr>";
+      });
+
+      tableHTML += "</tbody></table></div>";
+      output.push(tableHTML);
+      continue;
+    }
+
+    if (/^#{1,6}\s+/.test(line)) {
+      const heading = line.replace(/^#{1,6}\s+/, "");
+      output.push(`<h4>${formatDisplayText(heading)}</h4>`);
+      i++;
+      continue;
+    }
+
+    if (/^[-•]\s+/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^[-•]\s+/.test(lines[i].trim())) {
+        items.push(lines[i].trim().replace(/^[-•]\s+/, ""));
+        i++;
+      }
+
+      output.push(
+        "<ul>" +
+        items.map(item => `<li>${formatDisplayText(item)}</li>`).join("") +
+        "</ul>"
+      );
+      continue;
+    }
+
+    if (/^\d+[.)]\s+/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^\d+[.)]\s+/.test(lines[i].trim())) {
+        items.push(lines[i].trim().replace(/^\d+[.)]\s+/, ""));
+        i++;
+      }
+
+      output.push(
+        "<ol>" +
+        items.map(item => `<li>${formatDisplayText(item)}</li>`).join("") +
+        "</ol>"
+      );
+      continue;
+    }
+
+    if (line) {
+      output.push(`<p>${formatDisplayText(line)}</p>`);
+    }
+
+    i++;
+  }
+
+  if (output.length === 0) {
+    return `<p>${formatDisplayText(raw)}</p>`;
+  }
+
+  return output.join("");
+}
+
+function answerLabel(index) {
+  return index >= 0 ? String.fromCharCode(65 + index) : "—";
+}
+
+function getQuestionAnswerText(question, index) {
+  if (!question || !Array.isArray(question.options)) return "";
+  if (index < 0 || index >= question.options.length) return "";
+  return formatDisplayText(question.options[index]);
+}
+
+function showQuestion() {
+  updateQuizQuote();
+  selected = null;
+
+  document
+    .getElementById("instant-explanation")
+    ?.remove();
+
+  const q = questions[currentQuestion];
+
+  if (!q) {
+    console.error("Soal tidak ditemukan:", currentQuestion);
+    return;
+  }
+
+  const progress = document.getElementById("progress");
+  const questionBox = document.getElementById("question");
+  const optionsBox = document.getElementById("options");
+
+  if (progress) {
+    progress.innerText =
+      "Soal " + (currentQuestion + 1) + " dari " + questions.length;
+  }
+
+  if (questionBox) {
+    questionBox.innerHTML = formatDisplayText(q.question);
+  }
+
+  if (!optionsBox) return;
+
+  optionsBox.innerHTML = q.options.map(function(option, index) {
+    return `
+      <button
+        type="button"
+        class="option"
+        onclick="selectOption(${index}, this)"
+      >
+        ${String.fromCharCode(65 + index)}. ${formatDisplayText(option)}
+      </button>
+    `;
+  }).join("");
 }
 
 function selectOption(index, element) {
+  if (selected !== null) return;
 
-if (selected !== null) return;
+  const q = questions[currentQuestion];
 
-selected = index;
+  if (!q || index < 0 || index >= q.options.length) return;
 
-answers[currentQuestion] = index;
-saveQuizProgress();
-updateAnswerProgress();
+  selected = index;
+  answers[currentQuestion] = index;
 
-const q = questions[currentQuestion];
-const allOptions = document.querySelectorAll(".option");
+  saveQuizProgress();
+  updateAnswerProgress();
 
-allOptions.forEach((btn, idx) => {
+  const allOptions = document.querySelectorAll(".option");
 
-btn.disabled = true;
+  allOptions.forEach(function(btn, idx) {
+    btn.disabled = true;
 
-if (idx === q.answer) {
-  btn.style.background = "#dcfce7";
-  btn.style.border = "2px solid #16a34a";
-  btn.style.color = "#166534";
+    if (idx === q.answer) {
+      btn.style.background = "#dcfce7";
+      btn.style.border = "2px solid #16a34a";
+      btn.style.color = "#166534";
+    }
+
+    if (idx === index && index !== q.answer) {
+      btn.style.background = "#fee2e2";
+      btn.style.border = "2px solid #dc2626";
+      btn.style.color = "#991b1b";
+    }
+  });
+
+  const explanation = document.createElement("div");
+
+  explanation.id = "instant-explanation";
+  explanation.className = "instant-explanation";
+  explanation.style.marginTop = "20px";
+
+  const correct = index === q.answer;
+
+  explanation.innerHTML = `
+    <div class="explanation-status">
+      ${correct ? "✅ Benar" : "❌ Salah"}
+    </div>
+
+    ${
+      correct
+        ? ""
+        : `
+          <div class="explanation-answer">
+            <strong>Jawaban benar:</strong>
+            ${answerLabel(q.answer)}. ${getQuestionAnswerText(q, q.answer)}
+          </div>
+        `
+    }
+
+    <div class="explanation-body">
+      <strong>Pembahasan</strong>
+      ${formatExplanation(q.explanation)}
+    </div>
+  `;
+
+  const optionsBox = document.getElementById("options");
+
+  if (optionsBox) {
+    optionsBox.appendChild(explanation);
+  }
 }
 
-if (idx === index && index !== q.answer) {
-  btn.style.background = "#fee2e2";
-  btn.style.border = "2px solid #dc2626";
-  btn.style.color = "#991b1b";
+function nextQuestion() {
+  if (selected === null) {
+    alert("Pilih jawaban terlebih dahulu.");
+    return;
+  }
+
+  currentQuestion++;
+  saveQuizProgress();
+  updateAnswerProgress();
+
+  if (currentQuestion < questions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
 }
 
-});
+function scoreAttempt() {
+  let correct = 0;
 
-const explanation = document.createElement("div");
+  for (let i = 0; i < questions.length; i++) {
+    if (answers[i] === questions[i].answer) {
+      correct++;
+    }
+  }
 
-explanation.id = "instant-explanation";
-explanation.style.marginTop = "20px";
-explanation.style.padding = "18px";
-explanation.style.background = "#f8fafc";
-explanation.style.borderRadius = "8px";
-explanation.style.lineHeight = "1.6";
-
-if (index === q.answer) {
-
-explanation.innerHTML =
-"<strong>✅ Benar</strong><br><br>" +
-q.explanation;
-
-} else {
-
-explanation.innerHTML =
-"<strong>❌ Salah</strong><br><br>" +
-"<strong>Jawaban benar: " +
-String.fromCharCode(65 + q.answer) +
-". " +
-q.options[q.answer] +
-"</strong><br><br>" +
-q.explanation;
-
+  return correct;
 }
 
-document.getElementById("options").appendChild(explanation);
+function showResult() {
+  hideAll();
 
-}
+  document.getElementById("result")?.classList.remove("hidden");
 
-function nextQuestion(){
+  const correct = scoreAttempt();
+  const total = questions.length;
 
-if(selected === null){
-alert("Pilih jawaban terlebih dahulu.");
-return;
-}
+  const percentage =
+    total > 0
+      ? Math.round((correct / total) * 100)
+      : 0;
 
-currentQuestion++;
+  if (!resultSaved) {
+    saveScoreHistory(percentage);
+    addSubjectAttempt(currentSubject);
+    clearQuizProgress();
+    resultSaved = true;
+  }
 
-saveQuizProgress();
-updateAnswerProgress();
+  const scoreBox = document.getElementById("score");
 
-if(currentQuestion < questions.length){
-  showQuestion();
-}else{
+  if (scoreBox) {
+    scoreBox.innerText =
+      percentage + "% (" + correct + "/" + total + " benar)";
+  }
 
-showResult();
+  renderResultDashboard();
 
-}
+  let reviewHTML = "";
 
-}
+  for (let index = 0; index < total; index++) {
+    const q = questions[index];
+    const answer = answers[index];
+    const unanswered =
+      answer === undefined ||
+      answer === null ||
+      answer === -1;
 
-function showResult(){
+    const isCorrect =
+      !unanswered &&
+      answer === q.answer;
 
-hideAll();
+    if (isCorrect) continue;
 
-document.getElementById("result").classList.remove("hidden");
+    reviewHTML += `
+      <div class="review">
 
-let correct = 0;
+        <h3>Soal ${index + 1}</h3>
 
-answers.forEach((answer,index)=>{
-if(answer === questions[index].answer){
-correct++;
-}
-});
+        <div class="review-question">
+          ${formatDisplayText(q.question)}
+        </div>
 
-let percentage =
-Math.round((correct/questions.length)*100);
+        <p>
+          <strong>Jawaban kamu:</strong>
+          ${
+            unanswered
+              ? "Tidak dijawab — 0"
+              : `${answerLabel(answer)}. ${getQuestionAnswerText(q, answer)}`
+          }
+        </p>
 
-if (!resultSaved) {
-  saveScoreHistory(percentage);
-  addSubjectAttempt(currentSubject);
-  resultSaved = true;
-}
+        <p>
+          <strong>Jawaban benar:</strong>
+          ${answerLabel(q.answer)}.
+          ${getQuestionAnswerText(q, q.answer)}
+        </p>
 
-document.getElementById("score").innerText =
-percentage + "% (" + correct + "/" + questions.length + " benar)";
+        <div class="review-explanation">
+          <strong>Pembahasan</strong>
+          ${formatExplanation(q.explanation)}
+        </div>
 
-renderResultDashboard();
+      </div>
+    `;
+  }
 
-let reviewHTML = "";
+  if (reviewHTML === "") {
+    reviewHTML =
+      "<div class='review'><strong>Semua jawaban benar. Mantap.</strong></div>";
+  }
 
-answers.forEach((answer,index)=>{
+  const reviewBox = document.getElementById("review");
 
-let q = questions[index];
-
-if(answer !== q.answer){
-
-reviewHTML += `
-
-<div class="review">
-
-<h3>Soal ${index+1}</h3>
-
-<p>${q.question}</p>
-
-<p>
-<strong>Jawabanmu:</strong>
-${String.fromCharCode(65+answer)}.
-${q.options[answer]}
-</p>
-
-<p>
-<strong>Jawaban benar:</strong>
-${String.fromCharCode(65+q.answer)}.
-${q.options[q.answer]}
-</p>
-
-<p>
-<strong>Pembahasan:</strong><br>
-${q.explanation}
-</p>
-
-</div>
-
-`;
-
-}
-
-});
-
-if(reviewHTML === ""){
-reviewHTML =
-"<div class='review'><strong>Semua jawaban benar. Mantap.</strong></div>";
-}
-
-const reviewBox = document.getElementById("review");
-
-if (reviewBox) {
-  reviewBox.innerHTML = "";
-  reviewBox.style.display = "none";
-}
-
+  if (reviewBox) {
+    reviewBox.innerHTML = reviewHTML;
+    reviewBox.style.display = "block";
+  }
 }
 
 function getResultMainQuote(score) {
@@ -24709,25 +24832,43 @@ function showAttemptReview(historyIndex) {
 
   let reviewHTML = "";
 
-  attempt.answers.forEach(function(answer, index) {
+  for (let index = 0; index < attempt.questions.length; index++) {
     const q = attempt.questions[index];
-    if (!q) return;
+    if (!q) continue;
 
-    const isCorrect = answer === q.answer;
+    const answer = attempt.answers[index];
+
+    const unanswered =
+      answer === undefined ||
+      answer === null ||
+      answer === -1;
+
+    const isCorrect =
+      !unanswered &&
+      answer === q.answer;
 
     reviewHTML += `
       <div class="review">
-        <p><strong>Soal ${index + 1}</strong></p>
-        <p>${q.question}</p>
+
+        <h3>Soal ${index + 1}</h3>
+
+        <div class="review-question">
+          ${formatDisplayText(q.question)}
+        </div>
 
         <p>
           <strong>Jawaban kamu:</strong>
-          ${String.fromCharCode(65 + answer)}. ${q.options[answer]}
+          ${
+            unanswered
+              ? "Tidak dijawab — 0"
+              : `${answerLabel(answer)}. ${getQuestionAnswerText(q, answer)}`
+          }
         </p>
 
         <p>
           <strong>Jawaban benar:</strong>
-          ${String.fromCharCode(65 + q.answer)}. ${q.options[q.answer]}
+          ${answerLabel(q.answer)}.
+          ${getQuestionAnswerText(q, q.answer)}
         </p>
 
         <p>
@@ -24735,17 +24876,24 @@ function showAttemptReview(historyIndex) {
           ${isCorrect ? "✅ Benar" : "❌ Salah"}
         </p>
 
-        <p>
-          <strong>Pembahasan:</strong><br>
-          ${q.explanation || "Belum ada pembahasan."}
-        </p>
+        <div class="review-explanation">
+          <strong>Pembahasan</strong>
+          ${formatExplanation(q.explanation)}
+        </div>
+
       </div>
     `;
-  });
+  }
 
-  reviewBox.innerHTML = reviewHTML;
+  reviewBox.innerHTML =
+    reviewHTML ||
+    "<div class='review'><strong>Belum ada pembahasan.</strong></div>";
+
   reviewBox.style.display = "block";
-  reviewBox.scrollIntoView({ behavior: "smooth", block: "start" });
+  reviewBox.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
 }
 
 function drawScoreChart() {
@@ -24927,49 +25075,7 @@ function resetSubjectAttemptsForTesting(subject) {
   updateSubjectAttemptCounter();
 }  
 
-async function createMedicAccount() {
-  const name = document.getElementById("signup-name").value.trim();
-  const email = document.getElementById("signup-email").value.trim();
-  const password = document.getElementById("signup-password").value;
-  const message = document.getElementById("signup-message");
-
-  if (!name || !email || !password) {
-    message.innerText = "Isi nama, email, dan password dulu.";
-    return;
-  }
-
-  if (password.length < 6) {
-    message.innerText = "Password minimal 6 karakter.";
-    return;
-  }
-
-  message.innerText = "Membuat akun...";
-
-  const { data, error } = await supabaseClient.auth.signUp({
-    email: email,
-    password: password,
-    options: {
-      data: {
-        name: name
-      }
-    }
-  });
-
-  if (error) {
-    message.innerText = error.message;
-    return;
-  }
-
-message.innerText = "Akun berhasil dibuat 🎉";
-
-const accessOptions = document.getElementById("access-options");
-
-if (accessOptions) {
-  accessOptions.classList.remove("hidden");
-}
-
-console.log("Medic Test account:", data.user);
-}
+/* createMedicAccount is defined in the auth script above. */
 
 async function claimFreeAccess() {
   const { data: { user }, error: userError } =
@@ -25041,6 +25147,7 @@ function submitGuestPayment() {
   }
 }
   
+
 </script>
 
 <!-- RESET PASSWORD SCREEN -->
@@ -25094,54 +25201,7 @@ function submitGuestPayment() {
 
 </section>
 
-<!-- RESET PASSWORD SCREEN -->
-<section id="reset-password-screen" class="hidden">
 
-  <div class="access-card">
-
-    <div class="access-logo">
-      Medic Test ID ✨
-    </div>
-
-    <div class="access-greeting">
-      <strong>🔐 Buat password baru</strong>
-      <p>Masukkan password baru untuk akunmu.</p>
-    </div>
-
-    <div class="access-fields">
-
-      <input
-        type="password"
-        id="new-password"
-        placeholder="🔒 Password baru"
-        autocomplete="new-password"
-      >
-
-      <input
-        type="password"
-        id="confirm-new-password"
-        placeholder="🔒 Ulangi password baru"
-        autocomplete="new-password"
-      >
-
-    </div>
-
-    <button
-      type="button"
-      class="access-main-btn"
-      onclick="updateMedicPassword()"
-    >
-      Simpan Password Baru
-    </button>
-
-    <p
-      id="reset-password-message"
-      class="signup-message"
-    ></p>
-
-  </div>
-
-</section>
  
 </body>
 </html>
