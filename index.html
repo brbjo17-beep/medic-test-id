@@ -2380,82 +2380,100 @@ function showSignupForm() {
   }
 }
 
+/* ===== LOGIN AKUN ===== */
+
 async function loginMedicAccount() {
-  const email = document.getElementById("signup-email")?.value.trim();
-  const password = document.getElementById("signup-password")?.value || "";
-  const message = document.getElementById("signup-message");
+
+  const email =
+    document.getElementById("signup-email")?.value.trim();
+
+  const password =
+    document.getElementById("signup-password")?.value;
+
+  const message =
+    document.getElementById("signup-message");
 
   if (!email || !password) {
-    if (message) message.innerText = "Isi email dan password dulu.";
-    return;
-  }
-
-  if (message) message.innerText = "Sedang masuk...";
-
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if (error) {
-    console.error("Login error:", error);
-    if (message) message.innerText = "Email atau password salah.";
-    return;
-  }
-
-  if (message) message.innerText = "Berhasil masuk 🎉";
-
-  const accessOptions = document.getElementById("access-options");
-  if (accessOptions) accessOptions.classList.remove("hidden");
-
-  console.log("Login:", data.user);
-}
-
-async function createMedicAccount() {
-  const name = document.getElementById("signup-name")?.value.trim();
-  const email = document.getElementById("signup-email")?.value.trim();
-  const password = document.getElementById("signup-password")?.value || "";
-  const message = document.getElementById("signup-message");
-
-  if (!name || !email || !password) {
-    if (message) message.innerText = "Isi nama, email, dan password dulu.";
-    return;
-  }
-
-  if (password.length < 6) {
-    if (message) message.innerText = "Password minimal 6 karakter.";
-    return;
-  }
-
-  if (message) message.innerText = "Membuat akun...";
-
-  const { data, error } = await supabaseClient.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { name }
-    }
-  });
-
-  if (error) {
-    console.error("Signup error:", error);
-    if (message) message.innerText = error.message;
-    return;
-  }
-
-  if (data.session) {
-    if (message) message.innerText = "Akun berhasil dibuat 🎉";
-  } else {
     if (message) {
       message.innerText =
-        "Akun berhasil dibuat 🎉 Silakan cek email bila verifikasi diperlukan.";
+        "Isi email dan password dulu.";
     }
+    return;
   }
 
-  const accessOptions = document.getElementById("access-options");
-  if (accessOptions) accessOptions.classList.remove("hidden");
+  if (message) {
+    message.innerText = "Sedang masuk...";
+  }
 
-  console.log("Account:", data.user);
+  try {
+
+    /* Batas waktu 10 detik supaya tidak menggantung selamanya */
+    const loginRequest =
+      supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+    const timeout =
+      new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(
+            new Error(
+              "Login timeout. Supabase tidak merespons dalam 10 detik."
+            )
+          );
+        }, 10000);
+      });
+
+    const { data, error } =
+      await Promise.race([
+        loginRequest,
+        timeout
+      ]);
+
+    if (error) {
+      console.error("LOGIN ERROR:", error);
+
+      if (message) {
+        message.innerText =
+          error.message ||
+          "Email atau password salah.";
+      }
+
+      return;
+    }
+
+    console.log("LOGIN BERHASIL:", data);
+
+    if (message) {
+      message.innerText =
+        "Berhasil masuk 🎉";
+    }
+
+    const accessOptions =
+      document.getElementById("access-options");
+
+    if (accessOptions) {
+      accessOptions.classList.remove("hidden");
+    }
+
+  } catch (error) {
+
+    console.error("LOGIN EXCEPTION:", error);
+
+    if (message) {
+
+      if (
+        error.message?.includes("timeout")
+      ) {
+        message.innerText =
+          "Login terlalu lama. Coba refresh lalu masuk lagi.";
+      } else {
+        message.innerText =
+          "Login gagal: " + error.message;
+      }
+    }
+  }
 }
 
 /* ===== LUPA PASSWORD ===== */
@@ -2662,6 +2680,12 @@ function backFromSupport() {
         <span class="subject-status coming">Segera hadir</span>
       </div>
 
+  <div class="card" onclick="openSubject('Soal Mix')">
+  <div class="subject-icon">🧠</div>
+  <strong>Soal Mix</strong>
+  <span class="subject-status">Tersedia</span>
+</div>
+     
     </div>
 
   </section>
@@ -23826,6 +23850,15 @@ explanation: "Botulisme disebabkan oleh toksin botulinum (dari Clostridium botul
   "Bank 4": [],
   "Bank 5": []
 },
+
+  "Soal Mix": {
+    "Bank 1": [],
+    "Bank 2": [],
+    "Bank 3": [],
+    "Bank 4": [],
+    "Bank 5": []
+  }
+
 };
 
 let questions = [];
@@ -24973,15 +25006,16 @@ const y =
 }
 
 function renderResultSubjectMenu() {
-  const subjects = [
-    "Anatomi",
-    "Fisiologi",
-    "Histologi",
-    "Biokimia",
-    "Farmakologi",
-    "Mikrobiologi",
-    "Parasitologi"
-  ];
+const subjects = [
+  "Anatomi",
+  "Fisiologi",
+  "Histologi",
+  "Biokimia",
+  "Farmakologi",
+  "Mikrobiologi",
+  "Parasitologi",
+  "Soal Mix"
+];
 
   const menu = document.getElementById("result-subject-menu");
   if (!menu) return;
