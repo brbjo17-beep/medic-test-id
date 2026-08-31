@@ -2536,49 +2536,32 @@ function showSignupForm() {
 }
 
 
-/* =========================================================
-   BUAT AKUN
-   ========================================================= */
-
 async function createMedicAccount() {
-
   const name =
-    document.getElementById(
-      "signup-name"
-    )?.value.trim();
+    document.getElementById("signup-name")?.value.trim();
 
   const email =
-    document.getElementById(
-      "signup-email"
-    )?.value.trim();
+    document.getElementById("signup-email")?.value.trim();
 
   const password =
-    document.getElementById(
-      "signup-password"
-    )?.value;
+    document.getElementById("signup-password")?.value;
 
   const message =
-    document.getElementById(
-      "signup-message"
-    );
+    document.getElementById("signup-message");
 
   if (!name || !email || !password) {
-
     if (message) {
       message.innerText =
         "Isi nama, email, dan password dulu.";
     }
-
     return;
   }
 
   if (password.length < 6) {
-
     if (message) {
       message.innerText =
         "Password minimal 6 karakter.";
     }
-
     return;
   }
 
@@ -2590,39 +2573,55 @@ async function createMedicAccount() {
   try {
 
     const { data, error } =
-      await window.supabaseClient.auth.signUp({
+      await supabaseClient.auth.signUp({
         email: email,
         password: password,
 
         options: {
+          emailRedirectTo:
+            "https://brbjo17-beep.github.io/medic-test-id/",
+
           data: {
             name: name
           }
         }
-
       });
 
     if (error) {
-
-      console.error(
-        "SIGNUP ERROR:",
-        error
-      );
+      console.error("SIGNUP ERROR:", error);
 
       if (message) {
         message.innerText =
           error.message ||
-          "Akun gagal dibuat.";
+          "Gagal membuat akun.";
       }
 
       return;
     }
 
+    console.log("SIGNUP BERHASIL:", data);
+
+    if (message) {
+      message.innerText =
+        "Akun berhasil dibuat 🎉 Cek emailmu untuk konfirmasi.";
+    }
+
+  } catch (error) {
+
+    console.error("SIGNUP EXCEPTION:", error);
+
+    if (message) {
+      message.innerText =
+        "Gagal membuat akun: " +
+        error.message;
+    }
+  }
+}
+
 
     /*
       Kalau Supabase membutuhkan
-      konfirmasi email, identitas user
-      tetap dibuat tetapi session bisa null.
+      konfirmasi email,
     */
 
     if (data?.session) {
