@@ -2206,14 +2206,12 @@ background:
  
 
 
-  
-
 
 <script>
 const SUPABASE_URL = "https://niatujddqynppnazovra.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_kZXvoJsMa9JLi6D2D3fCag_K_KR7xva";
 
-const supabaseClient = supabase.createClient(
+window.supabaseClient = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
@@ -2345,6 +2343,7 @@ function showLoginForm() {
   }
 }
 
+
 function showSignupForm() {
   const nameInput = document.getElementById("signup-name");
   const passwordInput = document.getElementById("signup-password");
@@ -2380,6 +2379,7 @@ function showSignupForm() {
   }
 }
 
+
 /* ===== LOGIN AKUN ===== */
 
 async function loginMedicAccount() {
@@ -2407,43 +2407,24 @@ async function loginMedicAccount() {
 
   try {
 
-    /* Batas waktu 10 detik supaya tidak menggantung selamanya */
-    const loginRequest =
-      supabaseClient.auth.signInWithPassword({
+    const { data, error } =
+      await window.supabaseClient.auth.signInWithPassword({
         email: email,
         password: password
       });
-
-    const timeout =
-      new Promise((_, reject) => {
-        setTimeout(() => {
-          reject(
-            new Error(
-              "Login timeout. Supabase tidak merespons dalam 10 detik."
-            )
-          );
-        }, 10000);
-      });
-
-    const { data, error } =
-      await Promise.race([
-        loginRequest,
-        timeout
-      ]);
 
     if (error) {
       console.error("LOGIN ERROR:", error);
 
       if (message) {
         message.innerText =
-          error.message ||
-          "Email atau password salah.";
+          error.message || "Login gagal.";
       }
 
       return;
     }
 
-    console.log("LOGIN BERHASIL:", data);
+    console.log("LOGIN BERHASIL:", data.user);
 
     if (message) {
       message.innerText =
@@ -2462,60 +2443,93 @@ async function loginMedicAccount() {
     console.error("LOGIN EXCEPTION:", error);
 
     if (message) {
-
-      if (
-        error.message?.includes("timeout")
-      ) {
-        message.innerText =
-          "Login terlalu lama. Coba refresh lalu masuk lagi.";
-      } else {
-        message.innerText =
-          "Login gagal: " + error.message;
-      }
+      message.innerText =
+        "Login gagal: " + error.message;
     }
   }
 }
 
+
 /* ===== LUPA PASSWORD ===== */
 
 async function forgotMedicPassword() {
-  const email = document.getElementById("signup-email")?.value.trim();
-  const message = document.getElementById("signup-message");
+
+  const email =
+    document.getElementById("signup-email")?.value.trim();
+
+  const message =
+    document.getElementById("signup-message");
 
   if (!email) {
-    if (message) message.innerText = "Masukkan email akunmu dulu.";
-    return;
-  }
-
-  if (message) message.innerText = "Mengirim link reset password...";
-
-  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-    redirectTo: "https://brbjo17-beep.github.io/medic-test-id/"
-  });
-
-  if (error) {
-    console.error("Reset password error:", error);
-
     if (message) {
-      if (
-        error.status === 429 ||
-        error.message?.toLowerCase().includes("rate limit")
-      ) {
-        message.innerText =
-          "Terlalu banyak permintaan reset. Tunggu sebentar lalu coba lagi.";
-      } else {
-        message.innerText =
-          "Gagal mengirim link reset password. Coba lagi nanti.";
-      }
+      message.innerText =
+        "Masukkan email akunmu dulu.";
     }
     return;
   }
 
   if (message) {
     message.innerText =
-      "Link reset password sudah dikirim ke emailmu ✉️";
+      "Mengirim link reset password...";
+  }
+
+  try {
+
+    const { error } =
+      await window.supabaseClient.auth.resetPasswordForEmail(
+        email,
+        {
+          redirectTo:
+            "https://brbjo17-beep.github.io/medic-test-id/"
+        }
+      );
+
+    if (error) {
+      console.error(
+        "RESET PASSWORD ERROR:",
+        error
+      );
+
+      if (message) {
+
+        if (
+          error.status === 429 ||
+          error.message
+            ?.toLowerCase()
+            .includes("rate limit")
+        ) {
+          message.innerText =
+            "Terlalu banyak permintaan reset. Tunggu sebentar lalu coba lagi.";
+        } else {
+          message.innerText =
+            error.message ||
+            "Gagal mengirim link reset password.";
+        }
+      }
+
+      return;
+    }
+
+    if (message) {
+      message.innerText =
+        "Link reset password sudah dikirim ke emailmu ✉️";
+    }
+
+  } catch (error) {
+
+    console.error(
+      "RESET PASSWORD EXCEPTION:",
+      error
+    );
+
+    if (message) {
+      message.innerText =
+        "Gagal mengirim link reset password: " +
+        error.message;
+    }
   }
 }
+
 
 /* ===== ACCESS / SUPPORT ===== */
 
